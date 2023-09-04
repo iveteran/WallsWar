@@ -1,34 +1,34 @@
 #pragma once
 
-// ÒÔÏÂÎªÉè¼Æ³ß´ç
+// ä»¥ä¸‹ä¸ºè®¾è®¡å°ºå¯¸
 
-// ´°¿Ú´óĞ¡
+// çª—å£å¤§å°
 constexpr float WINDOW_WIDTH = 256;
 constexpr float WINDOW_HEIGHT = 224;
 
-// ¼ıÍ·Î»ÖÃ
+// ç®­å¤´ä½ç½®
 constexpr float ARROWS_X = 75;
 constexpr float ARROWS_Y = 132;
 constexpr float ARROWS_DIS = 15;
 
-// ÖĞ¼äºÚÉ«ÓÎÏ·ÇøÓò´óĞ¡
+// ä¸­é—´é»‘è‰²æ¸¸æˆåŒºåŸŸå¤§å°
 constexpr float CENTER_WIDTH = 208;
 constexpr float CENTER_HEIGHT = 208;
 
-// ·½¿é´óĞ¡
+// æ–¹å—å¤§å°
 constexpr float BLOCK_SIZE = 8;
 
-// Ì¹¿Ë´óĞ¡
+// å¦å…‹å¤§å°
 constexpr float TANK_SIZE = 16;
 
-// Íæ¼ÒÌ¹¿Ë³õÊ¼Î»ÖÃ
+// ç©å®¶å¦å…‹åˆå§‹ä½ç½®
 constexpr float PLAYER1_START_X = 80;
 constexpr float PLAYER1_START_Y = 8;
 
 constexpr float PLAYER2_START_X = 128;
 constexpr float PLAYER2_START_Y = 8;
 
-// µĞ·½Ì¹¿Ë³õÊ¼Î»ÖÃ
+// æ•Œæ–¹å¦å…‹åˆå§‹ä½ç½®
 constexpr float ENEMY1_STAR_X = 8;
 constexpr float ENEMY1_STAR_Y = 200;
 
@@ -38,20 +38,20 @@ constexpr float ENEMY2_STAR_Y = 200;
 constexpr float ENEMY3_STAR_X = 200;
 constexpr float ENEMY3_STAR_Y = 200;
 
-// ´ó±¾ÓªÎ»ÖÃ
+// å¤§æœ¬è¥ä½ç½®
 constexpr float CAMP_X = 104;
 constexpr float CAMP_Y = 8;
 
-// ×Óµ¯´óĞ¡
+// å­å¼¹å¤§å°
 constexpr float BULLET_SIZE = 4;
 
-// µĞ·½Ì¹¿Ë×ÜÊı
+// æ•Œæ–¹å¦å…‹æ€»æ•°
 constexpr unsigned char ENEMIES_COUNT = 20;
 
-// µĞ·½Ì¹¿ËÒÆ¶¯100¾àÀëºó¿É¸ü¸Ä·½Ïò
+// æ•Œæ–¹å¦å…‹ç§»åŠ¨100è·ç¦»åå¯æ›´æ”¹æ–¹å‘
 constexpr int MAX_MOVE_DISTANCE = 100;
 
-// ¹Ø¿¨×ÜÊı
+// å…³å¡æ€»æ•°
 constexpr short STAGE_COUNT = 35;
 
 enum class Dir {

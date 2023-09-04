@@ -87,7 +87,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // Set the design resolution
     glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::FIXED_HEIGHT);
 
-    // Ä£ÄâÆÁÄ»´óÐ¡
+    // æ¨¡æ‹Ÿå±å¹•å¤§å°
     glview->setFrameSize(1280, 768);
 
     register_all_packages();

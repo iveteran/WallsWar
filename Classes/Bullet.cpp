@@ -36,7 +36,7 @@ void Bullet::setLevel(BulletLevel lev) {
 void Bullet::addSpriteFrameCache() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
-    // �ӵ�
+    // 子弹
     auto* bullet_l = Sprite::create("images/bullet/bullet-0.png")->getSpriteFrame();
     auto* bullet_u = Sprite::create("images/bullet/bullet-1.png")->getSpriteFrame();
     auto* bullet_r = Sprite::create("images/bullet/bullet-2.png")->getSpriteFrame();
@@ -52,7 +52,7 @@ void Bullet::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(bullet_r, "bullet_r");
     spriteFrameCache->addSpriteFrame(bullet_d, "bullet_d");
 
-    // �ӵ���ը
+    // 子弹爆炸
     auto* bumb_0 = Sprite::create("images/bullet/bumb0.png")->getSpriteFrame();
     auto* bumb_1 = Sprite::create("images/bullet/bumb1.png")->getSpriteFrame();
     auto* bumb_2 = Sprite::create("images/bullet/bumb2.png")->getSpriteFrame();
@@ -91,10 +91,10 @@ void Bullet::__showEffect() {
 }
 
 void Bullet::__autoMove(float t) {
-    // 1. �ƶ�ʱ���͵�ͼ��Ե����ײ
-    // 2. �ƶ�ʱ���ͷ������ײ
-    // 3. �ƶ�ʱ����̹�˵���ײ
-    // 4. �ƶ�ʱ�����ӵ�����ײ
+    // 1. 移动时检测和地图边缘的碰撞
+    // 2. 移动时检测和方块的碰撞
+    // 3. 移动时检测和坦克的碰撞
+    // 4. 移动时检测和子弹的碰撞
 
     auto position = this->getPosition();
     auto step = 1;
@@ -102,7 +102,7 @@ void Bullet::__autoMove(float t) {
         step = 2;
     }
 
-    // ��������ƶ�
+    // 假设可以移动
     switch (dir) {
     case Dir::LEFT:
         this->setPositionX(position.x - step);
@@ -120,13 +120,13 @@ void Bullet::__autoMove(float t) {
         break;
     }
 
-    // ���������ײ:
-    // <1> �����ӵ�
-    // <2.1> ����ǵ��ˣ�����˵�Ѫ
-    // <2.2> ����Ƿ��飬�򷽿鱻�ݻ�(������ҵȼ�)
-    // <2.3> �����ǽ�ڣ���ʲô������
-    // <3> չʾ�ӵ���ײ��Ч
-    // <4> ֹͣ�Զ��ƶ�
+    // 如果产生碰撞:
+    // <1> 隐藏子弹
+    // <2.1> 如果是敌人，则敌人掉血
+    // <2.2> 如果是方块，则方块被摧毁(根据玩家等级)
+    // <2.3> 如果是墙壁，则什么都不做
+    // <3> 展示子弹碰撞特效
+    // <4> 停止自动移动
     if (__isBlockIntersection() || __isMapIntersection()) {
         this->setVisible(false);
         this->__showEffect();
@@ -153,26 +153,26 @@ bool Bullet::__isMapIntersection() {
 }
 
 bool Bullet::__isBlockIntersection() {
-    // �õ����з���λ��
+    // 得到所有方块位置
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
     auto box = getBoundingBox();
     auto count = 0;
 
     for (auto it = blocks.begin(); it != blocks.end(); ) {
         auto block = (*it);
-        // �����ϰ���
+        // 碰到障碍物
         if (block->getCategory() == BlockCategory::OBSTACLE
             && box.intersectsRect(block->getBoundingBox())) {
             if (block->getType() == BlockType::WALL) {
-                // ����ǽ
+                // 碰到墙
                 auto result =
                     dynamic_cast<BlockWall*>(block)->destory(this->dir, box);
 
                 if (result.first) {
-                    // ������ײ
+                    // 发生碰撞
                     count++;
                     if (result.second) {
-                        // ������ײ�ұ��ݻ�
+                        // 发生碰撞且被摧毁
                         block->removeFromParent();
                         it = blocks.erase(it);
                     } else {
@@ -184,7 +184,7 @@ bool Bullet::__isBlockIntersection() {
 
 
             } else if (block->getType() == BlockType::STONE) {
-                // ����ʯͷ
+                // 碰到石头
                 if (level >= 2) {
                     count++;
                     block->removeFromParent();
@@ -197,7 +197,7 @@ bool Bullet::__isBlockIntersection() {
                     ++it;
                 }
             } else {
-                // ������Ӫ
+                // 碰到大本营
                 AudioEngine::play2d("music/camp_bomb.mp3");
                 MapLayer::getInstance()->getCamp()->setTexture(
                     SpriteFrameCache::getInstance()->getSpriteFrameByName("camp_1")->getTexture());
@@ -207,7 +207,7 @@ bool Bullet::__isBlockIntersection() {
             }
 
         } else {
-            // û�������ϰ���
+            // 没有碰到障碍物
             ++it;
         }
     }

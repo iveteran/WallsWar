@@ -19,12 +19,12 @@ public:
 private:
     void __autoMove(float t);
     void __stopMove();
-    bool __isMapIntersection();                     // ¼ì²âºÍµØÍ¼±ßÔµµÄÅö×²
-    bool __isBlockIntersection();                   // ¼ì²âºÍ·½¿éµÄÅö×²
-    virtual bool __isTankIntersection() = 0;        // ¼ì²âºÍÌ¹¿ËµÄÅö×²
-    virtual bool __isBulletIntersection() = 0;      // ¼ì²âºÍ×Óµ¯µÄÅö×²
-    void __showEffect();                            // Õ¹Ê¾Åö×²ÌØĞ§
+    bool __isMapIntersection();                     // æ£€æµ‹å’Œåœ°å›¾è¾¹ç¼˜çš„ç¢°æ’
+    bool __isBlockIntersection();                   // æ£€æµ‹å’Œæ–¹å—çš„ç¢°æ’
+    virtual bool __isTankIntersection() = 0;        // æ£€æµ‹å’Œå¦å…‹çš„ç¢°æ’
+    virtual bool __isBulletIntersection() = 0;      // æ£€æµ‹å’Œå­å¼¹çš„ç¢°æ’
+    void __showEffect();                            // å±•ç¤ºç¢°æ’ç‰¹æ•ˆ
 
-    Dir dir{};                                      // ×Óµ¯·½Ïò
-    BulletLevel level{};                            // ×Óµ¯µÈ¼¶
+    Dir dir{};                                      // å­å¼¹æ–¹å‘
+    BulletLevel level{};                            // å­å¼¹ç­‰çº§
 };

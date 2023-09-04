@@ -13,41 +13,41 @@ class MapLayer : public cocos2d::LayerColor {
 public:
     bool init() override;
 
-    static MapLayer* getInstance();                 // µÃµ½µØÍ¼Í¼²ãÊµÀı
+    static MapLayer* getInstance();                 // å¾—åˆ°åœ°å›¾å›¾å±‚å®ä¾‹
 
-    void loadLevelData(short stage);                // ¼ÓÔØÖ¸¶¨¹Ø¿¨µÄÊı¾İ
+    void loadLevelData(short stage);                // åŠ è½½æŒ‡å®šå…³å¡çš„æ•°æ®
 
-    Block* getCamp();                               // µÃµ½´ó±¾Óª
-    PlayerTank* getPlayer1();                       // µÃµ½Íæ¼Ò1
-    const std::string& getMapData();                // µÃµ½µØÍ¼Êı¾İ
-    cocos2d::Vector<Block*>& getAllBlocks();        // µÃµ½ËùÓĞ·½¿é
-    cocos2d::Vector<EnemyTank*>& getEnemies();      // µÃµ½µĞ·½Ì¹¿Ë
-    cocos2d::Vector<PlayerTank*>& getPlayers();     // µÃµ½Íæ¼ÒÌ¹¿Ë
+    Block* getCamp();                               // å¾—åˆ°å¤§æœ¬è¥
+    PlayerTank* getPlayer1();                       // å¾—åˆ°ç©å®¶1
+    const std::string& getMapData();                // å¾—åˆ°åœ°å›¾æ•°æ®
+    cocos2d::Vector<Block*>& getAllBlocks();        // å¾—åˆ°æ‰€æœ‰æ–¹å—
+    cocos2d::Vector<EnemyTank*>& getEnemies();      // å¾—åˆ°æ•Œæ–¹å¦å…‹
+    cocos2d::Vector<PlayerTank*>& getPlayers();     // å¾—åˆ°ç©å®¶å¦å…‹
 
-    void enableAutoAddEnemies(bool b = true);       // ÆôÓÃ×Ô¶¯Ìí¼ÓµĞÈË
-    void enableAutoControlEnemies(bool b = true);   // ÆôÓÃ×Ô¶¯¿ØÖÆµĞÈË
+    void enableAutoAddEnemies(bool b = true);       // å¯ç”¨è‡ªåŠ¨æ·»åŠ æ•Œäºº
+    void enableAutoControlEnemies(bool b = true);   // å¯ç”¨è‡ªåŠ¨æ§åˆ¶æ•Œäºº
 
-    void addPlayer();                               // Ìí¼ÓÍæ¼Ò
-    void addEnemies();                              // Ìí¼ÓµĞÈË
+    void addPlayer();                               // æ·»åŠ ç©å®¶
+    void addEnemies();                              // æ·»åŠ æ•Œäºº
 
-    void resetMap();                                // ÇåÀí¹¤×÷
+    void resetMap();                                // æ¸…ç†å·¥ä½œ
 
-    unsigned char remainTank = ENEMIES_COUNT;       // Ê£ÓàÎ´³öÉúµÄµĞ·½Ì¹¿Ë
-    bool isCampOk = true;                           // ´ó±¾ÓªÊÇ·ñÍêºÃ
+    unsigned char remainTank = ENEMIES_COUNT;       // å‰©ä½™æœªå‡ºç”Ÿçš„æ•Œæ–¹å¦å…‹
+    bool isCampOk = true;                           // å¤§æœ¬è¥æ˜¯å¦å®Œå¥½
 
 private:
-    CREATE_FUNC(MapLayer);                          // µ¥Àı¶ÔÏó
+    CREATE_FUNC(MapLayer);                          // å•ä¾‹å¯¹è±¡
 
-    void __addSpriteFrameCache();                   // ¼ÓÔØ¾«ÁéÖ¡»º´æ
-    void __addEnemy(float x, float y);              // Ìí¼ÓÒ»Á¾µĞ·½Ì¹¿Ë
+    void __addSpriteFrameCache();                   // åŠ è½½ç²¾çµå¸§ç¼“å­˜
+    void __addEnemy(float x, float y);              // æ·»åŠ ä¸€è¾†æ•Œæ–¹å¦å…‹
 
-    void autoAddEnemies(float);                     // ×Ô¶¯Ìí¼ÓµĞÈË
-    void autoControlEnemiesDirection(float);        // ×Ô¶¯¿ØÖÆµĞÈË·½Ïò
-    void autoControlEnemiesShoot(float);            // ×Ô¶¯¿ØÖÆµĞÈË·¢Éä×Óµ¯
+    void autoAddEnemies(float);                     // è‡ªåŠ¨æ·»åŠ æ•Œäºº
+    void autoControlEnemiesDirection(float);        // è‡ªåŠ¨æ§åˆ¶æ•Œäººæ–¹å‘
+    void autoControlEnemiesShoot(float);            // è‡ªåŠ¨æ§åˆ¶æ•Œäººå‘å°„å­å¼¹
 
-    cocos2d::Vector<Block*> blocks;                 // ¹ÜÀíËùÓĞ·½¿é
-    cocos2d::Vector<PlayerTank*> players;           // ¹ÜÀíÍæ¼ÒÌ¹¿Ë
-    cocos2d::Vector<EnemyTank*> enemies;            // ¹ÜÀíµĞ·½Ì¹¿Ë
+    cocos2d::Vector<Block*> blocks;                 // ç®¡ç†æ‰€æœ‰æ–¹å—
+    cocos2d::Vector<PlayerTank*> players;           // ç®¡ç†ç©å®¶å¦å…‹
+    cocos2d::Vector<EnemyTank*> enemies;            // ç®¡ç†æ•Œæ–¹å¦å…‹
 
-    std::string data;                               // µØÍ¼Êı¾İ
+    std::string data;                               // åœ°å›¾æ•°æ®
 };

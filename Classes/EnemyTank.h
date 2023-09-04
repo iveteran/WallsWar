@@ -10,9 +10,9 @@ public:
 
     void setDir(Dir d) override;
 
-    static void loadFrameAnimation();                          // ¼ÓÔØÌ¹¿ËÒÆ¶¯Ö¡¶¯»­
-    void changeDirection();                                    // ¸ü¸Ä·½Ïò
-    virtual void disBlood();                                   // Ì¹¿ËµôÑª
+    static void loadFrameAnimation();                          // åŠ è½½å¦å…‹ç§»åŠ¨å¸§åŠ¨ç”»
+    void changeDirection();                                    // æ›´æ”¹æ–¹å‘
+    virtual void disBlood();                                   // å¦å…‹æ‰è¡€
 
 protected:
     void __initBullets() override;
@@ -20,8 +20,8 @@ protected:
         __getAnimations() override;
 
 private:
-    static cocos2d::Vector<cocos2d::Animate*> animations[4];   // ´æ´¢Ì¹¿ËÒÆ¶¯Ö¡¶¯»­£¨·½ÏòºÍµÈ¼¶£©
-    bool canChangeDir = false;                                 // ÄÜ·ñ¸ü¸Ä·½Ïò
+    static cocos2d::Vector<cocos2d::Animate*> animations[4];   // å­˜å‚¨å¦å…‹ç§»åŠ¨å¸§åŠ¨ç”»ï¼ˆæ–¹å‘å’Œç­‰çº§ï¼‰
+    bool canChangeDir = false;                                 // èƒ½å¦æ›´æ”¹æ–¹å‘
 
     bool __isTankIntersection() override;
 };

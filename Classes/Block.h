@@ -4,14 +4,14 @@
 #include "cocos2d.h"
 #include <utility>
 
-// ·½¿é·ÖÀà
+// æ–¹å—åˆ†ç±»
 enum class BlockCategory {
-    OBSTACLE,                     // Ì¹¿Ë²»ÄÜÍ¨¹ı£¬×Óµ¯¿ÉÒÔ´İ»Ù
-    NON_OBSTACLE,                 // Ì¹¿Ë¿ÉÒÔÍ¨¹ı£¬×Óµ¯²»ÄÜ´İ»Ù
-    RIVER                         // Ì¹¿Ë²»ÄÜÍ¨¹ı£¬×Óµ¯²»ÄÜ´İ»Ù
+    OBSTACLE,                     // å¦å…‹ä¸èƒ½é€šè¿‡ï¼Œå­å¼¹å¯ä»¥æ‘§æ¯
+    NON_OBSTACLE,                 // å¦å…‹å¯ä»¥é€šè¿‡ï¼Œå­å¼¹ä¸èƒ½æ‘§æ¯
+    RIVER                         // å¦å…‹ä¸èƒ½é€šè¿‡ï¼Œå­å¼¹ä¸èƒ½æ‘§æ¯
 };
 
-// ·½¿éÀàĞÍ
+// æ–¹å—ç±»å‹
 enum class BlockType {
     CAMP,
     FOREST,
@@ -24,7 +24,7 @@ enum class BlockType {
 
 class Block : public cocos2d::Sprite {
 public:
-    bool init() override;             // µ÷ÓÃ¸¸ÀàµÄinit
+    bool init() override;             // è°ƒç”¨çˆ¶ç±»çš„init
 
     virtual BlockCategory getCategory() = 0;
     virtual BlockType getType() { return BlockType::UNDIFINE; }
@@ -65,8 +65,8 @@ public:
     CREATE_FUNC(BlockWall);
 
 private:
-    cocos2d::LayerColor* blacks[4]{};        // 4¸öºÚÉ«·½¿é£¬ÓÃÓÚÕÚµ²
-    bool __isDestory();                      // ¼ì²â·½¿éÊÇ·ñ±»´İ»Ù
+    cocos2d::LayerColor* blacks[4]{};        // 4ä¸ªé»‘è‰²æ–¹å—ï¼Œç”¨äºé®æŒ¡
+    bool __isDestory();                      // æ£€æµ‹æ–¹å—æ˜¯å¦è¢«æ‘§æ¯
 };
 
 class BlockStone : public __Obstacle {

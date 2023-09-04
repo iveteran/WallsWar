@@ -14,13 +14,13 @@ bool PlayerTank::init() {
         return false;
     }
 
-    // Íæ¼Ò³öÉúÊ±ÑªÁ¿Îª3
+    // ç©å®¶å‡ºç”Ÿæ—¶è¡€é‡ä¸º3
     blood = 3;
 
-    // Õ¹Ê¾³öÉú¶¯»­
+    // å±•ç¤ºå‡ºç”ŸåŠ¨ç”»
     birth("player1_1_" + std::to_string(level));
 
-    // Íæ¼Ò³öÉúÊ±·½ÏòÏòÉÏ
+    // ç©å®¶å‡ºç”Ÿæ—¶æ–¹å‘å‘ä¸Š
     dir = Dir::UP;
 
     return true;
@@ -35,18 +35,18 @@ void PlayerTank::setDir(Dir d) {
 
     dir = d;
 
-    // µ±¸Ä±ä·½ÏòÊ±£¬½«×ø±êµ÷ÕûÎª×î½Ó½üÓÚ8µÄ±¶Êı
+    // å½“æ”¹å˜æ–¹å‘æ—¶ï¼Œå°†åæ ‡è°ƒæ•´ä¸ºæœ€æ¥è¿‘äº8çš„å€æ•°
     __adjustPosition();
 
     std::string name = "player1_" + std::to_string((int)dir) + "_"
         + std::to_string(level);
 
-    // ¸ü»»Í¼Æ¬
+    // æ›´æ¢å›¾ç‰‡
     this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
 }
 
 void PlayerTank::__initBullets() {
-    // Íæ¼Ò×î¶àÓµÓĞÁ½¿Å×Óµ¯
+    // ç©å®¶æœ€å¤šæ‹¥æœ‰ä¸¤é¢—å­å¼¹
     auto bullet1 = PlayerBullet::create();
     auto bullet2 = PlayerBullet::create();
     bullets.pushBack(bullet1);
@@ -70,10 +70,10 @@ void PlayerTank::loadFrameAnimation() {
 
     Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
 
-    // ×Ü¹²4¸öµÈ¼¶
+    // æ€»å…±4ä¸ªç­‰çº§
     for (int i = 0; i < 4; i++) {
         std::string lev = std::to_string(i);
-        // ×Ü¹²4¸ö·½Ïò
+        // æ€»å…±4ä¸ªæ–¹å‘
         for (int j = 0; j < 4; j++) {
             std::string d = std::to_string(j);
             auto player1_1 = SpriteFrame::create("images/player1_tank/m" + lev + "-" + d + "-1.png", tankRect);
@@ -83,10 +83,10 @@ void PlayerTank::loadFrameAnimation() {
             player1_1->getTexture()->setAliasTexParameters();
             player1_2->getTexture()->setAliasTexParameters();
 
-            // Ìí¼Óµ½»º´æ
+            // æ·»åŠ åˆ°ç¼“å­˜
             spriteFrameCache->addSpriteFrame(player1_1, "player1_" + d + "_" + lev);
 
-            // ±£´æ
+            // ä¿å­˜
             animations[j].pushBack(Animate::create(player1));
         }
     }
@@ -108,9 +108,9 @@ void PlayerTank::shoot() {
         bullet1->setLevel(level);
         __shoot(bullet1);
     } else if (bullet1->isVisible() && bullet2->isVisible()) {
-        // Ê²Ã´¶¼²»×ö
+        // ä»€ä¹ˆéƒ½ä¸åš
     } else if (level >= 2) {
-        // ´ËÊ±¿É·¢ÉäÁ½Ã¶×Óµ¯
+        // æ­¤æ—¶å¯å‘å°„ä¸¤æšå­å¼¹
         if (bullet1->isVisible()) {
             bullet2->setLevel(level);
             __shoot(bullet2);
@@ -142,14 +142,14 @@ void PlayerTank::disBlood() {
         spriteFrames.pushBack(spriteFrame);
     }
 
-    // TODO Ã¿´ÎËÀÍö¶¼ÖØĞÂ¹¹Ôì¶¯»­
+    // TODO æ¯æ¬¡æ­»äº¡éƒ½é‡æ–°æ„é€ åŠ¨ç”»
     auto blastAnimation = Animation::createWithSpriteFrames(spriteFrames, 0.1f);
     auto blastanimate = Animate::create(blastAnimation);
 
-    // ²¥·ÅÒôĞ§
+    // æ’­æ”¾éŸ³æ•ˆ
     AudioEngine::play2d("music/enemy-bomb.mp3");
 
-    // ²¥·Å¶¯»­
+    // æ’­æ”¾åŠ¨ç”»
     auto node = Sprite::create();
     MapLayer::getInstance()->addChild(node);
     node->setPosition(this->getPosition());
@@ -158,12 +158,12 @@ void PlayerTank::disBlood() {
                                      nullptr));
 
     if (--blood == 0) {
-        // ÒÆ³ı¸ÃÌ¹¿Ë
+        // ç§»é™¤è¯¥å¦å…‹
         auto& players = MapLayer::getInstance()->getPlayers();
         players.eraseObject(this);
         this->removeFromParentAndCleanup(true);
 
-        // ÏÔÊ¾Ò»¸ö´Ó×óµ½ÓÒµÄ¶¯»­
+        // æ˜¾ç¤ºä¸€ä¸ªä»å·¦åˆ°å³çš„åŠ¨ç”»
         auto gameover = Sprite::create("images/gameover.png");
         gameover->getTexture()->setAliasTexParameters();
         MapLayer::getInstance()->addChild(gameover);
@@ -175,9 +175,9 @@ void PlayerTank::disBlood() {
                                              CallFunc::create([gameover](){gameover->removeFromParent();}), 
                                              nullptr));
     } else {
-        // ²¥·Å¶¯»­
-        this->isInvincible = true; // ·ÀÖ¹µôÑª
-        // »Øµ½³öÉúµã
+        // æ’­æ”¾åŠ¨ç”»
+        this->isInvincible = true; // é˜²æ­¢æ‰è¡€
+        // å›åˆ°å‡ºç”Ÿç‚¹
         birth("player1_" + std::to_string((int)dir) + "_" + std::to_string(level));
     }
 }

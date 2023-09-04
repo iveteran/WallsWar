@@ -18,10 +18,10 @@ bool MapLayer::init() {
         return false;
     }
 
-    // ÉèÖÃ±³¾°ÑÕÉ«ÎªºÚÉ«
+    // è®¾ç½®èƒŒæ™¯é¢œè‰²ä¸ºé»‘è‰²
     this->initWithColor(Color4B(0, 0, 0, 255));
 
-    // ¼ÓÔØ¾«ÁéÖ¡»º´æ
+    // åŠ è½½ç²¾çµå¸§ç¼“å­˜
     __addSpriteFrameCache();
 
     return true;
@@ -37,16 +37,16 @@ MapLayer* MapLayer::getInstance() {
 }
 
 void MapLayer::__addSpriteFrameCache() {
-    // ÓÒ²àĞÅÏ¢ÇøÓò
+    // å³ä¾§ä¿¡æ¯åŒºåŸŸ
     GameScene::addSpriteFrameCache();
 
-    // ·½¿é
+    // æ–¹å—
     Block::addSpriteFrameCache();
 
-    // ×Óµ¯
+    // å­å¼¹
     Bullet::addSpriteFrameCache();
 
-    // Ì¹¿Ë
+    // å¦å…‹
     TankBase::addSpriteFrameCache();
     PlayerTank::loadFrameAnimation();
     EnemyTank::loadFrameAnimation();
@@ -93,7 +93,7 @@ void MapLayer::autoControlEnemiesDirection(float) {
 
 void MapLayer::autoControlEnemiesShoot(float) {
     for (auto enemy : enemies) {
-        // Èı·ÖÖ®Ò»µÄ¸ÅÂÊ·¢Éä×Óµ¯
+        // ä¸‰åˆ†ä¹‹ä¸€çš„æ¦‚ç‡å‘å°„å­å¼¹
         if (RandomUtil::random(1, 3) == 1)
             enemy->shoot();
     }
@@ -113,7 +113,7 @@ void MapLayer::addPlayer() {
 }
 
 void MapLayer::addEnemies() {
-    // ³õÊ¼Ê±Ìí¼Ó3Á¾Ì¹¿Ë
+    // åˆå§‹æ—¶æ·»åŠ 3è¾†å¦å…‹
     if (remainTank == ENEMIES_COUNT) {
         __addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
         __addEnemy(ENEMY2_STAR_X, ENEMY2_STAR_Y);
@@ -121,9 +121,9 @@ void MapLayer::addEnemies() {
     } else {
         if (remainTank == 0) return;
 
-        // µ±Ì¹¿ËÊıÁ¿Ğ¡ÓÚ6Á¾Ê±
+        // å½“å¦å…‹æ•°é‡å°äº6è¾†æ—¶
         if (enemies.size() < 6) {
-            // Ëæ»úÌí¼ÓÒ»Á¾
+            // éšæœºæ·»åŠ ä¸€è¾†
             switch (RandomUtil::random(0, 2)) {
             case 0:
                 __addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
@@ -153,16 +153,16 @@ void MapLayer::resetMap() {
 }
 
 void MapLayer::loadLevelData(short stage) {
-    // ÇåÀí¹¤×÷
+    // æ¸…ç†å·¥ä½œ
     resetMap();
 
-    // ÏÈÌí¼Ó´ó±¾Óª
+    // å…ˆæ·»åŠ å¤§æœ¬è¥
     auto camp = BlockCamp::create();
     this->addChild(camp);
     camp->setPosition(CAMP_X, CAMP_Y);
     blocks.pushBack(camp);
 
-    // È»ºóÌí¼ÓÆäËû·½¿é
+    // ç„¶åæ·»åŠ å…¶ä»–æ–¹å—
     std::string filename = "maps/" + std::to_string(stage) + ".txt";
     data = FileUtils::getInstance()->getStringFromFile(filename);
 
@@ -176,10 +176,10 @@ void MapLayer::loadLevelData(short stage) {
                 index++;
                 continue;
             }
-            // ÖÆÔì¾«Áé
+            // åˆ¶é€ ç²¾çµ
             Block* block = nullptr;
 
-            // ´´½¨²»Í¬ÀàĞÍµÄ·½¿é
+            // åˆ›å»ºä¸åŒç±»å‹çš„æ–¹å—
             if (c == '3') {
                 block = BlockWall::create();
             } else if (c == '5') {
@@ -193,18 +193,18 @@ void MapLayer::loadLevelData(short stage) {
             }
 
             if (block) {
-                // ½«¾«ÁéÌí¼Óµ½Í¼²ã
+                // å°†ç²¾çµæ·»åŠ åˆ°å›¾å±‚
                 if (block->getType() == BlockType::FOREST) {
                     this->addChild(block, 101);
                 } else {
                     this->addChild(block);
                 }
 
-                // ÉèÖÃ¾«ÁéÔÚÍ¼²ãÉÏµÄÎ»ÖÃ
+                // è®¾ç½®ç²¾çµåœ¨å›¾å±‚ä¸Šçš„ä½ç½®
                 block->setAnchorPoint(Vec2(0, 0));
                 block->setPosition(Vec2((float)j * BLOCK_SIZE, (float)(25 - i) * BLOCK_SIZE));
 
-                // ´æ´¢vector
+                // å­˜å‚¨vector
                 blocks.pushBack(block);
             }
 
@@ -236,7 +236,7 @@ cocos2d::Vector<PlayerTank*>& MapLayer::getPlayers() {
 
 void MapLayer::enableAutoAddEnemies(bool b) {
     if (b) {
-        // Ã¿¸ô4.5ÃëÌí¼ÓÒ»ÃûµĞÈË
+        // æ¯éš”4.5ç§’æ·»åŠ ä¸€åæ•Œäºº
         this->schedule(CC_SCHEDULE_SELECTOR(MapLayer::autoAddEnemies), 4.5f);
     } else {
         this->unschedule(CC_SCHEDULE_SELECTOR(MapLayer::autoAddEnemies));

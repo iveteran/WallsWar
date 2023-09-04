@@ -4,55 +4,55 @@
 #include "Bullet.h"
 #include "Common.h"
 
-// Ì¹¿ËµÈ¼¶
-// Íæ¼Ò·ÖÎª4¼¶
-// 2¼¶¼°ÒÔÉÏ¿É·¢ÉäÁ½Ã¶×Óµ¯
-// µĞÈË·ÖÎª4ÖÖ
+// å¦å…‹ç­‰çº§
+// ç©å®¶åˆ†ä¸º4çº§
+// 2çº§åŠä»¥ä¸Šå¯å‘å°„ä¸¤æšå­å¼¹
+// æ•Œäººåˆ†ä¸º4ç§
 using TankLevel = short;
 
 class TankBase : public cocos2d::Sprite {
 public:
-    bool init() override;                               // ³õÊ¼»¯»º´æºÍ×Óµ¯
+    bool init() override;                               // åˆå§‹åŒ–ç¼“å­˜å’Œå­å¼¹
 
-    virtual void playAnimate();                         // ²¥·ÅÒÆ¶¯¶¯»­
-    virtual void stopAnimate();                         // Í£Ö¹²¥·Å¶¯»­
-    virtual void shoot();                               // ·¢Éä×Óµ¯
-    virtual void setDir(Dir d) = 0;                     // Ì¹¿Ë¸Ä±ä·½Ïò
+    virtual void playAnimate();                         // æ’­æ”¾ç§»åŠ¨åŠ¨ç”»
+    virtual void stopAnimate();                         // åœæ­¢æ’­æ”¾åŠ¨ç”»
+    virtual void shoot();                               // å‘å°„å­å¼¹
+    virtual void setDir(Dir d) = 0;                     // å¦å…‹æ”¹å˜æ–¹å‘
 
-    void startMove();                                   // ¿ªÆô×Ô¶¯ÒÆ¶¯
-    void stopMove();                                    // Í£Ö¹×Ô¶¯ÒÆ¶¯
-    void birth(std::string);                            // Ì¹¿Ë³öÉú¶¯»­
-    void beInvincible(int);                             // Ê¹Ì¹¿ËÎŞµĞ
-    virtual void disBlood();                            // Ì¹¿ËµôÑª
+    void startMove();                                   // å¼€å¯è‡ªåŠ¨ç§»åŠ¨
+    void stopMove();                                    // åœæ­¢è‡ªåŠ¨ç§»åŠ¨
+    void birth(std::string);                            // å¦å…‹å‡ºç”ŸåŠ¨ç”»
+    void beInvincible(int);                             // ä½¿å¦å…‹æ— æ•Œ
+    virtual void disBlood();                            // å¦å…‹æ‰è¡€
 
     static void addSpriteFrameCache();
 
-    cocos2d::Vector<Bullet*>& getAllBullets();          // »ñµÃÌ¹¿ËÓµÓĞµÄËùÓĞ×Óµ¯
-    Bullet* getBullet1();                               // µÃµ½µÚÒ»¿Å×Óµ¯
-    bool canMove = false;                               // ÅĞ¶ÏÄÜ·ñÒÆ¶¯£¨¸Õ³öÉúÊ±Ò»¶ÎÊ±¼äÄÚÎŞ·¨ÒÆ¶¯£©
+    cocos2d::Vector<Bullet*>& getAllBullets();          // è·å¾—å¦å…‹æ‹¥æœ‰çš„æ‰€æœ‰å­å¼¹
+    Bullet* getBullet1();                               // å¾—åˆ°ç¬¬ä¸€é¢—å­å¼¹
+    bool canMove = false;                               // åˆ¤æ–­èƒ½å¦ç§»åŠ¨ï¼ˆåˆšå‡ºç”Ÿæ—¶ä¸€æ®µæ—¶é—´å†…æ— æ³•ç§»åŠ¨ï¼‰
 
 protected:
-    virtual void __initBullets() = 0;                   // ´´½¨×Óµ¯
+    virtual void __initBullets() = 0;                   // åˆ›å»ºå­å¼¹
     virtual const cocos2d::Vector<cocos2d::Animate*>*
-        __getAnimations() = 0;                          // »ñÈ¡Ö¡¶¯»­
+        __getAnimations() = 0;                          // è·å–å¸§åŠ¨ç”»
 
-    void __autoMove(float t);                           // ×Ô¶¯ÒÆ¶¯
-    void __adjustPosition();                            // µ÷ÕûÎ»ÖÃÎª8µÄ±¶Êı
-    void __shoot(Bullet* bullet);                       // ·¢Éä×Óµ¯¸¨Öúº¯Êı
+    void __autoMove(float t);                           // è‡ªåŠ¨ç§»åŠ¨
+    void __adjustPosition();                            // è°ƒæ•´ä½ç½®ä¸º8çš„å€æ•°
+    void __shoot(Bullet* bullet);                       // å‘å°„å­å¼¹è¾…åŠ©å‡½æ•°
 
-    Dir dir = Dir::DOWN;                                // Ì¹¿Ëµ±Ç°·½Ïò
-    TankLevel level = 0;                                // Ì¹¿Ëµ±Ç°µÈ¼¶
-    cocos2d::Vector<Bullet*> bullets;                   // ´æ´¢Ì¹¿ËËùÓĞµÄ×Óµ¯
-    unsigned char blood = 1;                            // Ì¹¿ËÉúÃüÖµ
-    bool isInvincible = false;                          // ÅĞ¶ÏÊÇ·ñÎŞµĞ
-    int moveDistance = 0;                               // ÒÆ¶¯×Ü¾àÀë
+    Dir dir = Dir::DOWN;                                // å¦å…‹å½“å‰æ–¹å‘
+    TankLevel level = 0;                                // å¦å…‹å½“å‰ç­‰çº§
+    cocos2d::Vector<Bullet*> bullets;                   // å­˜å‚¨å¦å…‹æ‰€æœ‰çš„å­å¼¹
+    unsigned char blood = 1;                            // å¦å…‹ç”Ÿå‘½å€¼
+    bool isInvincible = false;                          // åˆ¤æ–­æ˜¯å¦æ— æ•Œ
+    int moveDistance = 0;                               // ç§»åŠ¨æ€»è·ç¦»
 
 private:
-    static float __adjustNumber(int number);            // ½«¸ø¶¨Êı×Öµ÷ÕûÎª8µÄ±¶Êı
-    bool __isMapIntersection();                         // ¼ì²âÌ¹¿ËÓëµØÍ¼±ßÔµµÄÅö×²
-    bool __isBlockIntersection();                       // ¼ì²âÌ¹¿ËÓë·½¿éµÄÅö×²
-    virtual bool __isTankIntersection() = 0;            // ¼ì²âÌ¹¿ËÖ®¼äµÄÅö×²
+    static float __adjustNumber(int number);            // å°†ç»™å®šæ•°å­—è°ƒæ•´ä¸º8çš„å€æ•°
+    bool __isMapIntersection();                         // æ£€æµ‹å¦å…‹ä¸åœ°å›¾è¾¹ç¼˜çš„ç¢°æ’
+    bool __isBlockIntersection();                       // æ£€æµ‹å¦å…‹ä¸æ–¹å—çš„ç¢°æ’
+    virtual bool __isTankIntersection() = 0;            // æ£€æµ‹å¦å…‹ä¹‹é—´çš„ç¢°æ’
 
-    int musicId = -1;                                   // ÒÆ¶¯Ê±²¥·ÅµÄÒôÀÖid
-    bool isMove = false;                                // ÅĞ¶ÏÊÇ·ñÕıÔÚÒÆ¶¯
+    int musicId = -1;                                   // ç§»åŠ¨æ—¶æ’­æ”¾çš„éŸ³ä¹id
+    bool isMove = false;                                // åˆ¤æ–­æ˜¯å¦æ­£åœ¨ç§»åŠ¨
 };

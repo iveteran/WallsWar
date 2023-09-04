@@ -14,7 +14,7 @@ bool Block::init() {
 void Block::addSpriteFrameCache() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
-    // ´ó±¾Óª
+    // å¤§æœ¬è¥
     auto* camp_0 = Sprite::create("images/block/camp0.png")->getSpriteFrame();
     auto* camp_1 = Sprite::create("images/block/camp1.png")->getSpriteFrame();
 
@@ -24,7 +24,7 @@ void Block::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(camp_0, "camp_0");
     spriteFrameCache->addSpriteFrame(camp_1, "camp_1");
 
-    // ·½¿é
+    // æ–¹å—
     auto* wall = Sprite::create("images/block/wall.png")->getSpriteFrame();
     auto* stone = Sprite::create("images/block/stone.png")->getSpriteFrame();
     auto* forest = Sprite::create("images/block/forest.png")->getSpriteFrame();
@@ -54,7 +54,7 @@ bool BlockWall::init() {
 
     this->initWithSpriteFrameName("wall");
 
-    // ´´½¨4¸öÕÚµ²¾«Áé
+    // åˆ›å»º4ä¸ªé®æŒ¡ç²¾çµ
     for (int i = 0; i < 4; i++) {
         blacks[i] = LayerColor::create(Color4B(0, 0, 0, 255), 4, 4);
         blacks[i]->setIgnoreAnchorPointForPosition(false);
@@ -70,18 +70,18 @@ bool BlockWall::init() {
 }
 
 std::pair<bool, bool> BlockWall::destory(Dir d, const Rect& box) {
-    bool flag = false; // ÊÇ·ñÓë×Óµ¯·¢ÉúÅö×²
+    bool flag = false; // æ˜¯å¦ä¸å­å¼¹å‘ç”Ÿç¢°æ’
     auto position = this->getPosition();
 
     for (int i = 0; i < 4; i++) {
-        // ×ªÎª×ø±êÎªÏà¶ÔÓÚMapLayerµÄ×ø±ê
+        // è½¬ä¸ºåæ ‡ä¸ºç›¸å¯¹äºMapLayerçš„åæ ‡
         auto preBox = blacks[i]->getBoundingBox();
         auto tranBox = Rect(preBox.getMinX() + position.x,
                             preBox.getMinY() + position.y,
                             preBox.getMaxX() - preBox.getMinX(),
                             preBox.getMaxY() - preBox.getMinY());
 
-        // ¼Ó¿í×Óµ¯
+        // åŠ å®½å­å¼¹
         Rect cmpBox;
         switch (d) {
         case Dir::LEFT:

@@ -13,13 +13,13 @@ public:
     bool init() override;
 
     static void addSpriteFrameCache();
-    void updateInformationArea(bool first = false);                // ¸üĞÂÓÒ²àĞÅÏ¢ÇøÓò
+    void updateInformationArea(bool first = false);                // æ›´æ–°å³ä¾§ä¿¡æ¯åŒºåŸŸ
 
     static GameScene* create(int stage = 1) {
         auto* pRet = new(std::nothrow) GameScene();
         if (pRet) {
             if (stage == 0 || stage == 12 || stage == 14 || stage == 16 || stage == 30)
-                stage++; // µØÍ¼Êı¾İÓĞÎÊÌâ
+                stage++; // åœ°å›¾æ•°æ®æœ‰é—®é¢˜
             pRet->stage = stage;
             if (pRet->init()) {
                 pRet->autorelease();
@@ -33,18 +33,18 @@ public:
         return nullptr;
     }
 
-    short stage = 1;                                          // µ±Ç°¹Ø¿¨
+    short stage = 1;                                          // å½“å‰å…³å¡
 
 private:
-    MapLayer* map = nullptr;                                  // ¹ÜÀíµØÍ¼
+    MapLayer* map = nullptr;                                  // ç®¡ç†åœ°å›¾
     std::map<
-        cocos2d::EventKeyboard::KeyCode, Dir> table;          // ¼üÎ»·½Ïò±í
+        cocos2d::EventKeyboard::KeyCode, Dir> table;          // é”®ä½æ–¹å‘è¡¨
 
-    void __showLoadAnimate();                                 // Õ¹Ê¾ÔØÈë¹Ø¿¨¶¯»­
-    void __initMapLayer();                                    // ³õÊ¼»¯µØÍ¼Êı¾İ
-    void __enableKeyListener();                               // Æô¶¯¼üÅÌ¼àÌıÆ÷
-    void __addTouchButton();                                  // Ìí¼Ó´¥Ãş°´Å¥
-    void __checkGameStatus(float);                            // ¼ì²éÓÎÏ·×´Ì¬
-    void __gameover(float);                                   // ÓÎÏ·½áÊø¶¯»­
+    void __showLoadAnimate();                                 // å±•ç¤ºè½½å…¥å…³å¡åŠ¨ç”»
+    void __initMapLayer();                                    // åˆå§‹åŒ–åœ°å›¾æ•°æ®
+    void __enableKeyListener();                               // å¯åŠ¨é”®ç›˜ç›‘å¬å™¨
+    void __addTouchButton();                                  // æ·»åŠ è§¦æ‘¸æŒ‰é’®
+    void __checkGameStatus(float);                            // æ£€æŸ¥æ¸¸æˆçŠ¶æ€
+    void __gameover(float);                                   // æ¸¸æˆç»“æŸåŠ¨ç”»
 };
 

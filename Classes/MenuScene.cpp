@@ -27,7 +27,7 @@ void MenuScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
     switch (keyCode) {
     case EventKeyboard::KeyCode::KEY_ENTER:
     {
-        // ÇÐ»»³¡¾°
+        // åˆ‡æ¢åœºæ™¯
         Director::getInstance()->replaceScene(GameScene::createScene());
 
     }
@@ -61,7 +61,7 @@ void MenuScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
 
 // TODO
 bool MenuScene::onTouch(cocos2d::Touch* touch, cocos2d::Event*) {
-    // ÇÐ»»³¡¾°
+    // åˆ‡æ¢åœºæ™¯
     Director::getInstance()->replaceScene(GameScene::createScene());
 
     return true;
@@ -72,7 +72,7 @@ void MenuScene::__initBackground() {
     this->addChild(offsetNode);
     offsetNode->setPosition(Director::getInstance()->getVisibleSize() / 2);
 
-    // ´´½¨±³¾°Í¼Æ¬
+    // åˆ›å»ºèƒŒæ™¯å›¾ç‰‡
     background = Sprite::create("images/select_player.png");
     if (!background) return;
 
@@ -80,7 +80,7 @@ void MenuScene::__initBackground() {
     offsetNode->addChild(background);
     background->setPosition(Vec2(0, Director::getInstance()->getVisibleSize().height));
 
-    // °´ÏÂ¿Õ¸ñ¼ü¿ì½ø
+    // æŒ‰ä¸‹ç©ºæ ¼é”®å¿«è¿›
     auto* keyboardListener = EventListenerKeyboard::create();
 
     keyboardListener->onKeyPressed = [&](EventKeyboard::KeyCode keyCode, Event*) {
@@ -98,7 +98,7 @@ void MenuScene::__initBackground() {
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
-    // ´¥ÃþÆÁÄ»¿ì½ø
+    // è§¦æ‘¸å±å¹•å¿«è¿›
     auto touchListener = EventListenerTouchOneByOne::create();
     touchListener->onTouchBegan = [&](Touch* touch, Event*) {
         background->stopAllActions();
@@ -111,7 +111,7 @@ void MenuScene::__initBackground() {
     };
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    //±³¾°¶¯»­
+    //èƒŒæ™¯åŠ¨ç”»
     auto bkAction = Sequence::create(
         MoveTo::create(4.f, Vec2(0, 0)),
         CallFunc::create([=]() {
@@ -129,21 +129,21 @@ void MenuScene::__initSelector() {
     selector->getTexture()->setAliasTexParameters();
     selector->setPosition(ARROWS_X, WINDOW_HEIGHT - ARROWS_Y);
 
-    // Ñ­»·²¥·Å¶¯»­
+    // å¾ªçŽ¯æ’­æ”¾åŠ¨ç”»
     auto animate = __getAnimFrames();
     selector->runAction(RepeatForever::create(animate));
 
     background->addChild(selector);
 
-    // Ê¹ÓÃ¼üÅÌÒÆ¶¯¹â±ê
+    // ä½¿ç”¨é”®ç›˜ç§»åŠ¨å…‰æ ‡
     auto* keyBoardlistener = EventListenerKeyboard::create();
     keyBoardlistener->onKeyPressed = CC_CALLBACK_2(MenuScene::onKeyPressed, this);
 
-    // ´¥ÃþÆÁÄ»ÒÆ¶¯¹â±ê
+    // è§¦æ‘¸å±å¹•ç§»åŠ¨å…‰æ ‡
     auto* touchListener = EventListenerTouchOneByOne::create();
     touchListener->onTouchBegan = CC_CALLBACK_2(MenuScene::onTouch, this);
 
-    // ¼àÌýÊÂ¼þ
+    // ç›‘å¬äº‹ä»¶
     _eventDispatcher->removeAllEventListeners();
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyBoardlistener, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);

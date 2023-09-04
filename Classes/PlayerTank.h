@@ -14,7 +14,7 @@ public:
     bool isBeControl();
     void disBlood() override;
 
-    static void loadFrameAnimation();                          // ¼ÓÔØÌ¹¿ËÒÆ¶¯Ö¡¶¯»­
+    static void loadFrameAnimation();                          // åŠ è½½å¦å…‹ç§»åŠ¨å¸§åŠ¨ç”»
 
     CREATE_FUNC(PlayerTank);
 
@@ -23,7 +23,7 @@ protected:
 
 private:
     bool beControl = false;
-    static cocos2d::Vector<cocos2d::Animate*> animations[4];   // ´æ´¢Ì¹¿ËÒÆ¶¯Ö¡¶¯»­£¨·½ÏòºÍµÈ¼¶£©
+    static cocos2d::Vector<cocos2d::Animate*> animations[4];   // å­˜å‚¨å¦å…‹ç§»åŠ¨å¸§åŠ¨ç”»ï¼ˆæ–¹å‘å’Œç­‰çº§ï¼‰
 
     void __initBullets() override;
     bool __isTankIntersection() override;

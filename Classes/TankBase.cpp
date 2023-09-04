@@ -38,16 +38,16 @@ void TankBase::__autoMove(float /*t*/) {
     if (!canMove) {
         return;
     }
-    // 1. ÒÆ¶¯Ê±¼ì²âºÍµØÍ¼±ßÔµµÄÅö×²
-    // 2. ÒÆ¶¯Ê±¼ì²âºÍ·½¿éµÄÅö×²
-    // 3. ÒÆ¶¯Ê±¼ì²âºÍÌ¹¿ËµÄÅö×²
+    // 1. ç§»åŠ¨æ—¶æ£€æµ‹å’Œåœ°å›¾è¾¹ç¼˜çš„ç¢°æ’ž
+    // 2. ç§»åŠ¨æ—¶æ£€æµ‹å’Œæ–¹å—çš„ç¢°æ’ž
+    // 3. ç§»åŠ¨æ—¶æ£€æµ‹å’Œå¦å…‹çš„ç¢°æ’ž
 
     auto position = this->getPosition();
     auto step = 1.0f + level * 0.2f;
     if (dynamic_cast<EnemyTank*>(this))
         step = 1.0f;
 
-    // ¼ÙÉè¿ÉÒÔÒÆ¶¯
+    // å‡è®¾å¯ä»¥ç§»åŠ¨
     switch (dir) {
     case Dir::LEFT:
         this->setPositionX(position.x - step);
@@ -67,11 +67,11 @@ void TankBase::__autoMove(float /*t*/) {
 
     moveDistance += int(step);
 
-    // Èç¹û²úÉúÅö×²£¬Ôò»Øµ½ÒÆ¶¯Ö®Ç°µÄÎ»ÖÃ
+    // å¦‚æžœäº§ç”Ÿç¢°æ’žï¼Œåˆ™å›žåˆ°ç§»åŠ¨ä¹‹å‰çš„ä½ç½®
     if (__isBlockIntersection() || __isMapIntersection() || __isTankIntersection()) {
         this->setPosition(position);
 
-        // µÐ·½Ì¹¿ËÅö×²ºó¿ÉÒÔ¸Ä±ä·½Ïò
+        // æ•Œæ–¹å¦å…‹ç¢°æ’žåŽå¯ä»¥æ”¹å˜æ–¹å‘
         moveDistance = 100;
     }
 }
@@ -106,7 +106,7 @@ bool TankBase::__isMapIntersection() {
 }
 
 bool TankBase::__isBlockIntersection() {
-    // µÃµ½ËùÓÐ·½¿éÎ»ÖÃ
+    // å¾—åˆ°æ‰€æœ‰æ–¹å—ä½ç½®
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
     auto box = getBoundingBox();
     for (auto& block : blocks) {
@@ -151,7 +151,7 @@ void TankBase::birth(std::string afterStart) {
         spriteFrames.pushBack(spriteFrame);
     }
 
-    // ÐÇÐÇ¶¯»­
+    // æ˜Ÿæ˜ŸåŠ¨ç”»
     auto animation = Animation::createWithSpriteFrames(spriteFrames, 0.2f);
     auto animate = Animate::create(animation);
 
@@ -204,11 +204,11 @@ void TankBase::disBlood() {
         spriteFrames.pushBack(spriteFrame);
     }
 
-    // TODO Ã¿´ÎËÀÍö¶¼ÖØÐÂ¹¹Ôì¶¯»­
+    // TODO æ¯æ¬¡æ­»äº¡éƒ½é‡æ–°æž„é€ åŠ¨ç”»
     auto blastAnimation = Animation::createWithSpriteFrames(spriteFrames, 0.1f);
     auto blastanimate = Animate::create(blastAnimation);
 
-    // ²¥·Å¶¯»­
+    // æ’­æ”¾åŠ¨ç”»
     auto node = Sprite::create();
     MapLayer::getInstance()->addChild(node);
     node->setPosition(this->getPosition());
@@ -216,10 +216,10 @@ void TankBase::disBlood() {
                                      CallFunc::create([node] {node->removeFromParentAndCleanup(true); }),
                                      nullptr));
     if (--blood == 0) {
-        // ²¥·ÅÒôÐ§
+        // æ’­æ”¾éŸ³æ•ˆ
         AudioEngine::play2d("music/enemy-bomb.mp3");
 
-        // ÒÆ³ý¸ÃÌ¹¿Ë
+        // ç§»é™¤è¯¥å¦å…‹
         auto& enemies = MapLayer::getInstance()->getEnemies();
         enemies.eraseObject(dynamic_cast<EnemyTank*>(this));
         this->removeFromParentAndCleanup(true);
@@ -229,7 +229,7 @@ void TankBase::disBlood() {
 void TankBase::addSpriteFrameCache() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
-    // Ì¹¿Ë±¬Õ¨Ö¡¶¯»­
+    // å¦å…‹çˆ†ç‚¸å¸§åŠ¨ç”»
     auto* blast_0 = Sprite::create("images/blast/0.png")->getSpriteFrame();
     auto* blast_1 = Sprite::create("images/blast/1.png")->getSpriteFrame();
     auto* blast_2 = Sprite::create("images/blast/2.png")->getSpriteFrame();
@@ -248,7 +248,7 @@ void TankBase::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(blast_3, "blast_3");
     spriteFrameCache->addSpriteFrame(blast_4, "blast_4");
 
-    // Ì¹¿Ë³öÉúÇ°µÄÐÇÐÇÖ¡¶¯»­
+    // å¦å…‹å‡ºç”Ÿå‰çš„æ˜Ÿæ˜Ÿå¸§åŠ¨ç”»
     auto star_0 = Sprite::create("images/star0.png")->getSpriteFrame();
     auto star_1 = Sprite::create("images/star1.png")->getSpriteFrame();
     auto star_2 = Sprite::create("images/star2.png")->getSpriteFrame();
@@ -264,7 +264,7 @@ void TankBase::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(star_2, "star_2");
     spriteFrameCache->addSpriteFrame(star_3, "star_3");
 
-    // Ì¹¿Ë±£»¤»·Ö¡¶¯»­
+    // å¦å…‹ä¿æŠ¤çŽ¯å¸§åŠ¨ç”»
     auto ring_0 = Sprite::create("images/ring0.png")->getSpriteFrame();
     auto ring_1 = Sprite::create("images/ring1.png")->getSpriteFrame();
 

@@ -18,23 +18,23 @@ bool GameScene::init() {
     if (!Scene::init())
         return false;
 
-    // ³õÊ¼»¯±í
+    // åˆå§‹åŒ–è¡¨
     table[EventKeyboard::KeyCode::KEY_A] = Dir::LEFT;
     table[EventKeyboard::KeyCode::KEY_W] = Dir::UP;
     table[EventKeyboard::KeyCode::KEY_D] = Dir::RIGHT;
     table[EventKeyboard::KeyCode::KEY_S] = Dir::DOWN;
 
-    // ½«±³¾°É«ÉèÖÃÎª»ÒÉ«
+    // å°†èƒŒæ™¯è‰²è®¾ç½®ä¸ºç°è‰²
     auto background = LayerColor::create(Color4B(100, 100, 100, 200));
     this->addChild(background);
 
-    // ²¥·Å¿ªÊ¼ÒôÀÖ
+    // æ’­æ”¾å¼€å§‹éŸ³ä¹
     /*AudioEngine::setFinishCallback(AudioEngine::play2d("music/start.mp3"),
         [](int, const std::string &) {
             AudioEngine::play2d("music/bk_sound.mp3", true);
         });*/
 
-        // Õ¹Ê¾¼ÓÔØ¶¯»­
+        // å±•ç¤ºåŠ è½½åŠ¨ç”»
     __showLoadAnimate();
 
     return true;
@@ -49,11 +49,11 @@ void GameScene::__showLoadAnimate() {
     this->addChild(block1);
     this->addChild(block2);
 
-    //´ÓÉÏÍùÏÂ
+    //ä»Žä¸Šå¾€ä¸‹
     block1->setContentSize(Size(width, mid));
     block1->setPosition(Vec2(0, mid * 2));
 
-    //´ÓÏÂÍùÉÏ
+    //ä»Žä¸‹å¾€ä¸Š
     block2->setContentSize(Size(width, mid));
     block2->setPosition(Vec2(0, -mid));
 
@@ -71,7 +71,7 @@ void GameScene::__showLoadAnimate() {
     }), nullptr));
 
 
-    // Õ¹Ê¾Stage
+    // å±•ç¤ºStage
     auto node = Node::create();
     this->addChild(node);
     node->setPosition(this->getContentSize().width / 2 - 10, this->getContentSize().height / 2);
@@ -112,22 +112,22 @@ void GameScene::__initMapLayer() {
     map = MapLayer::getInstance();
     this->addChild(map);
 
-    // ÉèÖÃµØÍ¼Î»ÖÃ
+    // è®¾ç½®åœ°å›¾ä½ç½®
     map->setContentSize(Size(CENTER_WIDTH, CENTER_HEIGHT));
     map->setIgnoreAnchorPointForPosition(false);
     map->setPosition(Director::getInstance()->getVisibleSize() / 2);
 
-    // ¼ÓÔØµØÍ¼Êý¾Ý
+    // åŠ è½½åœ°å›¾æ•°æ®
     map->loadLevelData(stage);
 
-    // ¸üÐÂÐÅÏ¢
+    // æ›´æ–°ä¿¡æ¯
     updateInformationArea(true);
 
-    // Ìí¼ÓÍæ¼ÒºÍµÐÈË
+    // æ·»åŠ çŽ©å®¶å’Œæ•Œäºº
     map->addPlayer();
     map->addEnemies();
 
-    // ×Ô¶¯¿ØÖÆµÐÈË
+    // è‡ªåŠ¨æŽ§åˆ¶æ•Œäºº
     map->enableAutoAddEnemies();
     map->enableAutoControlEnemies();
 }
@@ -245,17 +245,17 @@ void GameScene::__addTouchButton() {
 
 void GameScene::__checkGameStatus(float) {
     if (map->getPlayers().size() == 0 || !map->isCampOk) {
-        // Í£Ö¹ËùÓÐÒôÀÖ
+        // åœæ­¢æ‰€æœ‰éŸ³ä¹
         AudioEngine::stopAll();
-        // ½øÈëÊ§°Ü³¡¾°
+        // è¿›å…¥å¤±è´¥åœºæ™¯
         this->unscheduleAllCallbacks();
         _eventDispatcher->removeAllEventListeners();
 
         scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::__gameover), 2.0f);
     } else if (map->remainTank == 0 && map->getEnemies().size() == 0) {
-        // Í£Ö¹ËùÓÐÒôÀÖ
+        // åœæ­¢æ‰€æœ‰éŸ³ä¹
         AudioEngine::stopAll();
-        // ½øÈë½áËã³¡¾°
+        // è¿›å…¥ç»“ç®—åœºæ™¯
         this->cleanup();
         this->removeAllChildrenWithCleanup(true);
 
@@ -291,8 +291,8 @@ void GameScene::updateInformationArea(bool first) {
     if (first) {
         sprites.clear();
         auto spriteFrameCache = SpriteFrameCache::getInstance();
-        // »æÖÆÊ£ÓàÌ¹¿ËÍ¼±ê
-        // ×óÉÏ½Ç×ø±ê
+        // ç»˜åˆ¶å‰©ä½™å¦å…‹å›¾æ ‡
+        // å·¦ä¸Šè§’åæ ‡
         auto x = map->getPositionX() + map->getContentSize().width / 2 + 7;
         auto y = map->getPositionY() + map->getContentSize().height / 2 - 10;
         auto enemyIcon = spriteFrameCache->getSpriteFrameByName("enemy_icon");

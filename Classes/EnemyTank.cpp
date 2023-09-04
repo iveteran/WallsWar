@@ -14,13 +14,13 @@ bool EnemyTank::init() {
         return false;
     }
 
-    // Ëæ»úÑ¡ÔñÒ»¸öÀàĞÍ
+    // éšæœºé€‰æ‹©ä¸€ä¸ªç±»å‹
     level = RandomUtil::random(0, 3);
 
-    // ²»¶ÏÒÆ¶¯
+    // ä¸æ–­ç§»åŠ¨
     startMove();
 
-    // Õ¹Ê¾³öÉú¶¯»­
+    // å±•ç¤ºå‡ºç”ŸåŠ¨ç”»
     birth("enemy_" + std::to_string(int(dir)) + "_" + std::to_string(level));
 
     return true;
@@ -33,13 +33,13 @@ void EnemyTank::setDir(Dir d) {
 
     dir = d;
 
-    // µ±¸Ä±ä·½ÏòÊ±£¬½«×ø±êµ÷ÕûÎª×î½Ó½üÓÚ8µÄ±¶Êı
+    // å½“æ”¹å˜æ–¹å‘æ—¶ï¼Œå°†åæ ‡è°ƒæ•´ä¸ºæœ€æ¥è¿‘äº8çš„å€æ•°
     __adjustPosition();
 
     std::string name = "enemy_" + std::to_string((int)dir) + "_"
         + std::to_string(level);
 
-    // ¸ü»»Í¼Æ¬
+    // æ›´æ¢å›¾ç‰‡
     this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
 }
 
@@ -48,10 +48,10 @@ void EnemyTank::loadFrameAnimation() {
 
     Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
 
-    // ×Ü¹²4¸öµÈ¼¶
+    // æ€»å…±4ä¸ªç­‰çº§
     for (int i = 0; i < 4; i++) {
         std::string lev = std::to_string(i);
-        // ×Ü¹²4¸ö·½Ïò
+        // æ€»å…±4ä¸ªæ–¹å‘
         for (int j = 0; j < 4; j++) {
             std::string d = std::to_string(j);
             auto enemy_1 = SpriteFrame::create("images/enemy_tank/normal_tank/" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + "-1.png", tankRect);
@@ -61,10 +61,10 @@ void EnemyTank::loadFrameAnimation() {
             enemy_1->getTexture()->setAliasTexParameters();
             enemy_2->getTexture()->setAliasTexParameters();
 
-            // Ìí¼Óµ½»º´æ
+            // æ·»åŠ åˆ°ç¼“å­˜
             spriteFrameCache->addSpriteFrame(enemy_1, "enemy_" + d + "_" + lev);
 
-            // ±£´æ
+            // ä¿å­˜
             animations[j].pushBack(Animate::create(enemy));
         }
     }
