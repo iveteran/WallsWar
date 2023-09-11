@@ -9,6 +9,6 @@ public:
     CREATE_FUNC(PlayerBullet);
 
 private:
-    bool __isTankIntersection() override;
-    bool __isBulletIntersection() override;
+    bool _isTankIntersection() override;
+    bool _isBulletIntersection() override;
 };

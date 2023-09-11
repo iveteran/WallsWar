@@ -10,8 +10,8 @@ public:
     void setBeIntersection();
 
 private:
-    bool __isTankIntersection() override;
-    bool __isBulletIntersection() override;
+    bool _isTankIntersection() override;
+    bool _isBulletIntersection() override;
 
-    bool isBeIntersection = false;
+    bool _isBeIntersection = false;
 };

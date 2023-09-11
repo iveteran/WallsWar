@@ -22,7 +22,7 @@ bool MapLayer::init() {
     this->initWithColor(Color4B(0, 0, 0, 255));
 
     // 加载精灵帧缓存
-    __addSpriteFrameCache();
+    _addSpriteFrameCache();
 
     return true;
 }
@@ -36,7 +36,7 @@ MapLayer* MapLayer::getInstance() {
     return _mapLayer;
 }
 
-void MapLayer::__addSpriteFrameCache() {
+void MapLayer::_addSpriteFrameCache() {
     // 右侧信息区域
     GameScene::addSpriteFrameCache();
 
@@ -52,13 +52,13 @@ void MapLayer::__addSpriteFrameCache() {
     EnemyTank::loadFrameAnimation();
 }
 
-void MapLayer::__addEnemy(float x, float y) {
-    for (const auto& player : players) {
+void MapLayer::_addEnemy(float x, float y) {
+    for (const auto& player : _players) {
         if (player->getBoundingBox().containsPoint({ x, y }))
             return;
     }
 
-    for (const auto& enemy : enemies) {
+    for (const auto& enemy : _enemies) {
         if (enemy->getBoundingBox().containsPoint({ x, y }))
             return;
     }
@@ -72,7 +72,7 @@ void MapLayer::__addEnemy(float x, float y) {
         this->addChild(bullet);
     }
 
-    enemies.pushBack(enemyTank);
+    _enemies.pushBack(enemyTank);
     remainTank--;
 
     auto parent = dynamic_cast<GameScene*>(this->getParent());
@@ -86,20 +86,20 @@ void MapLayer::autoAddEnemies(float) {
 }
 
 void MapLayer::autoControlEnemiesDirection(float) {
-    for (auto enemy : enemies) {
+    for (auto enemy : _enemies) {
         enemy->changeDirection();
     }
 }
 
 void MapLayer::autoControlEnemiesShoot(float) {
-    for (auto enemy : enemies) {
+    for (auto enemy : _enemies) {
         // 三分之一的概率发射子弹
         if (RandomUtil::random(1, 3) == 1)
             enemy->shoot();
     }
 }
 
-void MapLayer::addPlayer() {
+PlayerTank* MapLayer::addPlayer() {
     auto player = PlayerTank::create();
     this->addChild(player);
     player->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
@@ -109,30 +109,31 @@ void MapLayer::addPlayer() {
         this->addChild(bullet, 100);
     }
 
-    players.pushBack(player);
+    _players.pushBack(player);
+    return player;
 }
 
 void MapLayer::addEnemies() {
     // 初始时添加3辆坦克
     if (remainTank == ENEMIES_COUNT) {
-        __addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
-        __addEnemy(ENEMY2_STAR_X, ENEMY2_STAR_Y);
-        __addEnemy(ENEMY3_STAR_X, ENEMY3_STAR_Y);
+        _addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
+        _addEnemy(ENEMY2_STAR_X, ENEMY2_STAR_Y);
+        _addEnemy(ENEMY3_STAR_X, ENEMY3_STAR_Y);
     } else {
         if (remainTank == 0) return;
 
         // 当坦克数量小于6辆时
-        if (enemies.size() < 6) {
+        if (_enemies.size() < 6) {
             // 随机添加一辆
             switch (RandomUtil::random(0, 2)) {
             case 0:
-                __addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
+                _addEnemy(ENEMY1_STAR_X, ENEMY1_STAR_Y);
                 break;
             case 1:
-                __addEnemy(ENEMY2_STAR_X, ENEMY2_STAR_Y);
+                _addEnemy(ENEMY2_STAR_X, ENEMY2_STAR_Y);
                 break;
             case 2:
-                __addEnemy(ENEMY3_STAR_X, ENEMY3_STAR_Y);
+                _addEnemy(ENEMY3_STAR_X, ENEMY3_STAR_Y);
                 break;
             default:
                 break;
@@ -142,10 +143,10 @@ void MapLayer::addEnemies() {
 }
 
 void MapLayer::resetMap() {
-    blocks.clear();
-    data.clear();
-    enemies.clear();
-    players.clear();
+    _blocks.clear();
+    _data.clear();
+    _enemies.clear();
+    _players.clear();
     this->cleanup();
     this->removeAllChildrenWithCleanup(true);
     this->remainTank = ENEMIES_COUNT;
@@ -160,17 +161,17 @@ void MapLayer::loadLevelData(short stage) {
     auto camp = BlockCamp::create();
     this->addChild(camp);
     camp->setPosition(CAMP_X, CAMP_Y);
-    blocks.pushBack(camp);
+    _blocks.pushBack(camp);
 
     // 然后添加其他方块
     std::string filename = "maps/" + std::to_string(stage) + ".txt";
-    data = FileUtils::getInstance()->getStringFromFile(filename);
+    _data = FileUtils::getInstance()->getStringFromFile(filename);
 
     int index = 0;
 
     for (int i = 0; i < 26; i++) {
         for (int j = 0; j < 26; j++) {
-            char c = data[index++];
+            char c = _data[index++];
             if (c == '\r') {
                 j--;
                 index++;
@@ -205,7 +206,7 @@ void MapLayer::loadLevelData(short stage) {
                 block->setPosition(Vec2((float)j * BLOCK_SIZE, (float)(25 - i) * BLOCK_SIZE));
 
                 // 存储vector
-                blocks.pushBack(block);
+                _blocks.pushBack(block);
             }
 
         }
@@ -213,25 +214,25 @@ void MapLayer::loadLevelData(short stage) {
 }
 
 PlayerTank* MapLayer::getPlayer1() {
-    if (players.size() > 0)
-        return players.at(0);
+    if (_players.size() > 0)
+        return _players.at(0);
     return nullptr;
 }
 
 Block* MapLayer::getCamp() {
-    return blocks.at(0);
+    return _blocks.at(0);
 }
 
 cocos2d::Vector<Block*>& MapLayer::getAllBlocks() {
-    return blocks;
+    return _blocks;
 }
 
 cocos2d::Vector<EnemyTank*>& MapLayer::getEnemies() {
-    return enemies;
+    return _enemies;
 }
 
 cocos2d::Vector<PlayerTank*>& MapLayer::getPlayers() {
-    return players;
+    return _players;
 }
 
 void MapLayer::enableAutoAddEnemies(bool b) {
@@ -254,5 +255,5 @@ void MapLayer::enableAutoControlEnemies(bool b) {
 }
 
 const std::string& MapLayer::getMapData() {
-    return data;
+    return _data;
 }

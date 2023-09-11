@@ -11,7 +11,7 @@ public:
     CREATE_FUNC(GameOverScene);
 
 private:
-    void __replaceToMenu(float);
+    void _replaceToMenu(float);
 
 };
 

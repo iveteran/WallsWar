@@ -38,13 +38,13 @@ public:
 private:
     MapLayer* map = nullptr;                                  // 管理地图
     std::map<
-        cocos2d::EventKeyboard::KeyCode, Dir> table;          // 键位方向表
+        cocos2d::EventKeyboard::KeyCode, Direction> table;          // 键位方向表
 
-    void __showLoadAnimate();                                 // 展示载入关卡动画
-    void __initMapLayer();                                    // 初始化地图数据
-    void __enableKeyListener();                               // 启动键盘监听器
-    void __addTouchButton();                                  // 添加触摸按钮
-    void __checkGameStatus(float);                            // 检查游戏状态
-    void __gameover(float);                                   // 游戏结束动画
+    void _showLoadAnimate();                                 // 展示载入关卡动画
+    void _initMapLayer();                                    // 初始化地图数据
+    void _enableKeyListener();                               // 启动键盘监听器
+    void _addTouchButton();                                  // 添加触摸按钮
+    void _checkGameStatus(float);                            // 检查游戏状态
+    void _gameover(float);                                   // 游戏结束动画
 };
 

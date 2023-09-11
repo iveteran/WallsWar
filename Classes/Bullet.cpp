@@ -18,19 +18,19 @@ bool Bullet::init() {
 }
 
 void Bullet::startMove() {
-    this->schedule(CC_SCHEDULE_SELECTOR(Bullet::__autoMove), 0.008f);
+    this->schedule(CC_SCHEDULE_SELECTOR(Bullet::_autoMove), 0.008f);
 }
 
-void Bullet::__stopMove() {
-    this->unschedule(CC_SCHEDULE_SELECTOR(Bullet::__autoMove));
+void Bullet::_stopMove() {
+    this->unschedule(CC_SCHEDULE_SELECTOR(Bullet::_autoMove));
 }
 
-void Bullet::setDir(Dir d) {
-    dir = d;
+void Bullet::setDirection(Direction dir) {
+    _dir = dir;
 }
 
 void Bullet::setLevel(BulletLevel lev) {
-    level = lev;
+    _level = lev;
 }
 
 void Bullet::addSpriteFrameCache() {
@@ -66,7 +66,7 @@ void Bullet::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(bumb_2, "bumb_2");
 }
 
-void Bullet::__showEffect() {
+void Bullet::_showEffect() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
     auto mapLayer = MapLayer::getInstance();
 
@@ -90,7 +90,7 @@ void Bullet::__showEffect() {
     );
 }
 
-void Bullet::__autoMove(float t) {
+void Bullet::_autoMove(float t) {
     // 1. 移动时检测和地图边缘的碰撞
     // 2. 移动时检测和方块的碰撞
     // 3. 移动时检测和坦克的碰撞
@@ -98,22 +98,22 @@ void Bullet::__autoMove(float t) {
 
     auto position = this->getPosition();
     auto step = 1;
-    if (level >= 1) {
+    if (_level >= 1) {
         step = 2;
     }
 
     // 假设可以移动
-    switch (dir) {
-    case Dir::LEFT:
+    switch (_dir) {
+    case Direction::LEFT:
         this->setPositionX(position.x - step);
         break;
-    case Dir::UP:
+    case Direction::UP:
         this->setPositionY(position.y + step);
         break;
-    case Dir::RIGHT:
+    case Direction::RIGHT:
         this->setPositionX(position.x + step);
         break;
-    case Dir::DOWN:
+    case Direction::DOWN:
         this->setPositionY(position.y - step);
         break;
     default:
@@ -127,18 +127,18 @@ void Bullet::__autoMove(float t) {
     // <2.3> 如果是墙壁，则什么都不做
     // <3> 展示子弹碰撞特效
     // <4> 停止自动移动
-    if (__isBlockIntersection() || __isMapIntersection()) {
+    if (_isBlockIntersection() || _isMapIntersection()) {
         this->setVisible(false);
-        this->__showEffect();
-        this->__stopMove();
-    } else if (__isTankIntersection() || __isBulletIntersection()) {
+        this->_showEffect();
+        this->_stopMove();
+    } else if (_isTankIntersection() || _isBulletIntersection()) {
         this->setVisible(false);
-        this->__stopMove();
+        this->_stopMove();
     }
 
 }
 
-bool Bullet::__isMapIntersection() {
+bool Bullet::_isMapIntersection() {
     auto position = this->getPosition();
     if (position.x - BULLET_SIZE / 2 < 0
         || position.y + BULLET_SIZE / 2 > CENTER_HEIGHT
@@ -152,7 +152,7 @@ bool Bullet::__isMapIntersection() {
     return false;
 }
 
-bool Bullet::__isBlockIntersection() {
+bool Bullet::_isBlockIntersection() {
     // 得到所有方块位置
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
     auto box = getBoundingBox();
@@ -166,7 +166,7 @@ bool Bullet::__isBlockIntersection() {
             if (block->getType() == BlockType::WALL) {
                 // 碰到墙
                 auto result =
-                    dynamic_cast<BlockWall*>(block)->destory(this->dir, box);
+                    dynamic_cast<BlockWall*>(block)->destory(_dir, box);
 
                 if (result.first) {
                     // 发生碰撞
@@ -185,7 +185,7 @@ bool Bullet::__isBlockIntersection() {
 
             } else if (block->getType() == BlockType::STONE) {
                 // 碰到石头
-                if (level >= 2) {
+                if (_level >= 2) {
                     count++;
                     block->removeFromParent();
                     it = blocks.erase(it);

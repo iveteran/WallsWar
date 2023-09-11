@@ -5,9 +5,11 @@
 
 class PlayerTank : public TankBase {
 public:
+    CREATE_FUNC(PlayerTank);
+
     bool init() override;
 
-    void setDir(Dir d) override;
+    void setDirection(Direction dir) override;
     void shoot() override;
 
     void setBeControl(bool b = true);
@@ -16,15 +18,13 @@ public:
 
     static void loadFrameAnimation();                          // 加载坦克移动帧动画
 
-    CREATE_FUNC(PlayerTank);
-
 protected:
-    const cocos2d::Vector<cocos2d::Animate*>* __getAnimations() override;
+    const cocos2d::Vector<cocos2d::Animate*>* _getAnimations() override;
 
 private:
-    bool beControl = false;
-    static cocos2d::Vector<cocos2d::Animate*> animations[4];   // 存储坦克移动帧动画（方向和等级）
+    bool _beControl = false;
+    static cocos2d::Vector<cocos2d::Animate*> _animations[4];   // 存储坦克移动帧动画（方向和等级）
 
-    void __initBullets() override;
-    bool __isTankIntersection() override;
+    void _initBullets() override;
+    bool _isTankIntersection() override;
 };

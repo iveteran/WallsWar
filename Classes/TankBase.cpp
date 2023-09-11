@@ -13,7 +13,7 @@ bool TankBase::init() {
         return false;
     }
 
-    __initBullets();
+    _initBullets();
 
     return true;
 }
@@ -23,7 +23,7 @@ void TankBase::playAnimate() {
         return;
     }
 
-    this->runAction(RepeatForever::create(__getAnimations()[int(dir)].at(level)));
+    this->runAction(RepeatForever::create(_getAnimations()[int(_dir)].at(_level)));
 }
 
 void TankBase::stopAnimate() {
@@ -34,7 +34,7 @@ void TankBase::stopAnimate() {
     this->stopAllActions();
 }
 
-void TankBase::__autoMove(float /*t*/) {
+void TankBase::_autoMove(float /*t*/) {
     if (!canMove) {
         return;
     }
@@ -43,45 +43,45 @@ void TankBase::__autoMove(float /*t*/) {
     // 3. 移动时检测和坦克的碰撞
 
     auto position = this->getPosition();
-    auto step = 1.0f + level * 0.2f;
+    auto step = 1.0f + _level * 0.2f;
     if (dynamic_cast<EnemyTank*>(this))
         step = 1.0f;
 
     // 假设可以移动
-    switch (dir) {
-    case Dir::LEFT:
+    switch (_dir) {
+    case Direction::LEFT:
         this->setPositionX(position.x - step);
         break;
-    case Dir::UP:
+    case Direction::UP:
         this->setPositionY(position.y + step);
         break;
-    case Dir::RIGHT:
+    case Direction::RIGHT:
         this->setPositionX(position.x + step);
         break;
-    case Dir::DOWN:
+    case Direction::DOWN:
         this->setPositionY(position.y - step);
         break;
     default:
         break;
     }
 
-    moveDistance += int(step);
+    _moveDistance += int(step);
 
     // 如果产生碰撞，则回到移动之前的位置
-    if (__isBlockIntersection() || __isMapIntersection() || __isTankIntersection()) {
+    if (_isBlockIntersection() || _isMapIntersection() || _isTankIntersection()) {
         this->setPosition(position);
 
         // 敌方坦克碰撞后可以改变方向
-        moveDistance = 100;
+        _moveDistance = 100;
     }
 }
 
-void TankBase::__adjustPosition() {
-    this->setPositionX(__adjustNumber(int(this->getPositionX())));
-    this->setPositionY(__adjustNumber(int(this->getPositionY())));
+void TankBase::_adjustPosition() {
+    this->setPositionX(_adjustNumber(int(this->getPositionX())));
+    this->setPositionY(_adjustNumber(int(this->getPositionY())));
 }
 
-float TankBase::__adjustNumber(int number) {
+float TankBase::_adjustNumber(int number) {
     if (number % 8 != 0) {
         for (int offset = 1; offset < 8; offset++) {
             if ((number + offset) % 8 == 0) {
@@ -97,7 +97,7 @@ float TankBase::__adjustNumber(int number) {
     return float(number);
 }
 
-bool TankBase::__isMapIntersection() {
+bool TankBase::_isMapIntersection() {
     auto position = this->getPosition();
     return position.x - TANK_SIZE / 2.0f < 0
         || position.y + TANK_SIZE / 2.0f > CENTER_HEIGHT
@@ -105,7 +105,7 @@ bool TankBase::__isMapIntersection() {
         || position.y - TANK_SIZE / 2.0f < 0;
 }
 
-bool TankBase::__isBlockIntersection() {
+bool TankBase::_isBlockIntersection() {
     // 得到所有方块位置
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
     auto box = getBoundingBox();
@@ -122,23 +122,23 @@ bool TankBase::__isBlockIntersection() {
 }
 
 void TankBase::startMove() {
-    if (!isMove) {
+    if (!_isMove) {
         if (dynamic_cast<PlayerTank*>(this))
-            musicId = AudioEngine::play2d("music/player_move.mp3");
-        this->schedule(CC_SCHEDULE_SELECTOR(TankBase::__autoMove), 0.02f);
-        isMove = true;
+            _musicId = AudioEngine::play2d("music/player_move.mp3");
+        this->schedule(CC_SCHEDULE_SELECTOR(TankBase::_autoMove), 0.02f);
+        _isMove = true;
     }
 }
 
 void TankBase::stopMove() {
-    this->unschedule(CC_SCHEDULE_SELECTOR(TankBase::__autoMove));
-    AudioEngine::stop(musicId);
-    isMove = false;
+    this->unschedule(CC_SCHEDULE_SELECTOR(TankBase::_autoMove));
+    AudioEngine::stop(_musicId);
+    _isMove = false;
 }
 
 void TankBase::birth(std::string afterStart) {
     if (dynamic_cast<PlayerTank*>(this))
-        level = 0;
+        _level = 0;
     canMove = false;
     this->stopAllActions();
     this->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
@@ -168,7 +168,7 @@ void TankBase::birth(std::string afterStart) {
 }
 
 void TankBase::beInvincible(int time) {
-    this->isInvincible = true;
+    _isInvincible = true;
     auto ring = Sprite::create();
     auto spriteFrameCache = SpriteFrameCache::getInstance();
     Vector<SpriteFrame*> spriteFrames;
@@ -185,14 +185,14 @@ void TankBase::beInvincible(int time) {
         animate,
         CallFunc::create([=]() {
         ring->removeFromParent();
-        this->isInvincible = false;
+        _isInvincible = false;
     })
         , nullptr
         ));
 }
 
 void TankBase::disBlood() {
-    if (isInvincible)
+    if (_isInvincible)
         return;
 
     auto spriteFrameCache = SpriteFrameCache::getInstance();
@@ -215,7 +215,7 @@ void TankBase::disBlood() {
     node->runAction(Sequence::create(blastanimate,
                                      CallFunc::create([node] {node->removeFromParentAndCleanup(true); }),
                                      nullptr));
-    if (--blood == 0) {
+    if (--_blood == 0) {
         // 播放音效
         AudioEngine::play2d("music/enemy-bomb.mp3");
 
@@ -280,38 +280,38 @@ void TankBase::shoot() {
         return;
     }
 
-    auto bullet = bullets.at(0);
+    auto bullet = _bullets.at(0);
     if (!bullet->isVisible()) {
-        __shoot(bullet);
+        _shoot(bullet);
     }
 }
 
 cocos2d::Vector<Bullet*>& TankBase::getAllBullets() {
-    return bullets;
+    return _bullets;
 }
 
 Bullet* TankBase::getBullet1() {
-    return bullets.at(0);
+    return _bullets.at(0);
 }
 
-void TankBase::__shoot(Bullet* bullet) {
+void TankBase::_shoot(Bullet* bullet) {
     if (dynamic_cast<PlayerTank*>(this))
         AudioEngine::play2d("music/shoot.mp3");
     auto position = this->getPosition();
-    switch (dir) {
-    case Dir::LEFT:
+    switch (_dir) {
+    case Direction::LEFT:
         bullet->setSpriteFrame("bullet_l");
         bullet->setPosition(position.x - TANK_SIZE / 2.0f, position.y);
         break;
-    case Dir::UP:
+    case Direction::UP:
         bullet->setSpriteFrame("bullet_u");
         bullet->setPosition(position.x, position.y + TANK_SIZE / 2.0f);
         break;
-    case Dir::RIGHT:
+    case Direction::RIGHT:
         bullet->setSpriteFrame("bullet_r");
         bullet->setPosition(position.x + TANK_SIZE / 2.0f, position.y);
         break;
-    case Dir::DOWN:
+    case Direction::DOWN:
         bullet->setSpriteFrame("bullet_d");
         bullet->setPosition(position.x, position.y - TANK_SIZE / 2.0f);
         break;
@@ -319,7 +319,7 @@ void TankBase::__shoot(Bullet* bullet) {
         break;
     }
 
-    bullet->setDir(dir);
+    bullet->setDirection(_dir);
     bullet->setVisible(true);
     bullet->startMove();
 }

@@ -18,11 +18,11 @@ bool GameOverScene::init() {
     gameOver->setPosition(this->getContentSize() / 2);
 
     AudioEngine::play2d("music/fail.mp3");
-    scheduleOnce(CC_SCHEDULE_SELECTOR(GameOverScene::__replaceToMenu), 2.0f);
+    scheduleOnce(CC_SCHEDULE_SELECTOR(GameOverScene::_replaceToMenu), 2.0f);
 
     return true;
 }
 
-void GameOverScene::__replaceToMenu(float) {
+void GameOverScene::_replaceToMenu(float) {
     Director::getInstance()->replaceScene(MenuScene::create());
 }

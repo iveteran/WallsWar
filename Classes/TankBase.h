@@ -17,7 +17,7 @@ public:
     virtual void playAnimate();                         // 播放移动动画
     virtual void stopAnimate();                         // 停止播放动画
     virtual void shoot();                               // 发射子弹
-    virtual void setDir(Dir d) = 0;                     // 坦克改变方向
+    virtual void setDirection(Direction dir) = 0;                     // 坦克改变方向
 
     void startMove();                                   // 开启自动移动
     void stopMove();                                    // 停止自动移动
@@ -32,27 +32,27 @@ public:
     bool canMove = false;                               // 判断能否移动（刚出生时一段时间内无法移动）
 
 protected:
-    virtual void __initBullets() = 0;                   // 创建子弹
+    virtual void _initBullets() = 0;                   // 创建子弹
     virtual const cocos2d::Vector<cocos2d::Animate*>*
-        __getAnimations() = 0;                          // 获取帧动画
+        _getAnimations() = 0;                          // 获取帧动画
 
-    void __autoMove(float t);                           // 自动移动
-    void __adjustPosition();                            // 调整位置为8的倍数
-    void __shoot(Bullet* bullet);                       // 发射子弹辅助函数
+    void _autoMove(float t);                           // 自动移动
+    void _adjustPosition();                            // 调整位置为8的倍数
+    void _shoot(Bullet* bullet);                       // 发射子弹辅助函数
 
-    Dir dir = Dir::DOWN;                                // 坦克当前方向
-    TankLevel level = 0;                                // 坦克当前等级
-    cocos2d::Vector<Bullet*> bullets;                   // 存储坦克所有的子弹
-    unsigned char blood = 1;                            // 坦克生命值
-    bool isInvincible = false;                          // 判断是否无敌
-    int moveDistance = 0;                               // 移动总距离
+    Direction _dir = Direction::DOWN;                                // 坦克当前方向
+    TankLevel _level = 0;                                // 坦克当前等级
+    cocos2d::Vector<Bullet*> _bullets;                   // 存储坦克所有的子弹
+    unsigned char _blood = 1;                            // 坦克生命值
+    bool _isInvincible = false;                          // 判断是否无敌
+    int _moveDistance = 0;                               // 移动总距离
 
 private:
-    static float __adjustNumber(int number);            // 将给定数字调整为8的倍数
-    bool __isMapIntersection();                         // 检测坦克与地图边缘的碰撞
-    bool __isBlockIntersection();                       // 检测坦克与方块的碰撞
-    virtual bool __isTankIntersection() = 0;            // 检测坦克之间的碰撞
+    static float _adjustNumber(int number);            // 将给定数字调整为8的倍数
+    bool _isMapIntersection();                         // 检测坦克与地图边缘的碰撞
+    bool _isBlockIntersection();                       // 检测坦克与方块的碰撞
+    virtual bool _isTankIntersection() = 0;            // 检测坦克之间的碰撞
 
-    int musicId = -1;                                   // 移动时播放的音乐id
-    bool isMove = false;                                // 判断是否正在移动
+    int _musicId = -1;                                   // 移动时播放的音乐id
+    bool _isMove = false;                                // 判断是否正在移动
 };

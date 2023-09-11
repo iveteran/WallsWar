@@ -7,7 +7,7 @@
 
 USING_NS_CC;
 
-cocos2d::Vector<cocos2d::Animate*> EnemyTank::animations[4]{};
+cocos2d::Vector<cocos2d::Animate*> EnemyTank::_animations[4]{};
 
 bool EnemyTank::init() {
     if (!TankBase::init()) {
@@ -15,29 +15,29 @@ bool EnemyTank::init() {
     }
 
     // 随机选择一个类型
-    level = RandomUtil::random(0, 3);
+    _level = RandomUtil::random(0, 3);
 
     // 不断移动
     startMove();
 
     // 展示出生动画
-    birth("enemy_" + std::to_string(int(dir)) + "_" + std::to_string(level));
+    birth("enemy_" + std::to_string(int(_dir)) + "_" + std::to_string(_level));
 
     return true;
 }
 
-void EnemyTank::setDir(Dir d) {
-    if (d == dir) {
+void EnemyTank::setDirection(Direction dir) {
+    if (dir == _dir) {
         return;
     }
 
-    dir = d;
+    _dir = dir;
 
     // 当改变方向时，将坐标调整为最接近于8的倍数
-    __adjustPosition();
+    _adjustPosition();
 
-    std::string name = "enemy_" + std::to_string((int)dir) + "_"
-        + std::to_string(level);
+    std::string name = "enemy_" + std::to_string((int)_dir) + "_"
+        + std::to_string(_level);
 
     // 更换图片
     this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
@@ -53,7 +53,7 @@ void EnemyTank::loadFrameAnimation() {
         std::string lev = std::to_string(i);
         // 总共4个方向
         for (int j = 0; j < 4; j++) {
-            std::string d = std::to_string(j);
+            std::string dir = std::to_string(j);
             auto enemy_1 = SpriteFrame::create("images/enemy_tank/normal_tank/" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + "-1.png", tankRect);
             auto enemy_2 = SpriteFrame::create("images/enemy_tank/normal_tank/" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + "-2.png", tankRect);
             auto enemy = Animation::createWithSpriteFrames({ enemy_1, enemy_2 }, 0.05f);
@@ -62,34 +62,34 @@ void EnemyTank::loadFrameAnimation() {
             enemy_2->getTexture()->setAliasTexParameters();
 
             // 添加到缓存
-            spriteFrameCache->addSpriteFrame(enemy_1, "enemy_" + d + "_" + lev);
+            spriteFrameCache->addSpriteFrame(enemy_1, "enemy_" + dir + "_" + lev);
 
             // 保存
-            animations[j].pushBack(Animate::create(enemy));
+            _animations[j].pushBack(Animate::create(enemy));
         }
     }
 }
 
 void EnemyTank::changeDirection() {
-    if (moveDistance >= MAX_MOVE_DISTANCE) {
-        canChangeDir = true;
+    if (_moveDistance >= MAX_MOVE_DISTANCE) {
+        _canChangeDir = true;
     }
 
-    if (!canChangeDir) return;
+    if (!_canChangeDir) return;
 
-    moveDistance = 0;
-    canChangeDir = false;
+    _moveDistance = 0;
+    _canChangeDir = false;
 
     /*if (target == AttacTarget::CAMP) {
         if (RandomUtil::random(1, 10) <= 4) {
             auto camp = MapLayer::getInstance()->getCamp();
             if (this->getPositionX() > camp->getPositionX()) {
-                setDir(Dir::LEFT);
+                setDirection(Direction::LEFT);
             } else {
-                setDir(Dir::RIGHT);
+                setDirection(Direction::RIGHT);
             }
         } else {
-            setDir(Dir::DOWN);
+            setDirection(Direction::DOWN);
         }
     }*/
 
@@ -97,13 +97,13 @@ void EnemyTank::changeDirection() {
 
     this->stopAnimate();
     if (select <= 4) {
-        setDir(Dir::DOWN);
+        setDirection(Direction::DOWN);
     } else if (select <= 6) {
-        setDir(Dir::UP);
+        setDirection(Direction::UP);
     } else if (select <= 8) {
-        setDir(Dir::LEFT);
+        setDirection(Direction::LEFT);
     } else {
-        setDir(Dir::RIGHT);
+        setDirection(Direction::RIGHT);
     }
     this->playAnimate();
 }
@@ -112,16 +112,16 @@ void EnemyTank::disBlood() {
     TankBase::disBlood();
 }
 
-void EnemyTank::__initBullets() {
+void EnemyTank::_initBullets() {
     auto bullet = EnemyBullet::create();
-    bullets.pushBack(bullet);
+    _bullets.pushBack(bullet);
 }
 
-const cocos2d::Vector<cocos2d::Animate*>* EnemyTank::__getAnimations() {
-    return animations;
+const cocos2d::Vector<cocos2d::Animate*>* EnemyTank::_getAnimations() {
+    return _animations;
 }
 
-bool EnemyTank::__isTankIntersection() {
+bool EnemyTank::_isTankIntersection() {
     auto players = MapLayer::getInstance()->getPlayers();
     for (auto player : players) {
         if (this->getBoundingBox().myIntersectsRect(player->getBoundingBox())) {

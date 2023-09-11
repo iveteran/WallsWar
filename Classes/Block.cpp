@@ -69,7 +69,7 @@ bool BlockWall::init() {
     return true;
 }
 
-std::pair<bool, bool> BlockWall::destory(Dir d, const Rect& box) {
+std::pair<bool, bool> BlockWall::destory(Direction dir, const Rect& box) {
     bool flag = false; // 是否与子弹发生碰撞
     auto position = this->getPosition();
 
@@ -83,14 +83,14 @@ std::pair<bool, bool> BlockWall::destory(Dir d, const Rect& box) {
 
         // 加宽子弹
         Rect cmpBox;
-        switch (d) {
-        case Dir::LEFT:
-        case Dir::RIGHT:
+        switch (dir) {
+        case Direction::LEFT:
+        case Direction::RIGHT:
             cmpBox = Rect(box.getMinX(), box.getMinY() + 1 - BLOCK_SIZE,
                           BULLET_SIZE, TANK_SIZE);
             break;
-        case Dir::UP:
-        case Dir::DOWN:
+        case Direction::UP:
+        case Direction::DOWN:
             cmpBox = Rect(box.getMinX() + 1 - BLOCK_SIZE,
                           box.getMinY(), TANK_SIZE, BULLET_SIZE);
             break;
@@ -106,10 +106,10 @@ std::pair<bool, bool> BlockWall::destory(Dir d, const Rect& box) {
         }
     }
 
-    return std::make_pair(flag, __isDestory());
+    return std::make_pair(flag, _isDestory());
 }
 
-bool BlockWall::__isDestory() {
+bool BlockWall::_isDestory() {
     for (int i = 0; i < 4; i++) {
         if (!blacks[i]->isVisible()) {
             return false;

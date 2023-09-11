@@ -60,13 +60,13 @@ public:
     bool init() override;
     BlockType getType() override { return BlockType::WALL; }
 
-    std::pair<bool, bool> destory(Dir d, const cocos2d::Rect& box);
+    std::pair<bool, bool> destory(Direction dir, const cocos2d::Rect& box);
 
     CREATE_FUNC(BlockWall);
 
 private:
     cocos2d::LayerColor* blacks[4]{};        // 4个黑色方块，用于遮挡
-    bool __isDestory();                      // 检测方块是否被摧毁
+    bool _isDestory();                      // 检测方块是否被摧毁
 };
 
 class BlockStone : public __Obstacle {

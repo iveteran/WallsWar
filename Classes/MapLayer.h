@@ -27,7 +27,7 @@ public:
     void enableAutoAddEnemies(bool b = true);       // 启用自动添加敌人
     void enableAutoControlEnemies(bool b = true);   // 启用自动控制敌人
 
-    void addPlayer();                               // 添加玩家
+    PlayerTank* addPlayer();                        // 添加玩家
     void addEnemies();                              // 添加敌人
 
     void resetMap();                                // 清理工作
@@ -38,16 +38,16 @@ public:
 private:
     CREATE_FUNC(MapLayer);                          // 单例对象
 
-    void __addSpriteFrameCache();                   // 加载精灵帧缓存
-    void __addEnemy(float x, float y);              // 添加一辆敌方坦克
+    void _addSpriteFrameCache();                   // 加载精灵帧缓存
+    void _addEnemy(float x, float y);              // 添加一辆敌方坦克
 
     void autoAddEnemies(float);                     // 自动添加敌人
     void autoControlEnemiesDirection(float);        // 自动控制敌人方向
     void autoControlEnemiesShoot(float);            // 自动控制敌人发射子弹
 
-    cocos2d::Vector<Block*> blocks;                 // 管理所有方块
-    cocos2d::Vector<PlayerTank*> players;           // 管理玩家坦克
-    cocos2d::Vector<EnemyTank*> enemies;            // 管理敌方坦克
+    cocos2d::Vector<Block*> _blocks;                 // 管理所有方块
+    cocos2d::Vector<PlayerTank*> _players;           // 管理玩家坦克
+    cocos2d::Vector<EnemyTank*> _enemies;            // 管理敌方坦克
 
-    std::string data;                               // 地图数据
+    std::string _data;                               // 地图数据
 };

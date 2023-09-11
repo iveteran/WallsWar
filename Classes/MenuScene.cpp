@@ -14,7 +14,7 @@ bool MenuScene::init() {
     if (!Scene::init())
         return false;
 
-    __initBackground();
+    _initBackground();
 
     return true;
 }
@@ -67,7 +67,7 @@ bool MenuScene::onTouch(cocos2d::Touch* touch, cocos2d::Event*) {
     return true;
 }
 
-void MenuScene::__initBackground() {
+void MenuScene::_initBackground() {
     offsetNode = Node::create();
     this->addChild(offsetNode);
     offsetNode->setPosition(Director::getInstance()->getVisibleSize() / 2);
@@ -89,8 +89,8 @@ void MenuScene::__initBackground() {
             background->stopAllActions();
             background->setPosition(Vec2(0.f, 0.f));
 
-            if (!isSelectorInit)
-                __initSelector();
+            if (!_isSelectorInit)
+                _initSelector();
             break;
         default:
             break;
@@ -104,8 +104,8 @@ void MenuScene::__initBackground() {
         background->stopAllActions();
         background->setPosition(Vec2(0.f, 0.f));
 
-        if (!isSelectorInit)
-            __initSelector();
+        if (!_isSelectorInit)
+            _initSelector();
 
         return true;
     };
@@ -115,8 +115,8 @@ void MenuScene::__initBackground() {
     auto bkAction = Sequence::create(
         MoveTo::create(4.f, Vec2(0, 0)),
         CallFunc::create([=]() {
-        if (!isSelectorInit)
-            __initSelector();
+        if (!_isSelectorInit)
+            _initSelector();
     }),
         nullptr
         );
@@ -124,13 +124,13 @@ void MenuScene::__initBackground() {
     background->runAction(bkAction);
 }
 
-void MenuScene::__initSelector() {
+void MenuScene::_initSelector() {
     selector = Sprite::create("images/m0-2-1.png");
     selector->getTexture()->setAliasTexParameters();
     selector->setPosition(ARROWS_X, WINDOW_HEIGHT - ARROWS_Y);
 
     // 循环播放动画
-    auto animate = __getAnimFrames();
+    auto animate = _getAnimFrames();
     selector->runAction(RepeatForever::create(animate));
 
     background->addChild(selector);
@@ -148,10 +148,10 @@ void MenuScene::__initSelector() {
     _eventDispatcher->addEventListenerWithSceneGraphPriority(keyBoardlistener, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    isSelectorInit = true;
+    _isSelectorInit = true;
 }
 
-Animate* MenuScene::__getAnimFrames() {
+Animate* MenuScene::_getAnimFrames() {
     Vector<SpriteFrame*> animFrams;
     animFrams.reserve(2);
 

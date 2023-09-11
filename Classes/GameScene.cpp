@@ -35,12 +35,12 @@ bool GameScene::init() {
         });*/
 
         // 展示加载动画
-    __showLoadAnimate();
+    _showLoadAnimate();
 
     return true;
 }
 
-void GameScene::__showLoadAnimate() {
+void GameScene::_showLoadAnimate() {
     auto width = Director::getInstance()->getVisibleSize().width;
     auto mid = Director::getInstance()->getVisibleSize().height / 2;
     auto block1 = LayerColor::create(Color4B(0, 0, 0, 255));
@@ -99,43 +99,43 @@ void GameScene::__showLoadAnimate() {
         DelayTime::create(1),
         CallFunc::create([this, node]() {
         node->removeFromParentAndCleanup(true);
-        this->__initMapLayer();
-        this->__enableKeyListener();
-        this->__addTouchButton();
-        this->schedule(CC_SCHEDULE_SELECTOR(GameScene::__checkGameStatus), 0.2f);
+        this->_initMapLayer();
+        this->_enableKeyListener();
+        this->_addTouchButton();
+        this->schedule(CC_SCHEDULE_SELECTOR(GameScene::_checkGameStatus), 0.2f);
     }),
         nullptr)
     );
 }
 
-void GameScene::__initMapLayer() {
-    map = MapLayer::getInstance();
-    this->addChild(map);
+void GameScene::_initMapLayer() {
+    _map = MapLayer::getInstance();
+    this->addChild(_map);
 
     // 设置地图位置
-    map->setContentSize(Size(CENTER_WIDTH, CENTER_HEIGHT));
-    map->setIgnoreAnchorPointForPosition(false);
-    map->setPosition(Director::getInstance()->getVisibleSize() / 2);
+    _map->setContentSize(Size(CENTER_WIDTH, CENTER_HEIGHT));
+    _map->setIgnoreAnchorPointForPosition(false);
+    _map->setPosition(Director::getInstance()->getVisibleSize() / 2);
 
     // 加载地图数据
-    map->loadLevelData(stage);
+    _map->loadLevelData(stage);
 
     // 更新信息
     updateInformationArea(true);
 
     // 添加玩家和敌人
-    map->addPlayer();
-    map->addEnemies();
+    _player = _map->addPlayer();
+    _map->addEnemies();
 
     // 自动控制敌人
-    map->enableAutoAddEnemies();
-    map->enableAutoControlEnemies();
+    _map->enableAutoAddEnemies();
+    _map->enableAutoControlEnemies();
 }
 
-void GameScene::__enableKeyListener() {
+void GameScene::_enableKeyListener() {
     auto listener = EventListenerKeyboard::create();
     listener->onKeyPressed = [=](EventKeyboard::KeyCode keyCode, Event*) {
-        auto player1 = static_cast<PlayerTank*>(map->getPlayer1());
+        auto player1 = static_cast<PlayerTank*>(_map->getPlayer1());
         if (!player1) return;
 
         switch (keyCode) {
@@ -144,7 +144,7 @@ void GameScene::__enableKeyListener() {
         case cocos2d::EventKeyboard::KeyCode::KEY_D:
         case cocos2d::EventKeyboard::KeyCode::KEY_S:
             if (player1->canMove) {
-                player1->setDir(table[keyCode]);
+                player1->setDirection(table[keyCode]);
                 player1->playAnimate();
                 player1->startMove();
             }
@@ -159,7 +159,7 @@ void GameScene::__enableKeyListener() {
     };
 
     listener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event*) {
-        auto player1 = static_cast<PlayerTank*>(map->getPlayer1());
+        auto player1 = static_cast<PlayerTank*>(_map->getPlayer1());
         if (!player1) return;
 
         switch (keyCode) {
@@ -200,20 +200,20 @@ void GameScene::__addTouchButton() {
 
     touchListener->onTouchBegan = [=](Touch* touch, Event*) {
         auto point = touch->getLocation();
-        auto player1 = static_cast<PlayerTank*>(map->getPlayer1());
+        auto player1 = static_cast<PlayerTank*>(_map->getPlayer1());
         bool isMove = false;
 
         if (btn_left->getBoundingBox().containsPoint(point)) {
-            player1->setDir(Dir::LEFT);
+            player1->setDirection(Direction::LEFT);
             isMove = true;
         } else if (btn_up->getBoundingBox().containsPoint(point)) {
-            player1->setDir(Dir::UP);
+            player1->setDirection(Direction::UP);
             isMove = true;
         } else if (btn_right->getBoundingBox().containsPoint(point)) {
-            player1->setDir(Dir::RIGHT);
+            player1->setDirection(Direction::RIGHT);
             isMove = true;
         } else if (btn_down->getBoundingBox().containsPoint(point)) {
-            player1->setDir(Dir::DOWN);
+            player1->setDirection(Direction::DOWN);
             isMove = true;
         } else {
             player1->shoot();
@@ -229,7 +229,7 @@ void GameScene::__addTouchButton() {
 
     touchListener->onTouchEnded = [=](Touch* touch, Event*) {
         auto point = touch->getLocation();
-        auto player1 = static_cast<PlayerTank*>(map->getPlayer1());
+        auto player1 = static_cast<PlayerTank*>(_map->getPlayer1());
         if (btn_left->getBoundingBox().containsPoint(point)
             || btn_up->getBoundingBox().containsPoint(point)
             || btn_right->getBoundingBox().containsPoint(point)
@@ -242,19 +242,18 @@ void GameScene::__addTouchButton() {
 
     _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 }
+*/
 
-void GameScene::__checkGameStatus(float) {
-    if (map->getPlayers().size() == 0 || !map->isCampOk) {
-        // 停止所有音乐
-        AudioEngine::stopAll();
+void GameScene::_checkGameStatus(float) {
+    // 停止所有音乐
+    AudioEngine::stopAll();
+    if (_map->getPlayers().size() == 0 || !_map->isCampOk) {
         // 进入失败场景
         this->unscheduleAllCallbacks();
         _eventDispatcher->removeAllEventListeners();
 
-        scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::__gameover), 2.0f);
-    } else if (map->remainTank == 0 && map->getEnemies().size() == 0) {
-        // 停止所有音乐
-        AudioEngine::stopAll();
+        scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::_gameover), 2.0f);
+    } else if (_map->remainTank == 0 && _map->getEnemies().size() == 0) {
         // 进入结算场景
         this->cleanup();
         this->removeAllChildrenWithCleanup(true);
@@ -264,7 +263,7 @@ void GameScene::__checkGameStatus(float) {
     }
 }
 
-void GameScene::__gameover(float) {
+void GameScene::_gameover(float) {
     auto gameover = Sprite::create("images/gameover.png");
     gameover->getTexture()->setAliasTexParameters();
     this->addChild(gameover);
@@ -293,11 +292,11 @@ void GameScene::updateInformationArea(bool first) {
         auto spriteFrameCache = SpriteFrameCache::getInstance();
         // 绘制剩余坦克图标
         // 左上角坐标
-        auto x = map->getPositionX() + map->getContentSize().width / 2 + 7;
-        auto y = map->getPositionY() + map->getContentSize().height / 2 - 10;
+        auto x = _map->getPositionX() + _map->getContentSize().width / 2 + 7;
+        auto y = _map->getPositionY() + _map->getContentSize().height / 2 - 10;
         auto enemyIcon = spriteFrameCache->getSpriteFrameByName("enemy_icon");
 
-        for (int i = 0; i != map->remainTank; i++) {
+        for (int i = 0; i != _map->remainTank; i++) {
             auto icon = Sprite::createWithSpriteFrame(enemyIcon);
             icon->getTexture()->setAliasTexParameters();
             this->addChild(icon);

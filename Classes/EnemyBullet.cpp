@@ -9,10 +9,10 @@ bool EnemyBullet::init() {
 }
 
 void EnemyBullet::setBeIntersection() {
-    isBeIntersection = true;
+    _isBeIntersection = true;
 }
 
-bool EnemyBullet::__isTankIntersection() {
+bool EnemyBullet::_isTankIntersection() {
     auto player1 = MapLayer::getInstance()->getPlayer1();
     if (player1 && this->getBoundingBox().myIntersectsRect(player1->getBoundingBox())) {
         player1->disBlood();
@@ -22,9 +22,9 @@ bool EnemyBullet::__isTankIntersection() {
     return false;
 }
 
-bool EnemyBullet::__isBulletIntersection() {
-    if (isBeIntersection) {
-        isBeIntersection = false;
+bool EnemyBullet::_isBulletIntersection() {
+    if (_isBeIntersection) {
+        _isBeIntersection = false;
         return true;
     }
 
