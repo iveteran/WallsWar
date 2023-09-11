@@ -36,8 +36,8 @@ void EnemyTank::setDirection(Direction dir) {
     // 当改变方向时，将坐标调整为最接近于8的倍数
     _adjustPosition();
 
-    std::string name = "enemy_" + std::to_string((int)_dir) + "_"
-        + std::to_string(_level);
+    char name[128] = {0};
+    snprintf(name, sizeof(name), "enemy_%d_%d", (int)_dir, _level);
 
     // 更换图片
     this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
@@ -47,25 +47,29 @@ void EnemyTank::loadFrameAnimation() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
     Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
+    const char* imgPath = "images/enemy_tank/normal_tank";
 
-    // 总共4个等级
-    for (int i = 0; i < 4; i++) {
-        std::string lev = std::to_string(i);
-        // 总共4个方向
-        for (int j = 0; j < 4; j++) {
-            std::string dir = std::to_string(j);
-            auto enemy_1 = SpriteFrame::create("images/enemy_tank/normal_tank/" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + "-1.png", tankRect);
-            auto enemy_2 = SpriteFrame::create("images/enemy_tank/normal_tank/" + std::to_string(i + 1) + "-" + std::to_string(j + 1) + "-2.png", tankRect);
+    // 总共4个等级，从0到3
+    for (int level = 0; level < 4; level++) {
+        // 总共4个方向：left(0), up(1), right(2), down(3)
+        for (int dir = (int)Direction::NONE+1; dir < (int)Direction::COUNT; dir++) {
+            char buf[128] = {0};
+            snprintf(buf, sizeof(buf), "%s/%d-%d-1.png", imgPath, level+1, dir+1);
+            auto enemy_1 = SpriteFrame::create(buf, tankRect);
+            snprintf(buf, sizeof(buf), "%s/%d-%d-2.png", imgPath, level+1, dir+1);
+            auto enemy_2 = SpriteFrame::create(buf, tankRect);
             auto enemy = Animation::createWithSpriteFrames({ enemy_1, enemy_2 }, 0.05f);
 
             enemy_1->getTexture()->setAliasTexParameters();
             enemy_2->getTexture()->setAliasTexParameters();
 
             // 添加到缓存
-            spriteFrameCache->addSpriteFrame(enemy_1, "enemy_" + dir + "_" + lev);
+            char name[128] = {0};
+            snprintf(name, sizeof(name), "enemy_%d_%d", dir, level);
+            spriteFrameCache->addSpriteFrame(enemy_1, name);
 
             // 保存
-            _animations[j].pushBack(Animate::create(enemy));
+            _animations[dir].pushBack(Animate::create(enemy));
         }
     }
 }

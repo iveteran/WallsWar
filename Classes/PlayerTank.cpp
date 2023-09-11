@@ -38,8 +38,8 @@ void PlayerTank::setDirection(Direction dir) {
     // 当改变方向时，将坐标调整为最接近于8的倍数
     _adjustPosition();
 
-    std::string name = "player1_" + std::to_string((int)_dir) + "_"
-        + std::to_string(_level);
+    char name[128] = {0};
+    snprintf(name, sizeof(name), "player1_%d_%d", (int)_dir, _level);
 
     // 更换图片
     this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
@@ -69,25 +69,29 @@ void PlayerTank::loadFrameAnimation() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
     Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
+    const char* imgPath = "images/player1_tank";
 
-    // 总共4个等级
-    for (int i = 0; i < 4; i++) {
-        std::string lev = std::to_string(i);
-        // 总共4个方向
-        for (int j = 0; j < 4; j++) {
-            std::string dir = std::to_string(j);
-            auto player1_1 = SpriteFrame::create("images/player1_tank/m" + lev + "-" + dir + "-1.png", tankRect);
-            auto player1_2 = SpriteFrame::create("images/player1_tank/m" + lev + "-" + dir + "-2.png", tankRect);
+    // 总共4个等级，从0到3
+    for (int level = 0; level < 4; level++) {
+        // 总共4个方向：left(0), up(1), right(2), down(3)
+        for (int dir = (int)Direction::NONE+1; dir < (int)Direction::COUNT; dir++) {
+            char buf[128] = {0};
+            snprintf(buf, sizeof(buf), "%s/m%d-%d-1.png", imgPath, level, dir);
+            auto player1_1 = SpriteFrame::create(buf, tankRect);
+            snprintf(buf, sizeof(buf), "%s/m%d-%d-2.png", imgPath, level, dir);
+            auto player1_2 = SpriteFrame::create(buf, tankRect);
             auto player1 = Animation::createWithSpriteFrames({ player1_1, player1_2 }, 0.05f);
 
             player1_1->getTexture()->setAliasTexParameters();
             player1_2->getTexture()->setAliasTexParameters();
 
             // 添加到缓存
-            spriteFrameCache->addSpriteFrame(player1_1, "player1_" + dir + "_" + lev);
+            char name[128] = {0};
+            snprintf(name, sizeof(name), "player1_%d_%d", dir, level);
+            spriteFrameCache->addSpriteFrame(player1_1, name);
 
             // 保存
-            _animations[j].pushBack(Animate::create(player1));
+            _animations[dir].pushBack(Animate::create(player1));
         }
     }
 }

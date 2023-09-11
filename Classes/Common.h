@@ -54,6 +54,6 @@ constexpr int MAX_MOVE_DISTANCE = 100;
 // 关卡总数
 constexpr short STAGE_COUNT = 35;
 
-enum class Dir {
-    LEFT = 0, UP, RIGHT, DOWN
+enum class Direction {
+    NONE = -1, LEFT, UP, RIGHT, DOWN, COUNT
 };
