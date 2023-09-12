@@ -11,20 +11,14 @@ class PlayerTank;
 class Joypad : public Layer
 {
 public:
+    CREATE_FUNC(Joypad)
     static Joypad* getInstance();
 
-    CREATE_FUNC(Joypad)
     virtual bool init();
     void setPlayer(const PlayerTank* player);
 
 private:
-    bool initKeyboardKeysController();
-    bool initTouchButtonsController();
-
-private:
     PlayerTank* _player1 = nullptr;
-
-    std::map<cocos2d::EventKeyboard::KeyCode, Direction> _table;          // 键位方向表
 };
 
 #endif // _JOYPAD_H_
