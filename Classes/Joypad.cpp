@@ -27,11 +27,11 @@ bool Joypad::init()
     if (!Layer::init())
         return false;
 
-    auto btn_left = Sprite::create("images/move_left.png");
-    auto btn_up = Sprite::create("images/move_up.png");
-    auto btn_right = Sprite::create("images/move_right.png");
-    auto btn_down = Sprite::create("images/move_down.png");
-    auto btn_attack = Sprite::create("images/attack.png");
+    auto btn_left = Sprite::create("images/joypad/move_left.png");
+    auto btn_up = Sprite::create("images/joypad/move_up.png");
+    auto btn_right = Sprite::create("images/joypad/move_right.png");
+    auto btn_down = Sprite::create("images/joypad/move_down.png");
+    auto btn_attack = Sprite::create("images/joypad/attack.png");
     btn_attack->setScale(0.5);
 
     btn_left->setPosition(15, WINDOW_HEIGHT - 180);
