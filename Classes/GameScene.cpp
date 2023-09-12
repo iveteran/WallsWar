@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "MapLayer.h"
-#include "Joypad.h"
+//#include "Joypad.h"
+#include "Joypad2.h"
 #include "Common.h"
 #include "AudioEngine.h"
 #include "PlayerTank.h"
@@ -95,7 +96,8 @@ void GameScene::_showLoadAnimate() {
         CallFunc::create([this, node]() {
         node->removeFromParentAndCleanup(true);
         this->_initMapLayer();
-        this->_addJoypad();
+        //this->_addJoypad();
+        this->_addJoypad2();
         this->schedule(CC_SCHEDULE_SELECTOR(GameScene::_checkGameStatus), 0.2f);
     }),
         nullptr)
@@ -126,10 +128,17 @@ void GameScene::_initMapLayer() {
     _map->enableAutoControlEnemies();
 }
 
-void GameScene::_addJoypad() {
-    _joypad = Joypad::getInstance();
-    _joypad->setPlayer(_player);
-    this->addChild(_joypad);
+//void GameScene::_addJoypad() {
+//    _joypad = Joypad::getInstance();
+//    _joypad->setPlayer(_player);
+//    this->addChild(_joypad);
+//}
+
+void GameScene::_addJoypad2() {
+    _joypad2 = Joypad2::create();
+    _joypad2->setJoystickType(JoystickType::KEY4);
+    _joypad2->setPlayer(_player);
+    this->addChild(_joypad2);
 }
 
 void GameScene::_checkGameStatus(float) {
