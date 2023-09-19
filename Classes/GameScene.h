@@ -49,6 +49,7 @@ private:
     std::map<
         cocos2d::EventKeyboard::KeyCode, Direction> table;          // 键位方向表
 
+    void _printGameInfo();
     void _showLoadAnimate();                                 // 展示载入关卡动画
     void _initMapLayer();                                    // 初始化地图数据
     //void _addJoypad();

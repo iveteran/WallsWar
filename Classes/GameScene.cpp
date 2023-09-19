@@ -21,10 +21,6 @@ bool GameScene::init() {
     if (!Scene::init())
         return false;
 
-    // 将背景色设置为灰色
-    auto background = LayerColor::create(Color4B(100, 100, 100, 200));
-    this->addChild(background);
-
     // 播放开始音乐
     /*AudioEngine::setFinishCallback(AudioEngine::play2d("music/start.mp3"),
         [](int, const std::string &) {
@@ -34,7 +30,27 @@ bool GameScene::init() {
         // 展示加载动画
     _showLoadAnimate();
 
+    _printGameInfo();
+
     return true;
+}
+
+void GameScene::_printGameInfo()
+{
+    Point visible_origin = Director::getInstance()->getVisibleOrigin();
+    Size visible_size = Director::getInstance()->getVisibleSize();
+    CCLOG(">> visible_origin: (%f, %f)", visible_origin.x, visible_origin.y);
+    CCLOG(">> visible_size: (%f, %f)", visible_size.width, visible_size.height);
+
+    Size win_size = Director::getInstance()->getWinSize();
+    CCLOG(">> win_size: (%f, %f)", win_size.width, win_size.height);
+
+    auto camera = Camera::getDefaultCamera();
+    CCLOG(">> camera type: %d", camera->getType());
+    auto cameraPos = camera->getPosition();
+    CCLOG(">> camera pos: (%f, %f)", cameraPos.x, cameraPos.y);
+    auto vp = camera->getDefaultViewport();
+    CCLOG(">> camera viewport: (%f, %f, %f, %f)", vp.x, vp.y, vp.w, vp.h);
 }
 
 void GameScene::_showLoadAnimate() {
@@ -138,9 +154,9 @@ void GameScene::_initMapLayer() {
 
 void GameScene::_addJoypad2() {
     _joypad2 = Joypad2::create();
+    this->addChild(_joypad2);
     _joypad2->setJoystickType(JoystickType::KEY4);
     _joypad2->setPlayer(_player);
-    this->addChild(_joypad2);
 }
 
 void GameScene::_addKbdController() {
