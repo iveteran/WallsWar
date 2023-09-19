@@ -16,16 +16,12 @@ KbdController* KbdController::getInstance()
     return _kbdctrler;
 }
 
-void KbdController::setPlayer(const PlayerTank* player1)
-{
-    _player1 = (PlayerTank*)player1;
-}
-
-
 bool KbdController::init()
 {
     if (!Node::init())
         return false;
+
+    auto player1 = PlayerTank::getInstance();
 
     // 初始化控制键表
     _table[EventKeyboard::KeyCode::KEY_A] = Direction::LEFT;
@@ -48,15 +44,15 @@ bool KbdController::init()
         case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-            if (_player1->canMove) {
-                _player1->setDirection(_table[keyCode]);
-                _player1->playAnimate();
-                _player1->startMove();
+            if (player1->canMove) {
+                player1->setDirection(_table[keyCode]);
+                player1->playAnimate();
+                player1->startMove();
             }
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_J:
         case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
-            _player1->shoot();
+            player1->shoot();
             break;
         default:
             break;
@@ -74,9 +70,9 @@ bool KbdController::init()
         case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-            if (_player1->canMove) {
-                _player1->stopAnimate();
-                _player1->stopMove();
+            if (player1->canMove) {
+                player1->stopAnimate();
+                player1->stopMove();
             }
             break;
         default:

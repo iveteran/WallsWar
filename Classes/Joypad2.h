@@ -29,9 +29,6 @@ enum class JoyDirection
     COUNT
 };
 
-// use pre declare instead of include to avoid compile error
-class PlayerTank;
-
 // 虚拟手柄控制层
 class Joypad2 : public Layer
 {
@@ -44,7 +41,6 @@ public:
     virtual void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
     void setJoystickType(JoystickType joystick_type);
-    void setPlayer(const PlayerTank* player1);
 
 private:
     JoystickType m_type;
@@ -57,7 +53,6 @@ private:
 
     bool m_direction_status; // 方向键按下
     bool m_fire_status; // 开火键按下
-    PlayerTank* _player1 = nullptr; // like callback
 };
 
 #endif /* _JOYPAD2_H_ */

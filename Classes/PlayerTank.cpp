@@ -9,6 +9,17 @@ USING_NS_CC;
 
 cocos2d::Vector<cocos2d::Animate*> PlayerTank::_animations[4]{};
 
+static PlayerTank* _player1 = nullptr;
+
+PlayerTank* PlayerTank::getInstance() {
+    if (!_player1) {
+        _player1 = PlayerTank::create();
+        _player1->retain();
+    }
+
+    return _player1;
+}
+
 bool PlayerTank::init() {
     if (!TankBase::init()) {
         return false;
@@ -181,7 +192,7 @@ void PlayerTank::disBlood() {
     } else {
         // 播放动画
         _isInvincible = true; // 防止掉血
-        // 回到出生点
+        // 回到出生点, TODO: 等待N秒钟再重生
         birth("player1_" + std::to_string((int)_dir) + "_" + std::to_string(_level));
     }
 }

@@ -97,7 +97,7 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
     {
         // 开火
         // callback
-        _player1->shoot();
+        PlayerTank::getInstance()->shoot();
     }
 }
 
@@ -172,9 +172,10 @@ void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
 
             if (direction != Direction::NONE)
             {
-                _player1->setDirection(direction);
-                _player1->playAnimate();
-                _player1->startMove();
+                auto player1 = PlayerTank::getInstance();
+                player1->setDirection(direction);
+                player1->playAnimate();
+                player1->startMove();
 
             }
         }
@@ -228,7 +229,7 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
         // callback
         if (m_type == JoystickType::KEY4 || m_type == JoystickType::KEY8)
         {
-            _player1->stopMove();
+            PlayerTank::getInstance()->stopMove();
         }
         else if (m_type == JoystickType::KEYANY)
         {
@@ -241,11 +242,6 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     {
         // 停止开火
         // callback
-        //_player1->shoot(false);
+        //PlayerTank::getInstance()->shoot(false);
     }
-}
-
-void Joypad2::setPlayer(const PlayerTank* player1)
-{
-    _player1 = (PlayerTank*)player1;
 }

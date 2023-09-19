@@ -148,7 +148,6 @@ void GameScene::_initMapLayer() {
 
 //void GameScene::_addJoypad() {
 //    _joypad = Joypad::getInstance();
-//    _joypad->setPlayer(_player);
 //    this->addChild(_joypad);
 //}
 
@@ -156,12 +155,10 @@ void GameScene::_addJoypad2() {
     _joypad2 = Joypad2::create();
     this->addChild(_joypad2);
     _joypad2->setJoystickType(JoystickType::KEY4);
-    _joypad2->setPlayer(_player);
 }
 
 void GameScene::_addKbdController() {
     _kbd_ctrler = KbdController::create();
-    _kbd_ctrler->setPlayer(_player);
     this->addChild(_kbd_ctrler);
 }
 
