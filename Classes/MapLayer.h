@@ -15,6 +15,8 @@ public:
 
     static MapLayer* getInstance();                 // 得到地图图层实例
 
+    void loadCamp();
+    bool loadMapData();
     void loadLevelData(short stage);                // 加载指定关卡的数据
 
     Block* getCamp();                               // 得到大本营
@@ -38,6 +40,7 @@ public:
 private:
     CREATE_FUNC(MapLayer);                          // 单例对象
 
+    void _addBlock(int i, int j, BlockType t);
     void _addSpriteFrameCache();                   // 加载精灵帧缓存
     void _addEnemy(float x, float y);              // 添加一辆敌方坦克
 

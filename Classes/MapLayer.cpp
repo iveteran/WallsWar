@@ -19,7 +19,7 @@ bool MapLayer::init() {
     }
 
     // 设置背景颜色为黑色
-    this->initWithColor(Color4B(0, 0, 0, 255));
+    //this->initWithColor(Color4B(0, 0, 0, 255));
 
     // 加载精灵帧缓存
     _addSpriteFrameCache();
@@ -153,64 +153,116 @@ void MapLayer::resetMap() {
     this->isCampOk = true;
 }
 
+void MapLayer::loadCamp() {
+    auto camp = BlockCamp::create();
+    this->addChild(camp);
+    camp->setPosition(CAMP_X, CAMP_Y); // 左下角
+    _blocks.pushBack(camp);
+
+    // 上侧护墙
+    int y = 2;
+    for (int x=0; x<3; x++)
+    {
+        _addBlock(x, y, BlockType::STONE);
+    }
+    // 右侧护墙
+    int x = 2;
+    for (int y=0; y<2; y++)
+    {
+        _addBlock(x, y, BlockType::STONE);
+    }
+}
+
+bool MapLayer::loadMapData() {
+    // TODO: load from store
+    int widthSize = (int)(CENTER_WIDTH / BLOCK_SIZE);
+    int heightSize = (int)(CENTER_HEIGHT / BLOCK_SIZE);
+    // 增加底边围墙
+    int y = 4;
+    for (int x=0; x<widthSize-1; x++)
+    {
+        _addBlock(x, y, BlockType::WALL);
+    }
+    // 增加右边围墙
+    int x = widthSize-5;
+    for (int y=0; y<heightSize-1; y++)
+    {
+        _addBlock(x, y, BlockType::WALL);
+    }
+    // 增加顶边围墙
+    y = heightSize-5;
+    for (int x=0; x<widthSize; x++)
+    {
+        _addBlock(x, y, BlockType::WALL);
+    }
+    // 增加左边围墙
+    x = 4;
+    for (int y=2; y<heightSize; y++)
+    {
+        _addBlock(x, y, BlockType::WALL);
+    }
+
+    // 中心点石头
+    _addBlock(widthSize / 2, heightSize / 2, BlockType::STONE);
+
+    return true;
+}
+
+void MapLayer::_addBlock(int i, int j, BlockType t)
+{
+    // 制造精灵
+    Block* block = nullptr;
+
+    // 创建不同类型的方块
+    switch (t)
+    {
+        case BlockType::WALL:
+            block = BlockWall::create();
+            break;
+        case BlockType::STONE:
+            block = BlockStone::create();
+            break;
+        case BlockType::FOREST:
+            block = BlockForest::create();
+            break;
+        case BlockType::RIVER:
+            block = BlockRiver::create();
+            break;
+        case BlockType::ICE:
+            block = BlockIce::create();
+            break;
+        default:
+            break;
+    }
+
+    if (block) {
+        // 将精灵添加到图层
+        if (block->getType() == BlockType::FOREST) {
+            this->addChild(block, 101);
+        } else {
+            this->addChild(block);
+        }
+
+        // 设置精灵在图层上的位置
+        block->setAnchorPoint(Vec2(0, 0));
+        block->setPosition(Vec2((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE));
+
+        // 存储vector
+        _blocks.pushBack(block);
+        auto point = new Vec2(i, j);
+        _blockMatrix.insert(point, block);
+    }
+}
+
 void MapLayer::loadLevelData(short stage) {
     // 清理工作
     resetMap();
 
-    // 先添加大本营
-    auto camp = BlockCamp::create();
-    this->addChild(camp);
-    camp->setPosition(CAMP_X, CAMP_Y);
-    _blocks.pushBack(camp);
+    // 添加大本营
+    loadCamp();
 
-    // 然后添加其他方块
-    std::string filename = "maps/" + std::to_string(stage) + ".txt";
-    _data = FileUtils::getInstance()->getStringFromFile(filename);
-
-    int index = 0;
-
-    for (int i = 0; i < 26; i++) {
-        for (int j = 0; j < 26; j++) {
-            char c = _data[index++];
-            if (c == '\r') {
-                j--;
-                index++;
-                continue;
-            }
-            // 制造精灵
-            Block* block = nullptr;
-
-            // 创建不同类型的方块
-            if (c == '3') {
-                block = BlockWall::create();
-            } else if (c == '5') {
-                block = BlockStone::create();
-            } else if (c == '1') {
-                block = BlockForest::create();
-            } else if (c == '4') {
-                block = BlockRiver::create();
-            } else if (c == '2') {
-                block = BlockIce::create();
-            }
-
-            if (block) {
-                // 将精灵添加到图层
-                if (block->getType() == BlockType::FOREST) {
-                    this->addChild(block, 101);
-                } else {
-                    this->addChild(block);
-                }
-
-                // 设置精灵在图层上的位置
-                block->setAnchorPoint(Vec2(0, 0));
-                block->setPosition(Vec2((float)j * BLOCK_SIZE, (float)(25 - i) * BLOCK_SIZE));
-
-                // 存储vector
-                _blocks.pushBack(block);
-            }
-
-        }
-    }
+    // 加载地图
+    loadMapData();
 }
 
 PlayerTank* MapLayer::getPlayer1() {
