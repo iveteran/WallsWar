@@ -1,8 +1,6 @@
 #include "GameScene.h"
 #include "MapLayer.h"
-//#include "Joypad.h"
-#include "Joypad2.h"
-#include "KbdController.h"
+#include "ControlLayer.h"
 #include "Common.h"
 #include "AudioEngine.h"
 #include "PlayerTank.h"
@@ -113,9 +111,7 @@ void GameScene::_showLoadAnimate() {
         CallFunc::create([this, node]() {
         node->removeFromParentAndCleanup(true);
         this->_initMapLayer();
-        //this->_addJoypad();
-        this->_addJoypad2();
-        this->_addKbdController();
+        this->_initControlLayer();
         this->schedule(CC_SCHEDULE_SELECTOR(GameScene::_checkGameStatus), 0.2f);
     }),
         nullptr)
@@ -138,7 +134,7 @@ void GameScene::_initMapLayer() {
     updateInformationArea(true);
 
     // 添加玩家和敌人
-    _player = _map->addPlayer();
+    _player1 = _map->addPlayer();
     _map->addEnemies();
 
     // 自动控制敌人
@@ -146,20 +142,9 @@ void GameScene::_initMapLayer() {
     _map->enableAutoControlEnemies();
 }
 
-//void GameScene::_addJoypad() {
-//    _joypad = Joypad::getInstance();
-//    this->addChild(_joypad);
-//}
-
-void GameScene::_addJoypad2() {
-    _joypad2 = Joypad2::create();
-    this->addChild(_joypad2);
-    _joypad2->setJoystickType(JoystickType::KEY4);
-}
-
-void GameScene::_addKbdController() {
-    _kbd_ctrler = KbdController::create();
-    this->addChild(_kbd_ctrler);
+void GameScene::_initControlLayer() {
+    _ctrlLayer = ControlLayer::create();
+    this->addChild(_ctrlLayer);
 }
 
 void GameScene::_checkGameStatus(float) {

@@ -4,11 +4,8 @@
 #include "Common.h"
 #include <map>
 
-//class Joypad;
-class Joypad2;
-class KbdController;
-
 class PlayerTank;
+class ControlLayer;
 class MapLayer;
 
 class GameScene : public cocos2d::Scene {
@@ -41,20 +38,14 @@ public:
     short stage = 1;                                          // 当前关卡
 
 private:
-    PlayerTank* _player = nullptr;
-    //Joypad* _joypad = nullptr;
-    Joypad2* _joypad2 = nullptr;
-    KbdController* _kbd_ctrler = nullptr;
-    MapLayer* _map = nullptr;                                  // 管理地图
-    std::map<
-        cocos2d::EventKeyboard::KeyCode, Direction> table;          // 键位方向表
+    PlayerTank* _player1 = nullptr;
+    ControlLayer* _ctrlLayer = nullptr;                      // 游戏控制、信息和状态显示
+    MapLayer* _map = nullptr;                                // 管理地图
 
     void _printGameInfo();
     void _showLoadAnimate();                                 // 展示载入关卡动画
     void _initMapLayer();                                    // 初始化地图数据
-    //void _addJoypad();
-    void _addJoypad2();
-    void _addKbdController();                                // PC键盘控制
+    void _initControlLayer();
     void _checkGameStatus(float);                            // 检查游戏状态
     void _gameover(float);                                   // 游戏结束动画
 };
