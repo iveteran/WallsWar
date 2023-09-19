@@ -9,16 +9,13 @@ bool Joypad2::init()
     if (!Layer::init())
         return false;
 
-    Point visible_origin = Director::getInstance()->getVisibleOrigin();
-    Size visible_size = Director::getInstance()->getVisibleSize();
-
     // 此处是4方向
     m_type = JoystickType::KEY4;
 
     // 锚点在圆心
     m_wheel = Sprite::create("images/joypad/wheel.png");
     m_wheel->setScale(0.5);
-    m_wheel->setPosition(visible_origin.x + 70, visible_origin.y + 70);
+    m_wheel->setPosition(50, 50);
     addChild(m_wheel);
 
     // 摇杆
@@ -31,9 +28,8 @@ bool Joypad2::init()
 
     // 开火键
     m_attack = Sprite::create("images/joypad/attack.png");
-    m_attack->setScale(0.5);
-    m_attack->setPosition(Vec2(visible_origin.x + visible_size.width - 70,
-                          visible_origin.y + 70));
+    m_attack->setScale(0.7);
+    m_attack->setPosition(getContentSize().width - 50, 50);
     addChild(m_attack);
 
     // 触摸监听,多点触控
