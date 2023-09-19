@@ -37,10 +37,11 @@ protected:
         _getAnimations() = 0;                          // 获取帧动画
 
     void _autoMove(float t);                           // 自动移动
+    void _makeCameraFollowPlayerByMapBorder();
     void _adjustPosition();                            // 调整位置为8的倍数
     void _shoot(Bullet* bullet);                       // 发射子弹辅助函数
 
-    Direction _dir = Direction::DOWN;                                // 坦克当前方向
+    Direction _dir = Direction::UP;                      // 坦克当前方向
     TankLevel _level = 0;                                // 坦克当前等级
     cocos2d::Vector<Bullet*> _bullets;                   // 存储坦克所有的子弹
     unsigned char _blood = 1;                            // 坦克生命值

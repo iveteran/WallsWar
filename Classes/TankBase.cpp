@@ -67,12 +67,81 @@ void TankBase::_autoMove(float /*t*/) {
 
     _moveDistance += int(step);
 
+    bool moveCancelled = false;
     // 如果产生碰撞，则回到移动之前的位置
     if (_isBlockIntersection() || _isMapIntersection() || _isTankIntersection()) {
         this->setPosition(position);
+        moveCancelled = true;
 
         // 敌方坦克碰撞后可以改变方向
         _moveDistance = 100;
+    }
+
+    if (!moveCancelled && dynamic_cast<PlayerTank*>(this))
+    {
+        // 如果是玩家移动，让摄像头跟随他
+        _makeCameraFollowPlayerByMapBorder();
+    }
+}
+
+void TankBase::_makeCameraFollowPlayerByMapBorder() {
+    auto camera = Camera::getDefaultCamera();
+    auto cameraPos = camera->getPosition();
+    //CCLOG(">> [autoMove] camera position: (%f, %f)", cameraPos.x, cameraPos.y);
+
+    Size visible_size = Director::getInstance()->getVisibleSize();
+    //CCLOG(">> [autoMove] visible_size: (%f, %f)", visible_size.width, visible_size.height);
+
+    auto pos = this->getPosition();
+    //CCLOG(">> [autoMove] player position: (%f, %f)", pos.x, pos.y);
+
+    static const int minBordGrap = TANK_SIZE * 2;
+    int xOffset = 0, yOffset = 0;
+    int gap = 0;
+    float cameraGap = 0;
+    switch (_dir)
+    {
+        case Direction::LEFT:
+            cameraGap = cameraPos.x - visible_size.width / 2 + (CENTER_WIDTH / 2 - visible_size.width / 2);
+            gap = pos.x - cameraGap;
+            //printf(">>> cameraGap: %f\n", cameraGap);
+            if (gap < minBordGrap && cameraGap > 0)
+            {
+                xOffset = -1;
+            }
+            break;
+        case Direction::RIGHT:
+            gap = visible_size.width - pos.x;
+            if (cameraPos.x < CENTER_WIDTH / 2 && gap < minBordGrap)
+            {
+                xOffset = 1;
+            }
+            break;
+        case Direction::UP:
+            gap = visible_size.height - pos.y;
+            if (cameraPos.y < CENTER_HEIGHT / 2 && gap < minBordGrap)
+            {
+                yOffset = 1;
+            }
+            break;
+        case Direction::DOWN:
+            cameraGap = cameraPos.y - visible_size.height / 2 + (CENTER_HEIGHT / 2 - visible_size.height / 2);
+            gap = pos.y - cameraGap;
+            if (gap < minBordGrap && cameraGap > 0)
+            {
+                yOffset = -1;
+            }
+            break;
+        default:
+            break;
+    }
+    //CCLOG(">> [autoMove] gap : %d", gap);
+    if (xOffset != 0 || yOffset != 0) {
+        cameraPos.x += xOffset;
+        cameraPos.y += yOffset;
+        camera->setPosition(cameraPos);
+        //CCLOG("-------------------");
+        //CCLOG(">> [autoMove] camera move to position: (%f, %f)", cameraPos.x, cameraPos.y);
     }
 }
 
@@ -138,7 +207,18 @@ void TankBase::stopMove() {
 
 void TankBase::birth(std::string afterStart) {
     if (dynamic_cast<PlayerTank*>(this))
+    {
         _level = 0;
+
+        // 玩家重生摄像头重回出生地：地图左下角,
+        // visible_size: V, CENTER_SIZE: C, => V/2 - (C/2 - V/2) => V - C/2
+        Size visible_size = Director::getInstance()->getVisibleSize();
+        auto camera = Camera::getDefaultCamera();
+        float x = visible_size.width - CENTER_WIDTH / 2;
+        float y = visible_size.height - CENTER_HEIGHT / 2;
+        camera->setPosition(x, y);
+        CCLOG(">> [birth] camera move to position: (%f, %f)", x, y);
+    }
     canMove = false;
     this->stopAllActions();
     this->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
