@@ -11,35 +11,35 @@ constexpr float ARROWS_X = 75;
 constexpr float ARROWS_Y = 132;
 constexpr float ARROWS_DIS = 15;
 
-// 中间黑色游戏区域大小
-constexpr float CENTER_WIDTH = 208;
-constexpr float CENTER_HEIGHT = 208;
+// 中间游戏区域大小，注：8的倍数
+constexpr float CENTER_WIDTH = 512;
+constexpr float CENTER_HEIGHT = 512;
 
 // 方块大小
 constexpr float BLOCK_SIZE = 8;
 
 // 坦克大小
-constexpr float TANK_SIZE = 16;
+constexpr float TANK_SIZE = 2 * BLOCK_SIZE;
 
 // 玩家坦克初始位置
-constexpr float PLAYER1_START_X = 80;
-constexpr float PLAYER1_START_Y = 8;
+constexpr float PLAYER1_START_X = 4 * BLOCK_SIZE;
+constexpr float PLAYER1_START_Y = 1 * BLOCK_SIZE;
 
-constexpr float PLAYER2_START_X = 128;
-constexpr float PLAYER2_START_Y = 8;
+constexpr float PLAYER2_START_X = 1 * BLOCK_SIZE;
+constexpr float PLAYER2_START_Y = 4 * BLOCK_SIZE;
 
 // 敌方坦克初始位置
-constexpr float ENEMY1_STAR_X = 8;
-constexpr float ENEMY1_STAR_Y = 200;
+constexpr float ENEMY1_STAR_X = CENTER_WIDTH - 8;
+constexpr float ENEMY1_STAR_Y = 8;
 
-constexpr float ENEMY2_STAR_X = 104;
-constexpr float ENEMY2_STAR_Y = 200;
+constexpr float ENEMY2_STAR_X = CENTER_WIDTH - 8;
+constexpr float ENEMY2_STAR_Y = CENTER_HEIGHT - 8;
 
-constexpr float ENEMY3_STAR_X = 200;
-constexpr float ENEMY3_STAR_Y = 200;
+constexpr float ENEMY3_STAR_X = 8;
+constexpr float ENEMY3_STAR_Y = CENTER_HEIGHT - 8;
 
 // 大本营位置
-constexpr float CAMP_X = 104;
+constexpr float CAMP_X = 8;
 constexpr float CAMP_Y = 8;
 
 // 子弹大小
