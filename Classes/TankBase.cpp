@@ -1,6 +1,8 @@
 #include "TankBase.h"
 #include "Common.h"
 #include "MapLayer.h"
+#include "ControlLayer.h"
+#include "GameScene.h"
 #include "Bullet.h"
 #include "Block.h"
 
@@ -140,6 +142,13 @@ void TankBase::_makeCameraFollowPlayerByMapBorder() {
         cameraPos.x += xOffset;
         cameraPos.y += yOffset;
         camera->setPosition(cameraPos);
+
+        // 使ControlLayer跟随摄像头，从而固定在屏幕相应位置
+        auto ctrlLayer = GET_CONTROL_LAYER();
+        if (ctrlLayer != nullptr) {
+            auto ctrlLayerPos = ctrlLayer->getPosition();
+            ctrlLayer->setPosition(ctrlLayerPos.x + xOffset, ctrlLayerPos.y + yOffset);
+        }
         //CCLOG("-------------------");
         //CCLOG(">> [autoMove] camera move to position: (%f, %f)", cameraPos.x, cameraPos.y);
     }
@@ -213,10 +222,16 @@ void TankBase::birth(std::string afterStart) {
         // 玩家重生摄像头重回出生地：地图左下角,
         // visible_size: V, CENTER_SIZE: C, => V/2 - (C/2 - V/2) => V - C/2
         Size visible_size = Director::getInstance()->getVisibleSize();
-        auto camera = Camera::getDefaultCamera();
         float x = visible_size.width - CENTER_WIDTH / 2;
         float y = visible_size.height - CENTER_HEIGHT / 2;
+        auto camera = Camera::getDefaultCamera();
         camera->setPosition(x, y);
+
+        // 重置ControlLayer的位置，使其跟随摄像头，从而固定在屏幕相应位置
+        auto ctrlLayer = GET_CONTROL_LAYER();
+        if (ctrlLayer != nullptr) {
+            ctrlLayer->setPosition(x, y);
+        }
         CCLOG(">> [birth] camera move to position: (%f, %f)", x, y);
     }
     canMove = false;

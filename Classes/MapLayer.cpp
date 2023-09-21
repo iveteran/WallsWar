@@ -102,7 +102,6 @@ void MapLayer::autoControlEnemiesShoot(float) {
 PlayerTank* MapLayer::addPlayer() {
     auto player = PlayerTank::create();
     this->addChild(player);
-    player->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
 
     auto bullets = player->getAllBullets();
     for (auto& bullet : bullets) {

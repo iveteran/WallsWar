@@ -23,6 +23,9 @@ bool PlayerTank::init() {
     // 玩家出生时方向向上
     _dir = Direction::UP;
 
+    // 设置出生地点
+    this->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
+
     return true;
 }
 
