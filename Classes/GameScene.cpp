@@ -12,7 +12,12 @@
 USING_NS_CC;
 
 Scene* GameScene::createScene() {
+    CCLOG("-------- GameScene::createScene -----------");
     return GameScene::create();
+}
+
+GameScene::~GameScene() {
+    CCLOG("-------- GameScene::~GameScene -----------");
 }
 
 bool GameScene::init() {
@@ -28,7 +33,9 @@ bool GameScene::init() {
         // 展示加载动画
     _showLoadAnimate();
 
+    CCLOG("-------- GameScene::init -----------");
     _printGameInfo();
+    CCLOG("------------------------------------");
 
     return true;
 }
@@ -133,8 +140,9 @@ void GameScene::_initMapLayer() {
     // 更新信息
     updateInformationArea(true);
 
-    // 添加玩家和敌人
+    // 添加玩家
     _player1 = _map->addPlayer();
+    // 添加敌人
     _map->addEnemies();
 
     // 自动控制敌人

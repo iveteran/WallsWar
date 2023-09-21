@@ -12,6 +12,7 @@ class GameScene : public cocos2d::Scene {
 public:
     static cocos2d::Scene* createScene();
 
+    ~GameScene();
     bool init() override;
 
     static void addSpriteFrameCache();
