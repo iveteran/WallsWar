@@ -11,7 +11,6 @@ class KbdController : public Node
 {
 public:
     CREATE_FUNC(KbdController)
-    static KbdController* getInstance();
 
     virtual bool init();
 

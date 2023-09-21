@@ -10,17 +10,6 @@
 USING_NS_CC;
 using namespace cocos2d::ui;
 
-//static ControlLayer* _ctrlLayer = nullptr;
-//
-//ControlLayer* ControlLayer::getInstance() {
-//    if (!_ctrlLayer) {
-//        _ctrlLayer = ControlLayer::create();
-//        _ctrlLayer->retain();
-//    }
-//
-//    return _ctrlLayer;
-//}
-
 bool ControlLayer::init() {
     if (!cocos2d::Layer::init()) {
         return false;

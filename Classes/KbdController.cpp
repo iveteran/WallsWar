@@ -1,27 +1,19 @@
 #include "Common.h"
 #include "KbdController.h"
 #include "PlayerTank.h"
+#include "GameScene.h"
 
 USING_NS_CC;
-
-static KbdController* _kbdctrler = nullptr;
-
-KbdController* KbdController::getInstance()
-{
-    if (!_kbdctrler) {
-        _kbdctrler = KbdController::create();
-        _kbdctrler->retain();
-    }
-
-    return _kbdctrler;
-}
 
 bool KbdController::init()
 {
     if (!Node::init())
         return false;
 
-    auto player1 = PlayerTank::getInstance();
+    auto player1 = GET_PLAYER1();
+    if (player1 == nullptr) {
+        return false;
+    }
 
     // 初始化控制键表
     _table[EventKeyboard::KeyCode::KEY_A] = Direction::LEFT;

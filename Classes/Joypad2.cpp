@@ -1,6 +1,7 @@
 #include "Common.h"
 #include "Joypad2.h"
 #include "PlayerTank.h"
+#include "GameScene.h"
 
 const double PI = 3.141592654;
 
@@ -97,7 +98,10 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
     {
         // 开火
         // callback
-        PlayerTank::getInstance()->shoot();
+        auto player1 = GET_PLAYER1();
+        if (player1 != nullptr) {
+            player1->shoot();
+        }
     }
 }
 
@@ -172,10 +176,12 @@ void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
 
             if (direction != Direction::NONE)
             {
-                auto player1 = PlayerTank::getInstance();
-                player1->setDirection(direction);
-                player1->playAnimate();
-                player1->startMove();
+                auto player1 = GET_PLAYER1();
+                if (player1 != nullptr) {
+                    player1->setDirection(direction);
+                    player1->playAnimate();
+                    player1->startMove();
+                }
 
             }
         }
@@ -229,7 +235,10 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
         // callback
         if (m_type == JoystickType::KEY4 || m_type == JoystickType::KEY8)
         {
-            PlayerTank::getInstance()->stopMove();
+            auto player1 = GET_PLAYER1();
+            if (player1 != nullptr) {
+                player1->stopMove();
+            }
         }
         else if (m_type == JoystickType::KEYANY)
         {
@@ -242,6 +251,9 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     {
         // 停止开火
         // callback
-        //PlayerTank::getInstance()->shoot(false);
+        //auto player1 = GET_PLAYER1();
+        //if (player1 != nullptr) {
+        //    player1->shoot();
+        //}
     }
 }

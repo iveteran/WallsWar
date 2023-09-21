@@ -5,7 +5,6 @@
 class PlayerTank : public TankBase {
 public:
     CREATE_FUNC(PlayerTank);
-    static PlayerTank* getInstance();
 
     bool init() override;
 

@@ -100,7 +100,7 @@ void MapLayer::autoControlEnemiesShoot(float) {
 }
 
 PlayerTank* MapLayer::addPlayer() {
-    auto player = PlayerTank::getInstance();
+    auto player = PlayerTank::create();
     this->addChild(player);
     player->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
 

@@ -6,10 +6,8 @@ class KbdController;
 
 class ControlLayer : public cocos2d::Layer {
 public:
-    CREATE_FUNC(ControlLayer);                          // 单例对象
+    CREATE_FUNC(ControlLayer);
     bool init() override;
-
-    static ControlLayer* getInstance();
 
 private:
     void _addJoypad2();
