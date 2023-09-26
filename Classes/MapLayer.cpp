@@ -215,7 +215,7 @@ bool MapLayer::hasBlockAtPosition(const Vec2& pos, int floor) const {
     return iter != _posBlocks.end() && iter->second->getFloor() == floor;
 }
 
-void MapLayer::_addBlock(float x, float y, BlockType t)
+bool MapLayer::_addBlock(float x, float y, BlockType t)
 {
     // 制造精灵
     Block* block = nullptr;
@@ -225,7 +225,7 @@ void MapLayer::_addBlock(float x, float y, BlockType t)
     if (hasBlockAtPosition(blockPos, floor)) {
         CCLOG("[MapLayer::_addBlock] already has block at: (%f, %f) and floor: %d, do not to create again!",
                 blockPos.x, blockPos.y, floor);
-        return;
+        return false;
     }
 
     // 创建不同类型的方块
@@ -266,44 +266,37 @@ void MapLayer::_addBlock(float x, float y, BlockType t)
         // 存储vector
         _blocks.pushBack(block);
         _posBlocks.insert(blockPos, block);
+
+        return true;
     }
+    return false;
 }
 
-void MapLayer::_addBlock(int i, int j, BlockType t) {
-    _addBlock((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t);
+bool MapLayer::_addBlock(int i, int j, BlockType t) {
+    return _addBlock((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t);
 }
 
-void MapLayer::createBlock(int i, int j, BlockType t) {
-    _addBlock(i, j, t);
+bool MapLayer::createBlock(int i, int j, BlockType t) {
+    return _addBlock(i, j, t);
 }
 
-void MapLayer::createBlock(float x, float y, BlockType t) {
-    _addBlock(x, y, t);
+bool MapLayer::createBlock(float x, float y, BlockType t) {
+    return _addBlock(x, y, t);
 }
 
-void MapLayer::createBlock(const cocos2d::Vec2& pos, BlockType t) {
-    createBlock(pos.x, pos.y, t);
+bool MapLayer::createBlock(const cocos2d::Vec2& pos, BlockType t) {
+    return createBlock(pos.x, pos.y, t);
 }
 
-void MapLayer::createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t) {
+int MapLayer::createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t) {
+    int count = 0;
     for (auto pos : posList) {
-        createBlock(pos.x, pos.y, t);
+        bool success = createBlock(pos.x, pos.y, t);
+        if (success) {
+            count++;
+        }
     }
-}
-
-void MapLayer::createBlock4(int i, int j, BlockType t) {
-    createBlock4((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t);
-}
-
-void MapLayer::createBlock4(float x, float y, BlockType t) {
-    _addBlock(x, y, t);
-    _addBlock(x - BLOCK_SIZE, y, t);
-    _addBlock(x - BLOCK_SIZE, y + BLOCK_SIZE, t);
-    _addBlock(x, y + BLOCK_SIZE, t);
-}
-
-void MapLayer::createBlock4(const Vec2& pos, BlockType t) {
-    createBlock4(pos.x, pos.y, t);
+    return count;
 }
 
 void MapLayer::loadLevelData(short stage) {
