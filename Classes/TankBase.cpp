@@ -28,6 +28,15 @@ void TankBase::playAnimate() {
     this->runAction(RepeatForever::create(_getAnimations()[int(_dir)].at(_level)));
 }
 
+void TankBase::playFallingAnimate() {
+    // rising, falling
+    //this->runAction(RepeatForever::create(_getAnimations()[int(_dir)].at(_level)));
+}
+
+Direction TankBase::getDirection() const {
+    return _dir;
+}
+
 void TankBase::stopAnimate() {
     if (!canMove) {
         return;
@@ -79,10 +88,31 @@ void TankBase::_autoMove(float /*t*/) {
         _moveDistance = 100;
     }
 
+    fallDownIfNextFloorIsEmpty();
+
     if (!moveCancelled && dynamic_cast<PlayerTank*>(this))
     {
         // 如果是玩家移动，让摄像头跟随他
         _makeCameraFollowPlayerByMapBorder();
+    }
+}
+
+bool TankBase::_isNextFloorEmpty(const Vec2& pos) const {
+    auto mapLayer = MapLayer::getInstance();
+    CCAssert(mapLayer != nullptr, "Fatal: Map layer does not created!");
+    //bool hasBlocks = mapLayer->hasBlocksAroundPosition(pos, TANK_SIZE);
+    //printf(">>> hasBlocks: %d\n", hasBlocks);
+    //return ! hasBlocks;
+    bool checkZAxis = true;
+    return !_isBlockIntersection(checkZAxis);
+}
+
+// 如果Floor大于0，在移动时要检查下一层是否空的，如果是空的就使其掉落到下一层直至到地面(0层)
+void TankBase::fallDownIfNextFloorIsEmpty() {
+    while (getFloor() > 0 && _isNextFloorEmpty(getPosition())) {
+        decreaseFloor();
+        CCLOG(">> [TankBase::fallDownIfNextFloorIsEmpty] tank fall to floor: %d", getFloor());
+        playFallingAnimate();
     }
 }
 
@@ -172,7 +202,7 @@ float TankBase::_adjustNumber(int number) {
     return float(number);
 }
 
-bool TankBase::_isMapIntersection() {
+bool TankBase::_isMapIntersection() const {
     auto position = this->getPosition();
     return position.x - TANK_SIZE / 2.0f < 0
         || position.y + TANK_SIZE / 2.0f > CENTER_HEIGHT
@@ -180,13 +210,14 @@ bool TankBase::_isMapIntersection() {
         || position.y - TANK_SIZE / 2.0f < 0;
 }
 
-bool TankBase::_isBlockIntersection() {
+bool TankBase::_isBlockIntersection(bool checkZAxis) const {
     // 得到所有方块位置
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
     auto box = getBoundingBox();
     for (auto& block : blocks) {
         auto category = block->getCategory();
-        if (category == BlockCategory::OBSTACLE || category == BlockCategory::RIVER) {
+        if ((checkZAxis || getFloor() == block->getFloor()) &&
+                (category == BlockCategory::OBSTACLE || category == BlockCategory::RIVER)) {
             auto other = block->getBoundingBox();
             if (box.myIntersectsRect(other)) {
                 return true;
@@ -239,6 +270,11 @@ void TankBase::birth(std::string afterStart) {
     canMove = false;
     this->stopAllActions();
     this->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
+
+    // 如果出生地有障碍物或其它坦克就让其升高一层楼
+    while (_isBlockIntersection() || _isTankIntersection()) {
+        increaseFloor();
+    }
 
     auto spriteFrameCache = SpriteFrameCache::getInstance();
     Vector<SpriteFrame*> spriteFrames;
@@ -418,5 +454,6 @@ void TankBase::_shoot(Bullet* bullet) {
 
     bullet->setDirection(_dir);
     bullet->setVisible(true);
+    bullet->setFloor(getFloor());
     bullet->startMove();
 }

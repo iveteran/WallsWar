@@ -60,7 +60,8 @@ bool PlayerTank::_isTankIntersection() {
     auto& enemies = MapLayer::getInstance()->getEnemies();
 
     for (auto enemy : enemies) {
-        if (this->getBoundingBox().myIntersectsRect(enemy->getBoundingBox())) {
+        if (getFloor() == enemy->getFloor() &&
+                this->getBoundingBox().myIntersectsRect(enemy->getBoundingBox())) {
             return true;
         }
     }
@@ -187,4 +188,139 @@ void PlayerTank::disBlood() {
         // 回到出生点, TODO: 等待N秒钟再重生
         birth("player1_" + std::to_string((int)_dir) + "_" + std::to_string(_level));
     }
+}
+
+void PlayerTank::createBlock1() {
+    auto playerPos = this->getPosition();
+    float x = 0, y = 0;
+    switch (_dir) {
+        case Direction::UP:
+            x = playerPos.x;
+            y = playerPos.y;
+            break;
+        case Direction::RIGHT:
+            x = playerPos.x;
+            y = playerPos.y - BLOCK_SIZE;
+            break;
+        case Direction::DOWN:
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y - BLOCK_SIZE;
+            break;
+        case Direction::LEFT:
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y;
+            break;
+        default:
+            return;
+    }
+
+    BlockType blockType = (BlockType)_creatingBlock;
+    CCLOG(">> [PlayerTank::createBlock1] type: %d, position: (%f, %f)", blockType, x, y);
+    MapLayer::getInstance()->createBlock(Vec2(x, y), blockType);
+
+    if (blockType != BlockType::FOREST) {
+        //increaseFloor();
+        setFloor(1);
+    }
+    CCLOG(">> [PlayerTank::createBlock1] tank rises to floor: %d", getFloor());
+}
+
+void PlayerTank::createBlock2() {
+    auto playerPos = this->getPosition();
+    std::vector<Vec2> posList;
+    float x = 0, y = 0;
+    switch (_dir) {
+        case Direction::UP:
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y;
+            posList.push_back(Vec2(x, y));
+            x = playerPos.x;
+            y = playerPos.y;
+            posList.push_back(Vec2(x, y));
+            break;
+        case Direction::DOWN:
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y - BLOCK_SIZE;
+            posList.push_back(Vec2(x, y));
+            x = playerPos.x;
+            y = playerPos.y - BLOCK_SIZE;
+            posList.push_back(Vec2(x, y));
+            break;
+        case Direction::LEFT:
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y;
+            posList.push_back(Vec2(x, y));
+            x = playerPos.x - BLOCK_SIZE;
+            y = playerPos.y - BLOCK_SIZE;
+            posList.push_back(Vec2(x, y));
+            break;
+        case Direction::RIGHT:
+            x = playerPos.x;
+            y = playerPos.y;
+            posList.push_back(Vec2(x, y));
+            x = playerPos.x;
+            y = playerPos.y - BLOCK_SIZE;
+            posList.push_back(Vec2(x, y));
+            break;
+        default:
+            return;
+    }
+
+    BlockType blockType = (BlockType)_creatingBlock;
+    CCLOG(">> [PlayerTank::createBlock2] type: %d, begin: (%f, %f), direction: %d",
+            blockType, playerPos.x, playerPos.y, _dir);
+    MapLayer::getInstance()->createBlocks(posList, blockType);
+
+    if (blockType != BlockType::FOREST) {
+        //increaseFloor();
+        setFloor(1);
+    }
+    CCLOG(">> [PlayerTank::createBlock2] tank rises to floor: %d", getFloor());
+}
+
+void PlayerTank::createBlock4() {
+    auto playerPos = this->getPosition();
+    std::vector<Vec2> posList;
+    float x, y;
+    x = playerPos.x;
+    y = playerPos.y;
+    posList.push_back(Vec2(x, y));
+    x = playerPos.x;
+    y = playerPos.y - BLOCK_SIZE;
+    posList.push_back(Vec2(x, y));
+    x = playerPos.x - BLOCK_SIZE;
+    y = playerPos.y - BLOCK_SIZE;
+    posList.push_back(Vec2(x, y));
+    x = playerPos.x - BLOCK_SIZE;
+    y = playerPos.y;
+    posList.push_back(Vec2(x, y));
+
+    BlockType blockType = (BlockType)_creatingBlock;
+    CCLOG(">> [PlayerTank::createBlock4] type: %d, around: (%f, %f)",
+            blockType, playerPos.x, playerPos.y);
+    MapLayer::getInstance()->createBlocks(posList, blockType);
+
+    if (blockType != BlockType::FOREST) {
+        //increaseFloor();
+        setFloor(1);
+    }
+    CCLOG(">> [PlayerTank::createBlock4] tank rises to floor: %d", getFloor());
+}
+
+void PlayerTank::choiceCreatingBlockType(RRDirection rrd) {
+    int total = (int)BlockType::COUNT;
+    if (rrd == RRDirection::FORWARD) {
+        _creatingBlock++;
+    } else {
+        _creatingBlock--;
+    }
+    _creatingBlock = _creatingBlock % total;
+    if (_creatingBlock == (int)BlockType::UNDEFINED) {
+        if (rrd == RRDirection::FORWARD) {
+            _creatingBlock++;
+        } else {
+            _creatingBlock = total - 1;
+        }
+    }
+    CCLOG(">> [PlayerTank::choiceCreatingBlockType] switch to type: %d", _creatingBlock);
 }

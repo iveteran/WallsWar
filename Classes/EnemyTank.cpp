@@ -128,14 +128,16 @@ const cocos2d::Vector<cocos2d::Animate*>* EnemyTank::_getAnimations() {
 bool EnemyTank::_isTankIntersection() {
     auto players = MapLayer::getInstance()->getPlayers();
     for (auto player : players) {
-        if (this->getBoundingBox().myIntersectsRect(player->getBoundingBox())) {
+        if (getFloor() == player->getFloor() &&
+                this->getBoundingBox().myIntersectsRect(player->getBoundingBox())) {
             return true;
         }
     }
 
     auto buddies = MapLayer::getInstance()->getEnemies();
     for (auto buddy : buddies) {
-        if (buddy != this && this->getBoundingBox().myIntersectsRect(buddy->getBoundingBox())) {
+        if (buddy != this && getFloor() == buddy->getFloor() &&
+                this->getBoundingBox().myIntersectsRect(buddy->getBoundingBox())) {
             return true;
         }
     }

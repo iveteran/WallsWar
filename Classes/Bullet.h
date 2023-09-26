@@ -14,6 +14,9 @@ public:
     void setDirection(Direction dir);
     void setLevel(BulletLevel lev);
 
+    int getFloor() const { return getLocalZOrder(); }
+    void setFloor(int floor) { setLocalZOrder(floor); }
+
     static void addSpriteFrameCache();
 
 private:

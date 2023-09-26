@@ -42,6 +42,23 @@ bool KbdController::init()
         case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
             player1->shoot();
             break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_C:
+            player1->createBlock1();
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_V:
+            player1->createBlock2();
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_X:
+            player1->createBlock4();
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_LESS_THAN:
+        case cocos2d::EventKeyboard::KeyCode::KEY_PG_DOWN:
+            player1->choiceCreatingBlockType(RRDirection::BACKWARD);
+            break;
+        case cocos2d::EventKeyboard::KeyCode::KEY_GREATER_THAN:
+        case cocos2d::EventKeyboard::KeyCode::KEY_PG_UP:
+            player1->choiceCreatingBlockType(RRDirection::FORWARD);
+            break;
         default:
             break;
         }

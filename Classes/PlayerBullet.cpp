@@ -12,7 +12,8 @@ bool PlayerBullet::init() {
 bool PlayerBullet::_isTankIntersection() {
     auto& enemies = MapLayer::getInstance()->getEnemies();
     for (auto enemy : enemies) {
-        if (enemy->getBoundingBox().myIntersectsRect(this->getBoundingBox())) {
+        if (getFloor() == enemy->getFloor() &&
+                enemy->getBoundingBox().myIntersectsRect(this->getBoundingBox())) {
             enemy->disBlood();
             return true;
         }
@@ -25,7 +26,8 @@ bool PlayerBullet::_isBulletIntersection() {
     auto& enemies = MapLayer::getInstance()->getEnemies();
     for (auto enemy : enemies) {
         auto bullet = static_cast<EnemyBullet*>(enemy->getBullet1());
-        if (this->getBoundingBox().myIntersectsRect(bullet->getBoundingBox())) {
+        if (getFloor() == bullet->getFloor() &&
+                this->getBoundingBox().myIntersectsRect(bullet->getBoundingBox())) {
             bullet->setBeIntersection();
             return true;
         }

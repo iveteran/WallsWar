@@ -3,6 +3,26 @@
 
 USING_NS_CC;
 
+int getBlockFloor(BlockType bt) {
+    int floor = 0;
+    switch (bt)
+    {
+        case BlockType::WALL:
+        case BlockType::STONE:
+        case BlockType::RIVER:
+        case BlockType::ICE:
+            floor = 0;
+            break;
+        case BlockType::FOREST:
+            floor = 9;
+            break;
+        default:
+            CCLOG("[getBlockFloor] unsupported block type: %d", bt);
+            break;
+    }
+    return floor;
+}
+
 bool Block::init() {
     if (!Sprite::init()) {
         return false;

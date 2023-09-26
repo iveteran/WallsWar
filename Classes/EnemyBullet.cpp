@@ -14,7 +14,9 @@ void EnemyBullet::setBeIntersection() {
 
 bool EnemyBullet::_isTankIntersection() {
     auto player1 = MapLayer::getInstance()->getPlayer1();
-    if (player1 && this->getBoundingBox().myIntersectsRect(player1->getBoundingBox())) {
+    if (player1 &&
+            getFloor() == player1->getFloor() &&
+            this->getBoundingBox().myIntersectsRect(player1->getBoundingBox())) {
         player1->disBlood();
         return true;
     }

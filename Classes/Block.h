@@ -23,12 +23,15 @@ enum class BlockType {
     COUNT
 };
 
+int getBlockFloor(BlockType bt);
+
 class Block : public cocos2d::Sprite {
 public:
     bool init() override;             // 调用父类的init
 
     virtual BlockCategory getCategory() = 0;
     virtual BlockType getType() { return BlockType::UNDEFINED; }
+    int getFloor() const { return getLocalZOrder(); }
 
     static void addSpriteFrameCache();
 };

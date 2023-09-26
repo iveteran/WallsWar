@@ -131,6 +131,10 @@ void Bullet::_autoMove(float t) {
         this->setVisible(false);
         this->_showEffect();
         this->_stopMove();
+        auto& players = MapLayer::getInstance()->getPlayers();
+        for (auto player : players) {
+            player->fallDownIfNextFloorIsEmpty();
+        }
     } else if (_isTankIntersection() || _isBulletIntersection()) {
         this->setVisible(false);
         this->_stopMove();
@@ -155,13 +159,15 @@ bool Bullet::_isMapIntersection() {
 bool Bullet::_isBlockIntersection() {
     // 得到所有方块位置
     auto& blocks = MapLayer::getInstance()->getAllBlocks();
+    auto& posBlocks = MapLayer::getInstance()->getPositionBlocks();
     auto box = getBoundingBox();
     auto count = 0;
 
     for (auto it = blocks.begin(); it != blocks.end(); ) {
         auto block = (*it);
         // 碰到障碍物
-        if (block->getCategory() == BlockCategory::OBSTACLE
+        if (getFloor() == block->getFloor()
+            && block->getCategory() == BlockCategory::OBSTACLE
             && box.intersectsRect(block->getBoundingBox())) {
             if (block->getType() == BlockType::WALL) {
                 // 碰到墙
@@ -174,6 +180,7 @@ bool Bullet::_isBlockIntersection() {
                     if (result.second) {
                         // 发生碰撞且被摧毁
                         block->removeFromParent();
+                        posBlocks.erase(block->getPosition());
                         it = blocks.erase(it);
                     } else {
                         ++it;

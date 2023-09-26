@@ -15,9 +15,17 @@ public:
     bool init() override;                               // 初始化缓存和子弹
 
     virtual void playAnimate();                         // 播放移动动画
+    virtual void playFallingAnimate();
     virtual void stopAnimate();                         // 停止播放动画
     virtual void shoot();                               // 发射子弹
     virtual void setDirection(Direction dir) = 0;       // 坦克改变方向
+    Direction getDirection() const;
+
+    int getFloor() const { return getLocalZOrder(); }
+    void setFloor(int floor) { setLocalZOrder(floor); }
+    void increaseFloor() { setLocalZOrder(getLocalZOrder() + 1); }
+    void decreaseFloor() { setLocalZOrder(getLocalZOrder() - 1); }
+    void fallDownIfNextFloorIsEmpty();
 
     void startMove(Direction dir);                      // 开启自动移动
     void stopMove();                                    // 停止自动移动
@@ -37,6 +45,7 @@ protected:
         _getAnimations() = 0;                          // 获取帧动画
 
     void _autoMove(float t);                           // 自动移动
+    bool _isNextFloorEmpty(const cocos2d::Vec2& pos) const;
     void _makeCameraFollowPlayerByMapBorder();
     void _adjustPosition();                            // 调整位置为8的倍数
     void _shoot(Bullet* bullet);                       // 发射子弹辅助函数
@@ -50,8 +59,8 @@ protected:
 
 private:
     static float _adjustNumber(int number);            // 将给定数字调整为8的倍数
-    bool _isMapIntersection();                         // 检测坦克与地图边缘的碰撞
-    bool _isBlockIntersection();                       // 检测坦克与方块的碰撞
+    bool _isMapIntersection() const;                         // 检测坦克与地图边缘的碰撞
+    bool _isBlockIntersection(bool checkZAxis = false) const ; // 检测坦克与方块的碰撞
     virtual bool _isTankIntersection() = 0;            // 检测坦克之间的碰撞
 
     int _musicId = -1;                                   // 移动时播放的音乐id

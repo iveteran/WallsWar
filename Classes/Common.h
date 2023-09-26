@@ -11,7 +11,7 @@ constexpr float ARROWS_X = 75;
 constexpr float ARROWS_Y = 132;
 constexpr float ARROWS_DIS = 15;
 
-// 中间游戏区域大小，注：8的倍数
+// 中间游戏区域大小，注：BLOCK_SIZE的倍数
 constexpr float CENTER_WIDTH = 512;
 constexpr float CENTER_HEIGHT = 512;
 
@@ -56,4 +56,8 @@ constexpr short STAGE_COUNT = 35;
 
 enum class Direction {
     NONE = -1, LEFT, UP, RIGHT, DOWN, COUNT
+};
+
+enum class RRDirection {
+    FORWARD, BACKWARD
 };

@@ -143,6 +143,7 @@ void MapLayer::addEnemies() {
 
 void MapLayer::resetMap() {
     _blocks.clear();
+    _posBlocks.clear();
     _data.clear();
     _enemies.clear();
     _players.clear();
@@ -158,6 +159,7 @@ void MapLayer::loadCamp() {
     Vec2 campPos(CAMP_X, CAMP_Y);
     camp->setPosition(campPos); // 左下角
     _blocks.pushBack(camp);
+    _posBlocks.insert(campPos, camp);
 
     // 上侧护墙
     int y = 2;
@@ -208,11 +210,23 @@ bool MapLayer::loadMapData() {
     return true;
 }
 
-void MapLayer::_addBlock(int i, int j, BlockType t)
+bool MapLayer::hasBlockAtPosition(const Vec2& pos, int floor) const {
+    auto iter = _posBlocks.find(pos);
+    return iter != _posBlocks.end() && iter->second->getFloor() == floor;
+}
+
+void MapLayer::_addBlock(float x, float y, BlockType t)
 {
     // 制造精灵
     Block* block = nullptr;
-    Vec2 blockPos(Vec2((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE));
+    Vec2 blockPos(x, y);
+
+    int floor = getBlockFloor(t);
+    if (hasBlockAtPosition(blockPos, floor)) {
+        CCLOG("[MapLayer::_addBlock] already has block at: (%f, %f) and floor: %d, do not to create again!",
+                blockPos.x, blockPos.y, floor);
+        return;
+    }
 
     // 创建不同类型的方块
     switch (t)
@@ -251,7 +265,45 @@ void MapLayer::_addBlock(int i, int j, BlockType t)
 
         // 存储vector
         _blocks.pushBack(block);
+        _posBlocks.insert(blockPos, block);
     }
+}
+
+void MapLayer::_addBlock(int i, int j, BlockType t) {
+    _addBlock((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t);
+}
+
+void MapLayer::createBlock(int i, int j, BlockType t) {
+    _addBlock(i, j, t);
+}
+
+void MapLayer::createBlock(float x, float y, BlockType t) {
+    _addBlock(x, y, t);
+}
+
+void MapLayer::createBlock(const cocos2d::Vec2& pos, BlockType t) {
+    createBlock(pos.x, pos.y, t);
+}
+
+void MapLayer::createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t) {
+    for (auto pos : posList) {
+        createBlock(pos.x, pos.y, t);
+    }
+}
+
+void MapLayer::createBlock4(int i, int j, BlockType t) {
+    createBlock4((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t);
+}
+
+void MapLayer::createBlock4(float x, float y, BlockType t) {
+    _addBlock(x, y, t);
+    _addBlock(x - BLOCK_SIZE, y, t);
+    _addBlock(x - BLOCK_SIZE, y + BLOCK_SIZE, t);
+    _addBlock(x, y + BLOCK_SIZE, t);
+}
+
+void MapLayer::createBlock4(const Vec2& pos, BlockType t) {
+    createBlock4(pos.x, pos.y, t);
 }
 
 void MapLayer::loadLevelData(short stage) {
@@ -277,6 +329,10 @@ Block* MapLayer::getCamp() {
 
 cocos2d::Vector<Block*>& MapLayer::getAllBlocks() {
     return _blocks;
+}
+
+cocos2d::Map<Vec2, Block*>& MapLayer::getPositionBlocks() {
+    return _posBlocks;
 }
 
 cocos2d::Vector<EnemyTank*>& MapLayer::getEnemies() {
