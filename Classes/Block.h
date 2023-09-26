@@ -13,13 +13,14 @@ enum class BlockCategory {
 
 // 方块类型
 enum class BlockType {
-    CAMP,
+    UNDEFINED,
+    WALL,
+    STONE,
     FOREST,
     ICE,
     RIVER,
-    STONE,
-    WALL,
-    UNDIFINE
+    CAMP,
+    COUNT
 };
 
 class Block : public cocos2d::Sprite {
@@ -27,7 +28,7 @@ public:
     bool init() override;             // 调用父类的init
 
     virtual BlockCategory getCategory() = 0;
-    virtual BlockType getType() { return BlockType::UNDIFINE; }
+    virtual BlockType getType() { return BlockType::UNDEFINED; }
 
     static void addSpriteFrameCache();
 };

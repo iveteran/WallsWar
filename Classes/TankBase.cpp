@@ -160,16 +160,13 @@ void TankBase::_adjustPosition() {
 }
 
 float TankBase::_adjustNumber(int number) {
-    if (number % 8 != 0) {
-        for (int offset = 1; offset < 8; offset++) {
-            if ((number + offset) % 8 == 0) {
-                return float(number + offset);
-            }
-
-            if ((number - offset) % 8 == 0) {
-                return float(number - offset);
-            }
-        }
+    int adjustSize = BLOCK_SIZE;
+    int mod = number % (int)adjustSize;
+    int half_block_size = adjustSize / 2;
+    if (mod < half_block_size) {
+        number += mod;
+    } else if (mod >= half_block_size) {
+        number -= adjustSize - mod;
     }
 
     return float(number);
@@ -199,19 +196,24 @@ bool TankBase::_isBlockIntersection() {
     return false;
 }
 
-void TankBase::startMove() {
+void TankBase::startMove(Direction dir) {
     if (!_isMove) {
+        setDirection(dir);
         if (dynamic_cast<PlayerTank*>(this))
             _musicId = AudioEngine::play2d("music/player_move.mp3");
         this->schedule(CC_SCHEDULE_SELECTOR(TankBase::_autoMove), 0.02f);
         _isMove = true;
+        playAnimate();
     }
 }
 
 void TankBase::stopMove() {
     this->unschedule(CC_SCHEDULE_SELECTOR(TankBase::_autoMove));
     AudioEngine::stop(_musicId);
+    // 到达目的地后，将坐标调整为最接近于BLOCK_SIZE的倍数
+    _adjustPosition();
     _isMove = false;
+    stopAnimate();
 }
 
 void TankBase::birth(std::string afterStart) {

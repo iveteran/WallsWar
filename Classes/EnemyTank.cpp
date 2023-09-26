@@ -18,7 +18,7 @@ bool EnemyTank::init() {
     _level = RandomUtil::random(0, 3);
 
     // 不断移动
-    startMove();
+    startMove(_dir);
 
     // 展示出生动画
     birth("enemy_" + std::to_string(int(_dir)) + "_" + std::to_string(_level));
@@ -34,7 +34,7 @@ void EnemyTank::setDirection(Direction dir) {
     _dir = dir;
 
     // 当改变方向时，将坐标调整为最接近于8的倍数
-    _adjustPosition();
+    //_adjustPosition();
 
     char name[128] = {0};
     snprintf(name, sizeof(name), "enemy_%d_%d", (int)_dir, _level);

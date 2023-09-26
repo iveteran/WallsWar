@@ -178,9 +178,7 @@ void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
             {
                 auto player1 = GET_PLAYER1();
                 if (player1 != nullptr) {
-                    player1->setDirection(direction);
-                    player1->playAnimate();
-                    player1->startMove();
+                    player1->startMove(direction);
                 }
 
             }

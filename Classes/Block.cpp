@@ -56,14 +56,15 @@ bool BlockWall::init() {
 
     // 创建4个遮挡精灵
     for (int i = 0; i < 4; i++) {
-        blacks[i] = LayerColor::create(Color4B(0, 0, 0, 255), 4, 4);
-        blacks[i]->setIgnoreAnchorPointForPosition(false);
-        blacks[i]->setAnchorPoint(Vec2(0, 0));
-        this->addChild(blacks[i]);
-        blacks[i]->setVisible(false);
+        auto block = LayerColor::create(Color4B(0, 0, 0, 255), 4, 4);
+        block->setIgnoreAnchorPointForPosition(false);
+        block->setAnchorPoint(Vec2(0, 0));
+        this->addChild(block);
+        block->setVisible(false);
 
-        blacks[i]->setPosition(Vec2(i / 2 * BLOCK_SIZE / 2.0f,
+        block->setPosition(Vec2(i / 2 * BLOCK_SIZE / 2.0f,
                                     i % 2 * BLOCK_SIZE / 2.0f));
+        blacks[i] = block;
     }
 
     return true;

@@ -17,9 +17,9 @@ public:
     virtual void playAnimate();                         // 播放移动动画
     virtual void stopAnimate();                         // 停止播放动画
     virtual void shoot();                               // 发射子弹
-    virtual void setDirection(Direction dir) = 0;                     // 坦克改变方向
+    virtual void setDirection(Direction dir) = 0;       // 坦克改变方向
 
-    void startMove();                                   // 开启自动移动
+    void startMove(Direction dir);                      // 开启自动移动
     void stopMove();                                    // 停止自动移动
     void birth(std::string);                            // 坦克出生动画
     void beInvincible(int);                             // 使坦克无敌

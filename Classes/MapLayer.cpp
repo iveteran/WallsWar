@@ -155,7 +155,8 @@ void MapLayer::resetMap() {
 void MapLayer::loadCamp() {
     auto camp = BlockCamp::create();
     this->addChild(camp);
-    camp->setPosition(CAMP_X, CAMP_Y); // 左下角
+    Vec2 campPos(CAMP_X, CAMP_Y);
+    camp->setPosition(campPos); // 左下角
     _blocks.pushBack(camp);
 
     // 上侧护墙
@@ -211,6 +212,7 @@ void MapLayer::_addBlock(int i, int j, BlockType t)
 {
     // 制造精灵
     Block* block = nullptr;
+    Vec2 blockPos(Vec2((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE));
 
     // 创建不同类型的方块
     switch (t)
@@ -231,25 +233,24 @@ void MapLayer::_addBlock(int i, int j, BlockType t)
             block = BlockIce::create();
             break;
         default:
+            CCLOG("[MapLayer::_addBlock] unsupported block type: %d", t);
             break;
     }
 
     if (block) {
         // 将精灵添加到图层
         if (block->getType() == BlockType::FOREST) {
-            this->addChild(block, 101);
+            this->addChild(block, 9);  // z order is 9
         } else {
             this->addChild(block);
         }
 
         // 设置精灵在图层上的位置
         block->setAnchorPoint(Vec2(0, 0));
-        block->setPosition(Vec2((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE));
+        block->setPosition(blockPos);
 
         // 存储vector
         _blocks.pushBack(block);
-        auto point = new Vec2(i, j);
-        _blockMatrix.insert(point, block);
     }
 }
 

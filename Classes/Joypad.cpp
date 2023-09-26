@@ -49,28 +49,22 @@ bool Joypad::init()
     auto touchListener = EventListenerTouchOneByOne::create();
 
     touchListener->onTouchBegan = [=](Touch* touch, Event*) {
+        Direction direction = Direction::NONE;
         auto point = touch->getLocation();
-        bool isMove = false;
-
         if (btn_left->getBoundingBox().containsPoint(point)) {
-            _player1->setDirection(Direction::LEFT);
-            isMove = true;
+            direction = Direction::LEFT;
         } else if (btn_up->getBoundingBox().containsPoint(point)) {
-            _player1->setDirection(Direction::UP);
-            isMove = true;
+            direction =Direction::UP;
         } else if (btn_right->getBoundingBox().containsPoint(point)) {
-            _player1->setDirection(Direction::RIGHT);
-            isMove = true;
+            direction = Direction::RIGHT;
         } else if (btn_down->getBoundingBox().containsPoint(point)) {
-            _player1->setDirection(Direction::DOWN);
-            isMove = true;
+            direction = Direction::DOWN;
         } else if (btn_attack->getBoundingBox().containsPoint(point)) {
             _player1->shoot();
         }
 
-        if (isMove) {
-            _player1->playAnimate();
-            _player1->startMove();
+        if (direction != Direction::NONE) {
+            _player1->startMove(direction);
         }
 
         return true;
@@ -83,7 +77,6 @@ bool Joypad::init()
             || btn_right->getBoundingBox().containsPoint(point)
             || btn_down->getBoundingBox().containsPoint(point)) {
 
-            _player1->stopAnimate();
             _player1->stopMove();
         }
     };

@@ -36,11 +36,7 @@ bool KbdController::init()
         case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-            if (player1->canMove) {
-                player1->setDirection(_table[keyCode]);
-                player1->playAnimate();
-                player1->startMove();
-            }
+            player1->startMove(_table[keyCode]);
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_J:
         case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
@@ -53,6 +49,7 @@ bool KbdController::init()
     };
 
     listener->onKeyReleased = [=](EventKeyboard::KeyCode keyCode, Event*) {
+        auto direction = _table[keyCode];
         switch (keyCode) {
         case cocos2d::EventKeyboard::KeyCode::KEY_A:
         case cocos2d::EventKeyboard::KeyCode::KEY_W:
@@ -62,9 +59,11 @@ bool KbdController::init()
         case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
         case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-            if (player1->canMove) {
-                player1->stopAnimate();
+            if (player1->getDirection() == direction) {
                 player1->stopMove();
+            } else {
+                // 如果方向不同则只调整方向
+                player1->setDirection(direction);
             }
             break;
         default:
