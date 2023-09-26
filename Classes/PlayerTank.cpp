@@ -38,8 +38,8 @@ void PlayerTank::setDirection(Direction dir) {
 
     _dir = dir;
 
-    // 当改变方向时，将坐标调整为最接近于8的倍数
-    _adjustPosition();
+    // 当改变方向时，将坐标调整为最接近于BLOCK_SIZE的倍数
+    //_adjustPosition();
 
     char name[128] = {0};
     snprintf(name, sizeof(name), "player1_%d_%d", (int)_dir, _level);

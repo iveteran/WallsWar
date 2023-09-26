@@ -190,7 +190,8 @@ void TankBase::_adjustPosition() {
 }
 
 float TankBase::_adjustNumber(int number) {
-    int adjustSize = BLOCK_SIZE;
+    //int adjustSize = BLOCK_SIZE;
+    int adjustSize = BLOCK_SIZE / 4;
     int mod = number % (int)adjustSize;
     int half_block_size = adjustSize / 2;
     if (mod < half_block_size) {
