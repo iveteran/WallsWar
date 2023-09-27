@@ -23,7 +23,6 @@ enum class BlockType {
     COUNT
 };
 
-int getBlockFloor(BlockType bt);
 
 class Block : public cocos2d::Sprite {
 public:
@@ -32,8 +31,13 @@ public:
     virtual BlockCategory getCategory() = 0;
     virtual BlockType getType() { return BlockType::UNDEFINED; }
     int getFloor() const { return getLocalZOrder(); }
+    void setFloor(int floor) { setLocalZOrder(floor); }
 
+    static int getFloor(BlockType bt);
+    static Block* createBlock(BlockType type);
     static void addSpriteFrameCache();
+
+    static const int Floor = 0;
 };
 
 class __Obstacle : public Block {
@@ -68,6 +72,8 @@ public:
 
     CREATE_FUNC(BlockWall);
 
+    static const int Floor = 0;
+
 private:
     cocos2d::LayerColor* blacks[4]{};        // 4个黑色方块，用于遮挡
     bool _isDestory();                      // 检测方块是否被摧毁
@@ -79,6 +85,8 @@ public:
     BlockType getType() override { return BlockType::STONE; }
 
     CREATE_FUNC(BlockStone);
+
+    static const int Floor = 0;
 };
 
 class BlockForest : public __NonObstacle {
@@ -87,6 +95,8 @@ public:
     BlockType getType() override { return BlockType::FOREST; }
 
     CREATE_FUNC(BlockForest);
+
+    static const int Floor = 9;
 };
 
 class BlockIce : public __NonObstacle {
@@ -95,6 +105,8 @@ public:
     BlockType getType() override { return BlockType::ICE; }
 
     CREATE_FUNC(BlockIce);
+
+    static const int Floor = 0;
 };
 
 class BlockRiver : public __River {
@@ -103,4 +115,6 @@ public:
     BlockType getType() override { return BlockType::RIVER; }
 
     CREATE_FUNC(BlockRiver);
+
+    static const int Floor = -1;
 };

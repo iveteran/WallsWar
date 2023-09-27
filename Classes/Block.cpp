@@ -3,24 +3,60 @@
 
 USING_NS_CC;
 
-int getBlockFloor(BlockType bt) {
-    int floor = 0;
+int Block::getFloor(BlockType bt) {
+    int floor = Block::Floor;
     switch (bt)
     {
         case BlockType::WALL:
         case BlockType::STONE:
-        case BlockType::RIVER:
         case BlockType::ICE:
-            floor = 0;
+            floor = Block::Floor;
+            break;
+        case BlockType::RIVER:
+            floor = BlockRiver::Floor;
             break;
         case BlockType::FOREST:
-            floor = 9;
+            floor = BlockForest::Floor;
             break;
         default:
             CCLOG("[getBlockFloor] unsupported block type: %d", bt);
             break;
     }
     return floor;
+}
+
+Block* Block::createBlock(BlockType type) {
+    Block* block = nullptr;
+    switch (type)
+    {
+        case BlockType::WALL:
+            block = BlockWall::create();
+            block->setFloor(BlockWall::Floor);
+            break;
+        case BlockType::STONE:
+            block = BlockStone::create();
+            block->setFloor(BlockStone::Floor);
+            break;
+        case BlockType::FOREST:
+            block = BlockForest::create();
+            block->setFloor(BlockForest::Floor);
+            break;
+        case BlockType::RIVER:
+            block = BlockRiver::create();
+            block->setFloor(BlockRiver::Floor);
+            break;
+        case BlockType::ICE:
+            block = BlockIce::create();
+            block->setFloor(BlockIce::Floor);
+            break;
+        default:
+            CCLOG("[Block::createBlock] unsupported block type: %d", type);
+            break;
+    }
+    if (block) {
+        block->setAnchorPoint(Vec2(0, 0));
+    }
+    return block;
 }
 
 bool Block::init() {

@@ -217,11 +217,8 @@ bool MapLayer::hasBlockAtPosition(const Vec2& pos, int floor) const {
 
 bool MapLayer::_addBlock(float x, float y, BlockType t)
 {
-    // 制造精灵
-    Block* block = nullptr;
     Vec2 blockPos(x, y);
-
-    int floor = getBlockFloor(t);
+    int floor = Block::getFloor(t);
     if (hasBlockAtPosition(blockPos, floor)) {
         CCLOG("[MapLayer::_addBlock] already has block at: (%f, %f) and floor: %d, do not to create again!",
                 blockPos.x, blockPos.y, floor);
@@ -229,38 +226,12 @@ bool MapLayer::_addBlock(float x, float y, BlockType t)
     }
 
     // 创建不同类型的方块
-    switch (t)
-    {
-        case BlockType::WALL:
-            block = BlockWall::create();
-            break;
-        case BlockType::STONE:
-            block = BlockStone::create();
-            break;
-        case BlockType::FOREST:
-            block = BlockForest::create();
-            break;
-        case BlockType::RIVER:
-            block = BlockRiver::create();
-            break;
-        case BlockType::ICE:
-            block = BlockIce::create();
-            break;
-        default:
-            CCLOG("[MapLayer::_addBlock] unsupported block type: %d", t);
-            break;
-    }
-
+    Block* block = Block::createBlock(t);
     if (block) {
         // 将精灵添加到图层
-        if (block->getType() == BlockType::FOREST) {
-            this->addChild(block, 9);  // z order is 9
-        } else {
-            this->addChild(block);
-        }
+        this->addChild(block);
 
         // 设置精灵在图层上的位置
-        block->setAnchorPoint(Vec2(0, 0));
         block->setPosition(blockPos);
 
         // 存储vector
