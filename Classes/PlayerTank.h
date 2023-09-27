@@ -16,8 +16,10 @@ public:
     bool isBeControl();
     void disBlood() override;
 
-    void createBlock1();
-    void createBlock2();
+    bool createBlock1();
+    bool createBlock1(Direction dir);
+    bool createBlock2();
+    bool createBlock2(Direction dir);
     void createBlock4();
     void choiceCreatingBlockType(RRDirection rrd);
 

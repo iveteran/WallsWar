@@ -54,6 +54,7 @@ constexpr int MAX_MOVE_DISTANCE = 100;
 // 关卡总数
 constexpr short STAGE_COUNT = 35;
 
+// 移动方向，采用顺时针排列，NOTE: 不要改变它们的顺序
 enum class Direction {
     NONE = -1, LEFT, UP, RIGHT, DOWN, COUNT
 };

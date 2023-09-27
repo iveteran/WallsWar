@@ -190,10 +190,10 @@ void PlayerTank::disBlood() {
     }
 }
 
-void PlayerTank::createBlock1() {
+bool PlayerTank::createBlock1(Direction dir) {
     auto playerPos = this->getPosition();
     float x = 0, y = 0;
-    switch (_dir) {
+    switch (dir) {
         case Direction::UP:
             x = playerPos.x;
             y = playerPos.y;
@@ -211,25 +211,43 @@ void PlayerTank::createBlock1() {
             y = playerPos.y;
             break;
         default:
-            return;
+            return false;
     }
 
     BlockType blockType = (BlockType)_creatingBlock;
     CCLOG(">> [PlayerTank::createBlock1] type: %d, position: (%f, %f)", blockType, x, y);
-    MapLayer::getInstance()->createBlock(Vec2(x, y), blockType);
+    bool success = MapLayer::getInstance()->createBlock(Vec2(x, y), blockType);
+    CCLOG(">> [PlayerTank::createBlock1] creating success? %d", success);
 
-    if (blockType != BlockType::FOREST) {
+    if (success && blockType != BlockType::FOREST) {
         //increaseFloor();
         setFloor(1);
+        CCLOG(">> [PlayerTank::createBlock1] tank rises to floor: %d", getFloor());
     }
-    CCLOG(">> [PlayerTank::createBlock1] tank rises to floor: %d", getFloor());
+    return success;
 }
 
-void PlayerTank::createBlock2() {
+bool PlayerTank::createBlock1() {
+    bool success = false;
+    int tryCount = 0;
+    int directionCount = (int)Direction::COUNT;
+    // 循环尝试玩家当前方向的右上、右下、左下、左上四个方向(顺时针)，直至创建成功
+    for (int priorityDir = (int)_dir; tryCount < directionCount;
+            priorityDir = (priorityDir + 1) % directionCount) {
+        success = createBlock1((Direction)priorityDir);
+        if (success) {
+            break;
+        }
+        tryCount++;
+    }
+    return success;
+}
+
+bool PlayerTank::createBlock2(Direction dir) {
     auto playerPos = this->getPosition();
     std::vector<Vec2> posList;
     float x = 0, y = 0;
-    switch (_dir) {
+    switch (dir) {
         case Direction::UP:
             x = playerPos.x - BLOCK_SIZE;
             y = playerPos.y;
@@ -263,19 +281,33 @@ void PlayerTank::createBlock2() {
             posList.push_back(Vec2(x, y));
             break;
         default:
-            return;
+            return false;
     }
 
     BlockType blockType = (BlockType)_creatingBlock;
     CCLOG(">> [PlayerTank::createBlock2] type: %d, begin: (%f, %f), direction: %d",
             blockType, playerPos.x, playerPos.y, _dir);
-    MapLayer::getInstance()->createBlocks(posList, blockType);
+    int count = MapLayer::getInstance()->createBlocks(posList, blockType);
+    CCLOG(">> [PlayerTank::createBlock2] created %d block(s)", count);
 
-    if (blockType != BlockType::FOREST) {
+    bool success = count > 0;
+    if (success && blockType != BlockType::FOREST) {
         //increaseFloor();
         setFloor(1);
+        CCLOG(">> [PlayerTank::createBlock2] tank rises to floor: %d", getFloor());
     }
-    CCLOG(">> [PlayerTank::createBlock2] tank rises to floor: %d", getFloor());
+    return success;
+}
+
+bool PlayerTank::createBlock2() {
+    // 尝试当前方向
+    bool success = createBlock2(_dir);
+    if (!success) {
+        // 尝试当前方向的反方向
+        int reverseDir = ((int)_dir + 2) % (int)Direction::COUNT;
+        success = createBlock2((Direction)(reverseDir));
+    }
+    return success;
 }
 
 void PlayerTank::createBlock4() {
@@ -298,13 +330,14 @@ void PlayerTank::createBlock4() {
     BlockType blockType = (BlockType)_creatingBlock;
     CCLOG(">> [PlayerTank::createBlock4] type: %d, around: (%f, %f)",
             blockType, playerPos.x, playerPos.y);
-    MapLayer::getInstance()->createBlocks(posList, blockType);
+    int count = MapLayer::getInstance()->createBlocks(posList, blockType);
+    CCLOG(">> [PlayerTank::createBlock4] created %d block(s)", count);
 
-    if (blockType != BlockType::FOREST) {
+    if (count > 0 && blockType != BlockType::FOREST) {
         //increaseFloor();
         setFloor(1);
+        CCLOG(">> [PlayerTank::createBlock4] tank rises to floor: %d", getFloor());
     }
-    CCLOG(">> [PlayerTank::createBlock4] tank rises to floor: %d", getFloor());
 }
 
 void PlayerTank::choiceCreatingBlockType(RRDirection rrd) {
