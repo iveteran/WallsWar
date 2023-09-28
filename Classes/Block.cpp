@@ -36,35 +36,27 @@ Block* Block::createBlock(BlockType type) {
     {
         case BlockType::WALL:
             block = BlockWall::create();
-            block->setFloor(BlockWall::Floor);
             break;
         case BlockType::STONE:
             block = BlockStone::create();
-            block->setFloor(BlockStone::Floor);
             break;
         case BlockType::FOREST:
             block = BlockForest::create();
-            block->setFloor(BlockForest::Floor);
             break;
         case BlockType::BRIDGE:
             block = BlockBridge::create();
-            block->setFloor(BlockBridge::Floor);
             break;
         case BlockType::CLOUD:
             block = BlockCloud::create();
-            block->setFloor(BlockCloud::Floor);
             break;
         case BlockType::RIVER:
             block = BlockRiver::create();
-            block->setFloor(BlockRiver::Floor);
             break;
         case BlockType::TRENCH:
             block = BlockTrench::create();
-            block->setFloor(BlockTrench::Floor);
             break;
         case BlockType::ICE:
             block = BlockIce::create();
-            block->setFloor(BlockIce::Floor);
             break;
         default:
             CCLOG("[Block::createBlock] unsupported block type: %d", type);
@@ -98,15 +90,15 @@ void Block::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(camp_1, "camp_1");
 
     // 方块
-    auto* wall = Sprite::create("images/block/wall.png")->getSpriteFrame();
-    auto* stone = Sprite::create("images/block/stone.png")->getSpriteFrame();
-    auto* forest = Sprite::create("images/block/forest.png")->getSpriteFrame();
-    auto* bridge = Sprite::create("images/block/bridge.png")->getSpriteFrame();
-    auto* ice = Sprite::create("images/block/ice.png")->getSpriteFrame();
-    auto* river_0 = Sprite::create("images/block/river-0.png")->getSpriteFrame();
-    auto* river_1 = Sprite::create("images/block/river-1.png")->getSpriteFrame();
-    auto* trench = Sprite::create("images/block/trench.png")->getSpriteFrame();
-    auto* cloud = Sprite::create("images/block/cloud.png")->getSpriteFrame();
+    auto wall = Sprite::create("images/block/wall.png")->getSpriteFrame();
+    auto stone = Sprite::create("images/block/stone.png")->getSpriteFrame();
+    auto forest = Sprite::create("images/block/forest.png")->getSpriteFrame();
+    auto bridge = Sprite::create("images/block/bridge.png")->getSpriteFrame();
+    auto ice = Sprite::create("images/block/ice.png")->getSpriteFrame();
+    auto river_0 = Sprite::create("images/block/river-0.png")->getSpriteFrame();
+    auto river_1 = Sprite::create("images/block/river-1.png")->getSpriteFrame();
+    auto trench = Sprite::create("images/block/trench.png")->getSpriteFrame();
+    auto cloud = Sprite::create("images/block/cloud.png")->getSpriteFrame();
 
     wall->getTexture()->setAliasTexParameters();
     stone->getTexture()->setAliasTexParameters();
@@ -135,6 +127,7 @@ bool BlockWall::init() {
     }
 
     this->initWithSpriteFrameName("wall");
+    this->setFloor(BlockWall::Floor);
 
     // 创建4个遮挡精灵
     for (int i = 0; i < 4; i++) {
@@ -208,6 +201,7 @@ bool BlockStone::init() {
     }
 
     this->initWithSpriteFrameName("stone");
+    this->setFloor(BlockStone::Floor);
 
     return true;
 }
@@ -228,6 +222,7 @@ bool BlockForest::init() {
     }
 
     this->initWithSpriteFrameName("forest");
+    this->setFloor(BlockForest::Floor);
 
     return true;
 }
@@ -238,6 +233,7 @@ bool BlockBridge::init() {
     }
 
     this->initWithSpriteFrameName("bridge");
+    this->setFloor(BlockBridge::Floor);
 
     return true;
 }
@@ -248,6 +244,7 @@ bool BlockCloud::init() {
     }
 
     this->initWithSpriteFrameName("cloud");
+    this->setFloor(BlockCloud::Floor);
 
     return true;
 }
@@ -258,6 +255,7 @@ bool BlockIce::init() {
     }
 
     this->initWithSpriteFrameName("ice");
+    this->setFloor(BlockIce::Floor);
 
     return true;
 }
@@ -268,6 +266,7 @@ bool BlockTrench::init() {
     }
 
     this->initWithSpriteFrameName("trench");
+    this->setFloor(BlockTrench::Floor);
 
     return true;
 }
@@ -276,6 +275,7 @@ bool BlockRiver::init() {
     if (!Block::init()) {
         return false;
     }
+    this->setFloor(BlockRiver::Floor);
 
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
