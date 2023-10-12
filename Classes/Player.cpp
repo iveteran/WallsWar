@@ -1,0 +1,568 @@
+#include "Player.h"
+#include "MapLayer.h"
+#include "ControlLayer.h"
+#include "GameScene.h"
+#include "Bullet.h"
+#include "Camp.h"
+
+#include "RandomUtil.h"
+#include "AudioEngine.h"
+
+USING_NS_CC;
+
+bool Player::IsHost = false;
+Vector<Animate*> Player::_animations[4]{};
+Vector<Animate*> Player::_enemy_animations[4]{};
+
+std::set<BlockType>
+Player::CollidingAbleBlockTypes{
+    BlockType::MAP_BORDER,
+    BlockType::PLAYER,
+    BlockType::BULLET,
+    BlockType::WALL,
+    BlockType::STONE,
+    BlockType::ICE,
+    BlockType::RIVER,
+    BlockType::TRENCH,
+    BlockType::NPC,
+    BlockType::CAMP
+};
+
+std::set<BlockType>
+Player::getCollidingAbleBTs() const {
+    return Player::CollidingAbleBlockTypes;
+}
+
+void Player::initSpriteFrameCache() {
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+
+    // 坦克爆炸帧动画
+    auto* blast_0 = Sprite::create("images/blast/0.png")->getSpriteFrame();
+    auto* blast_1 = Sprite::create("images/blast/1.png")->getSpriteFrame();
+    auto* blast_2 = Sprite::create("images/blast/2.png")->getSpriteFrame();
+    auto* blast_3 = Sprite::create("images/blast/3.png")->getSpriteFrame();
+    auto* blast_4 = Sprite::create("images/blast/4.png")->getSpriteFrame();
+
+    blast_0->getTexture()->setAliasTexParameters();
+    blast_1->getTexture()->setAliasTexParameters();
+    blast_2->getTexture()->setAliasTexParameters();
+    blast_3->getTexture()->setAliasTexParameters();
+    blast_4->getTexture()->setAliasTexParameters();
+
+    spriteFrameCache->addSpriteFrame(blast_0, "blast_0");
+    spriteFrameCache->addSpriteFrame(blast_1, "blast_1");
+    spriteFrameCache->addSpriteFrame(blast_2, "blast_2");
+    spriteFrameCache->addSpriteFrame(blast_3, "blast_3");
+    spriteFrameCache->addSpriteFrame(blast_4, "blast_4");
+
+    // 坦克出生前的星星帧动画
+    auto star_0 = Sprite::create("images/star0.png")->getSpriteFrame();
+    auto star_1 = Sprite::create("images/star1.png")->getSpriteFrame();
+    auto star_2 = Sprite::create("images/star2.png")->getSpriteFrame();
+    auto star_3 = Sprite::create("images/star3.png")->getSpriteFrame();
+
+    star_0->getTexture()->setAliasTexParameters();
+    star_1->getTexture()->setAliasTexParameters();
+    star_2->getTexture()->setAliasTexParameters();
+    star_3->getTexture()->setAliasTexParameters();
+
+    spriteFrameCache->addSpriteFrame(star_0, "star_0");
+    spriteFrameCache->addSpriteFrame(star_1, "star_1");
+    spriteFrameCache->addSpriteFrame(star_2, "star_2");
+    spriteFrameCache->addSpriteFrame(star_3, "star_3");
+
+    // 坦克保护环帧动画
+    auto ring_0 = Sprite::create("images/ring0.png")->getSpriteFrame();
+    auto ring_1 = Sprite::create("images/ring1.png")->getSpriteFrame();
+
+    ring_0->getTexture()->setAliasTexParameters();
+    ring_1->getTexture()->setAliasTexParameters();
+
+    spriteFrameCache->addSpriteFrame(ring_0, "ring_0");
+    spriteFrameCache->addSpriteFrame(ring_1, "ring_1");
+}
+
+void Player::loadFrameAnimation(bool isHost) {
+    const char* imgPath = nullptr;
+    const char* namePrefix = nullptr;
+    if (isHost) {
+        imgPath = "images/player1_tank";
+        namePrefix = "player1";
+    } else {
+        imgPath = "images/enemy_tank/normal_tank";
+        namePrefix = "enemy";
+    }
+    _loadFrameAnimation(imgPath, namePrefix, isHost);
+}
+
+void Player::_loadFrameAnimation(const char* imgPath, const char* namePrefix, bool isHost) {
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+
+    Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
+
+    // 总共4个等级，从0到3
+    for (int level = 0; level < 4; level++) {
+        // 总共4个方向：left(0), up(1), right(2), down(3)
+        for (int dir = (int)Direction::NONE+1; dir < (int)Direction::COUNT; dir++) {
+            char buf[128] = {0};
+            // FIXME: 修改图片名称使其统一
+            if (strcmp(namePrefix, "player1") == 0) {
+                snprintf(buf, sizeof(buf), "%s/m%d-%d-1.png", imgPath, level, dir);
+            } else {
+                snprintf(buf, sizeof(buf), "%s/%d-%d-1.png", imgPath, level+1, dir+1);
+            }
+            auto player_1 = SpriteFrame::create(buf, tankRect);
+            // FIXME: 修改图片名称使其统一
+            if (strcmp(namePrefix, "player1") == 0) {
+                snprintf(buf, sizeof(buf), "%s/m%d-%d-2.png", imgPath, level, dir);
+            } else {
+                snprintf(buf, sizeof(buf), "%s/%d-%d-2.png", imgPath, level+1, dir+1);
+            }
+            auto player_2 = SpriteFrame::create(buf, tankRect);
+            auto player = Animation::createWithSpriteFrames({ player_1, player_2 }, 0.05f);
+
+            player_1->getTexture()->setAliasTexParameters();
+            player_2->getTexture()->setAliasTexParameters();
+
+            // 添加到缓存
+            char name[128] = {0};
+            snprintf(name, sizeof(name), "%s_%d_%d", namePrefix, dir, level);
+            spriteFrameCache->addSpriteFrame(player_1, name);
+
+            // 保存
+            if (isHost) {
+                _animations[dir].pushBack(Animate::create(player));
+            } else {
+                _enemy_animations[dir].pushBack(Animate::create(player));
+            }
+        }
+    }
+}
+
+bool Player::init() {
+    if (!Gamer::init()) {
+        return false;
+    }
+    _canMove = false;
+
+    _initBullets();
+
+    _isHost = Player::IsHost;
+    if (_isHost) {
+        return _initPlayer();
+    } else {
+        return _initEnemy();
+    }
+
+    return true;
+}
+
+bool Player::_initPlayer() {
+    // 玩家出生时血量为3
+    _blood = 3;
+
+    // 展示出生动画
+    birth("player1_1_" + std::to_string(_level));
+
+    // 设置出生地点
+    //this->setPosition(PLAYER1_START_X, PLAYER1_START_Y);
+
+    return true;
+}
+
+bool Player::_initEnemy() {
+    // 随机选择一个类型
+    _level = RandomUtil::random(0, 3);
+
+    // 展示出生动画
+    birth("enemy_" + std::to_string(int(_dir)) + "_" + std::to_string(_level));
+
+    // 不断移动
+    startMove(_dir);
+
+    return true;
+}
+
+std::string Player::getSpriteFrameName() const {
+    char name[128] = {0};
+    if (_isHost) {
+        snprintf(name, sizeof(name), "player1_%d_%d", (int)_dir, _level);
+    } else {
+        snprintf(name, sizeof(name), "enemy_%d_%d", (int)_dir, _level);
+    }
+    return std::string(name);
+}
+
+Direction Player::getInitialDirection() const {
+    Direction dir = Direction::NONE;
+    auto campPos = _joinedCamp->getPosition();
+    auto enemyCampPos = _enemyCamp->getPosition();
+    if (campPos.x > enemyCampPos.x) {
+        dir = Direction::LEFT;
+        int xDistance = campPos.x - enemyCampPos.x;
+        if (campPos.y > enemyCampPos.y) {
+            int yDistance = campPos.y - enemyCampPos.y;
+            if (yDistance < xDistance) {
+                dir = Direction::DOWN;
+            }
+        }
+    } else {
+        dir = Direction::RIGHT;
+        int xDistance = abs(campPos.x - enemyCampPos.x);
+        if (campPos.y < enemyCampPos.y) {
+            int yDistance = abs(campPos.y - enemyCampPos.y);
+            if (yDistance < xDistance) {
+                dir = Direction::UP;
+            }
+        }
+    }
+    return dir;
+}
+
+void Player::setInitialDirection() {
+    Direction dir = getInitialDirection();
+    setDirection(dir);
+}
+
+void Player::setInitialPosition() {
+    auto campPos = _joinedCamp->getPosition();
+    int offset = CAMP_SIZE / 2 + BLOCK_SIZE + TANK_SIZE / 2;  // 营地大小的一半+围墙大小+玩家大小的一半
+    // Camp的上边
+    Vec2 pos1 = Vec2(campPos.x, campPos.y + offset);
+    // Camp的右上
+    Vec2 pos2 = Vec2(campPos.x + offset, campPos.y + offset);
+    // Camp的右边
+    Vec2 pos3 = Vec2(campPos.x + offset, campPos.y);
+    // Camp的下边
+    Vec2 pos4 = Vec2(campPos.x, campPos.y - offset);
+    // Camp的左下
+    Vec2 pos5 = Vec2(campPos.x - offset, campPos.y - offset);
+    // Camp的左边
+    Vec2 pos6 = Vec2(campPos.x - offset, campPos.y);
+
+    std::vector<Vec2> candidatePositions{pos1, pos2, pos3, pos4, pos5, pos6};
+    for (auto pos : candidatePositions) {
+        moveTo(pos);
+        printf(">>> player pos: (%f, %f)\n", pos.x, pos.y);
+        if (!detectCollision()) {
+            //return pos;
+            break;
+        }
+    }
+    // TODO: to try next second later
+}
+
+void Player::_initBullets() {
+    // 玩家最多拥有两颗子弹
+    auto bullet1 = Bullet::create();
+    bullet1->setCreator(this);
+    _bullets.pushBack(bullet1);
+
+    auto bullet2 = Bullet::create();
+    bullet2->setCreator(this);
+    _bullets.pushBack(bullet2);
+}
+
+void Player::_detachBullets() {
+    for (auto bullet : _bullets) {
+        bullet->unsetCreator();
+    }
+}
+
+void Player::playAnimate() {
+    if (!_canMove) {
+        return;
+    }
+
+    if (_isHost) {
+        this->runAction(RepeatForever::create(_animations[int(_dir)].at(_level)));
+    } else {
+        this->runAction(RepeatForever::create(_enemy_animations[int(_dir)].at(_level)));
+    }
+}
+
+void Player::playFallingAnimate() {
+    // rising, falling
+    //this->runAction(RepeatForever::create(_animations[int(_dir)].at(_level)));
+}
+
+void Player::stopAnimate() {
+    if (!_canMove) {
+        return;
+    }
+
+    this->stopAllActions();
+}
+
+int Player::getMovingStep() const {
+    int step = MovableBlock::getMovingStep() + _level * 0.2f;
+    return step;
+}
+
+void Player::birth(const std::string& frameName) {
+    if (_isHost)
+    {
+        _level = 0;
+    }
+    _canMove = false;
+    stopAllActions();
+
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+    Vector<SpriteFrame*> spriteFrames;
+    for (int i = 0; i < 4 * 2; i++) {
+        std::string n = std::to_string(i % 4);
+        auto spriteFrame = spriteFrameCache->getSpriteFrameByName("star_" + n);
+        spriteFrames.pushBack(spriteFrame);
+    }
+
+    // 星星动画
+    auto animation = Animation::createWithSpriteFrames(spriteFrames, 0.2f);
+    auto animate = Animate::create(animation);
+
+    auto action = this->runAction(Sequence::create(
+        animate,
+        CallFunc::create([=]() {
+        this->initWithSpriteFrameName(frameName);
+        _canMove = true;
+        if (_isHost)
+            this->beInvincible(3);
+    }),
+        nullptr
+        ));
+}
+
+void Player::makeCamaraFollowsPlayer() {
+
+    // 玩家重生摄像头重回出生地：地图左下角,
+    // visible_size: V, CENTER_SIZE: C, => V/2 - (C/2 - V/2) => V - C/2
+    Size visible_size = Director::getInstance()->getVisibleSize();
+    float x = visible_size.width - CENTER_WIDTH / 2;
+    float y = visible_size.height - CENTER_HEIGHT / 2;
+    Vec2 campPos(x, y);
+    //auto campPos = _joinedCamp->getPosition();
+
+    auto camera = Camera::getDefaultCamera();
+    camera->setPosition(campPos);
+
+    // 重置ControlLayer的位置，使其跟随摄像头，从而固定在屏幕相应位置
+    auto ctrlLayer = GET_CONTROL_LAYER();
+    if (ctrlLayer != nullptr) {
+        ctrlLayer->setPosition(campPos);
+    }
+    CCLOG(">> [makeCamaraFollowsPlayer] camera move to position: (%f, %f)",
+            camera->getPosition().x, camera->getPosition().y);
+}
+
+void Player::beInvincible(int time) {
+    _isInvincible = true;
+    auto ring = Sprite::create();
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+    Vector<SpriteFrame*> spriteFrames;
+    for (int i = 0; i < 2 * time * 5; i++) {
+        std::string n = std::to_string(i % 2);
+        auto spriteFrame = spriteFrameCache->getSpriteFrameByName("ring_" + n);
+        spriteFrames.pushBack(spriteFrame);
+    }
+    auto animation = Animation::createWithSpriteFrames(spriteFrames, 0.1f);
+    auto animate = Animate::create(animation);
+    this->addChild(ring);
+    ring->setPosition(this->getContentSize() / 2);
+    ring->runAction(Sequence::create(
+        animate,
+        CallFunc::create([=]() {
+        ring->removeFromParent();
+        _isInvincible = false;
+    })
+        , nullptr
+        ));
+}
+
+void Player::changeDirection() {
+    if (_moveDistance < MAX_MOVE_DISTANCE) {
+        return;
+    }
+    _moveDistance = 0;
+
+    auto select = RandomUtil::random(1, 10);
+    this->stopAnimate();
+    if (select <= 4) {
+        setDirection(Direction::DOWN);
+    } else if (select <= 6) {
+        setDirection(Direction::UP);
+    } else if (select <= 8) {
+        setDirection(Direction::LEFT);
+    } else {
+        setDirection(Direction::RIGHT);
+    }
+    this->playAnimate();
+}
+
+void Player::shoot() {
+    if (!_canMove) {
+        return;
+    }
+
+    auto bullet1 = _bullets.at(0);
+    auto bullet2 = _bullets.at(1);
+
+    if (!bullet1->isVisible() && !bullet2->isVisible()) {
+        _shoot(bullet1);
+    } else if (bullet1->isVisible() && bullet2->isVisible()) {
+        // 什么都不做
+    } else if (_level >= 2) {
+        // 此时可发射两枚子弹
+        if (bullet1->isVisible()) {
+            _shoot(bullet2);
+        } else {
+            _shoot(bullet1);
+        }
+    }
+}
+
+void Player::_shoot(Bullet* bullet) {
+    if (_isHost)
+        AudioEngine::play2d("music/shoot.mp3");
+
+    auto playerPos = getPosition();
+    switch (_dir) {
+    case Direction::LEFT:
+        bullet->setSpriteFrame("bullet_l");
+        bullet->moveTo(playerPos.x - TANK_SIZE / 2.0f, playerPos.y);
+        break;
+    case Direction::UP:
+        bullet->setSpriteFrame("bullet_u");
+        bullet->moveTo(playerPos.x, playerPos.y + TANK_SIZE / 2.0f);
+        break;
+    case Direction::RIGHT:
+        bullet->setSpriteFrame("bullet_r");
+        bullet->moveTo(playerPos.x + TANK_SIZE / 2.0f, playerPos.y);
+        break;
+    case Direction::DOWN:
+        bullet->setSpriteFrame("bullet_d");
+        bullet->moveTo(playerPos.x, playerPos.y - TANK_SIZE / 2.0f);
+        break;
+    default:
+        break;
+    }
+
+    bullet->setDirection(_dir);
+    bullet->setVisible(true);
+    bullet->setFloor(getFloor());
+    bullet->startMove(_dir);
+}
+
+void Player::disBlood() {
+    if (_isInvincible)
+        return;
+
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+    Vector<SpriteFrame*> spriteFrames;
+
+    for (int i = 0; i != 5; i++) {
+        std::string n = std::to_string(i);
+        auto spriteFrame = spriteFrameCache->getSpriteFrameByName("blast_" + n);
+        spriteFrames.pushBack(spriteFrame);
+    }
+
+    // TODO 每次死亡都重新构造动画
+    auto blastAnimation = Animation::createWithSpriteFrames(spriteFrames, 0.1f);
+    auto blastanimate = Animate::create(blastAnimation);
+
+    // 播放动画
+    auto mapLayer = MapLayer::getInstance();
+    auto node = Sprite::create();
+    mapLayer->addChild(node);
+    node->setPosition(getPosition());
+    node->runAction(Sequence::create(blastanimate,
+                CallFunc::create([node] {node->removeFromParentAndCleanup(true); }),
+                nullptr));
+
+    if (--_blood == 0) {
+        // 播放音效
+        if (_isHost) {
+            AudioEngine::play2d("music/player-bomb.mp3");
+        } else {
+            AudioEngine::play2d("music/enemy-bomb.mp3");
+        }
+        // 移除该坦克
+        exitCamp();
+        _detachBullets(); // 让已发射的子弹可以继续有效
+        MapLayer::getInstance()->removeAndUnmanageBlock(this);
+        printf(">>> player/enemy removed\n");
+    } else {
+        if (_isHost) {
+            // 播放动画
+            _isInvincible = true; // 防止掉血
+            // 回到出生点, TODO: 等待N秒钟再重生
+            setInitialDirection();
+            setInitialPosition();
+            birth("player1_" + std::to_string((int)_dir) + "_" + std::to_string(_level));
+            makeCamaraFollowsPlayer();
+        }
+    }
+}
+
+void Player::joinCamp(Camp* camp) {
+    if (_joinedCamp) {
+        exitCamp();
+    }
+    _joinedCamp = camp;
+}
+
+void Player::exitCamp() {
+    if (_joinedCamp) {
+        _joinedCamp->removePlayer(this);
+        _joinedCamp = nullptr;
+    }
+}
+
+void Player::onBeCollided(Block* activeBlock) {
+    if (activeBlock->getType() == BlockType::BULLET) {
+        auto bullet = dynamic_cast<Bullet*>(activeBlock);
+        auto bulletCreator = bullet->getCreator();
+        if (bulletCreator && (bulletCreator == this || // 自己的子弹
+                bulletCreator->getCamp() == this->getCamp())  // 队友的子弹
+                ) {
+            return; // 忽略自己和队友的子弹
+        } else {
+            disBlood();
+        }
+    } else if (activeBlock->getType() == BlockType::PLAYER) {
+        auto otherPlayer = dynamic_cast<Player*>(activeBlock);
+        if (_isMoving) {
+            //auto pos = getPosition();
+            //auto pos2 = otherPlayer->getPosition();
+            //printf(">>>> onBeCollided by player, self: (%f, %f)\n", pos.x, pos.y);
+            //printf(">>>> onBeCollided by player, other: (%f, %f)\n", pos2.x, pos2.y);
+            // 如果碰到自己的也是玩家并且是相向碰撞，自己也返回原来的位置
+            if (reverseDirection(getDirection()) == otherPlayer->getDirection()) {
+                goBack();
+            }
+        }
+    }
+}
+
+void Player::onCollidedWith(Vector<Block*>& withBlocks) {
+    for (auto block : withBlocks) {
+        if (block->getType() == BlockType::WALL ||
+                block->getType() == BlockType::STONE ||
+                block->getType() == BlockType::PLAYER) {
+            // 如果碰到其它障碍物(Wall, Stone, Player)，自己返回原来的位置
+            //if (block->getType() == BlockType::PLAYER) {
+            //    auto pos = getPosition();
+            //    auto pos2 = block->getPosition();
+            //    printf("<<<< onCollidedWith by player, self from: (%f, %f)\n", _fromPosition.x, _fromPosition.y);
+            //    printf("<<<< onCollidedWith by player, self: (%f, %f)\n", pos.x, pos.y);
+            //    printf("<<<< onCollidedWith by player, other: (%f, %f)\n", pos2.x, pos2.y);
+            //    printf("<<<< step: %d\n", getMovingStep());
+            //}
+            goBack();
+            break;  // 如果碰到一个障碍物就不能前进
+        }
+    }
+    if (!_isHost) {
+        // 敌方坦克碰撞后可以改变方向
+        _moveDistance = MAX_MOVE_DISTANCE;
+        changeDirection();
+    }
+}

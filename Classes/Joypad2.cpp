@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "Joypad2.h"
-#include "PlayerTank.h"
-#include "GameScene.h"
+#include "Player.h"
+//#include "GameScene.h"
 
 const double PI = 3.141592654;
 
@@ -98,9 +98,10 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
     {
         // 开火
         // callback
-        auto player1 = GET_PLAYER1();
-        if (player1 != nullptr) {
-            player1->shoot();
+        if (_player != nullptr) {
+            _player->shoot();
+        } else {
+            CCLOG("[WARNING] the joypad does not attach player");
         }
     }
 }
@@ -176,9 +177,10 @@ void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
 
             if (direction != Direction::NONE)
             {
-                auto player1 = GET_PLAYER1();
-                if (player1 != nullptr) {
-                    player1->startMove(direction);
+                if (_player != nullptr) {
+                    _player->startMove(direction);
+                } else {
+                    CCLOG("[WARNING] the joypad does not attach player");
                 }
 
             }
@@ -233,9 +235,10 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
         // callback
         if (m_type == JoystickType::KEY4 || m_type == JoystickType::KEY8)
         {
-            auto player1 = GET_PLAYER1();
-            if (player1 != nullptr) {
-                player1->stopMove();
+            if (_player != nullptr) {
+                _player->stopMove();
+            } else {
+                CCLOG("[WARNING] the joypad does not attach player");
             }
         }
         else if (m_type == JoystickType::KEYANY)
@@ -249,9 +252,10 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     {
         // 停止开火
         // callback
-        //auto player1 = GET_PLAYER1();
-        //if (player1 != nullptr) {
-        //    player1->shoot();
+        //if (_player != nullptr) {
+        //    _player->shoot();
+        //} else {
+        //    CCLOG("[WARNING] the joypad does not attach player");
         //}
     }
 }

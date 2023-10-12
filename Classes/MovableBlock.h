@@ -1,0 +1,89 @@
+#pragma once
+
+#include "Block.h"
+
+using cocos2d::Vector;
+using cocos2d::Vec2;
+
+class MovableBlock : public Block {
+public:
+    static std::set<BlockType> CollidingAbleBlockTypes;
+
+public:
+    bool init() override { return Block::init(); }
+    BlockType getType() const override { return BlockType::MOVABLE_BLOCK; }
+
+    bool movable() const override { return true; }
+    int getDistances() const { return _distances; }
+
+    Direction getDirection() const { return _dir; }
+    void setDirection(Direction dir);
+
+    void goBack();
+    void moveTo(const Vec2& to);
+    void moveTo(float x, float y);
+    void moveBy(const Vec2& step);
+    void moveBy(float xStep, float yStep);
+    void xMoveBy(float step);
+    void yMoveBy(float step);
+    void setFloor(int floor);
+    void increaseFloor();
+    void decreaseFloor();
+
+    void startMove(Direction dir);                      // 开启自动移动
+    void stopMove();                                    // 停止自动移动
+
+    void fallDownIfDownFloorIsEmpty();
+
+    virtual bool allowedCameraFollows() const { return _allowedCameraFollows; }
+    virtual void allowCameraFollows() { _allowedCameraFollows = true; }
+
+    virtual std::string getSpriteFrameName() const = 0;
+
+    virtual void changeSpriteDirection();
+    virtual void playAnimate();                         // 播放移动动画
+    virtual void playFallingAnimate();
+    virtual void stopAnimate();                         // 停止播放动画
+
+    virtual bool movingMusicEnabled() { return false; }
+    virtual int getMovingStep() const { return 1; }
+
+    virtual std::set<BlockType> getCollidingAbleBTs() const;
+
+    bool handleCollisionDetection();
+    virtual bool detectCollision(Vector<Block*>* collisionBlocks=nullptr) const;
+    bool isCollidedWithMapBorder(const Vector<Block*>& collisionBlocks) const;
+
+    Direction getFromDirection() const { return _fromDir; }
+    int getFromFloor() const { return _fromFloor; }
+    const Vec2& getFromPosition() const { return _fromPosition; }
+
+    void onMoved();
+
+protected:
+    void _autoMove(float t);                           // 自动移动
+    void _makeCameraFollows();
+    void _adjustPosition();
+    float _adjustNumber(int number);
+
+private:
+    using Node::setPosition;
+
+protected:
+    bool _movable = true;
+    bool _canMove = true;
+    bool _isMoving = false;
+    int _moveDistance = 0;
+
+    Direction _dir = Direction::UP;
+
+    Direction _fromDir;
+    int _fromFloor = 0;
+    Vec2 _fromPosition;
+
+    //int _step = 1;
+    int _distances = -1;
+    int _musicId = -1;
+
+    bool _allowedCameraFollows = false;
+};

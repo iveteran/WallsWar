@@ -2,13 +2,25 @@
 
 #include "cocos2d.h"
 #include "Block.h"
-#include "PlayerTank.h"
-#include "EnemyTank.h"
 #include "Vec2Hash.h"
 
+#include <map>
 #include <string>
 
-class TankBase;
+using cocos2d::Rect;
+using cocos2d::Vector;
+using cocos2d::Map;
+using cocos2d::Vec2;
+using cocos2d::Vec3;
+
+using YAxisBlock = std::map<int, Block*>;
+using XYAxisBlock = std::map<int, YAxisBlock>;
+using FloorXYAxisBlockMap = std::map<int, XYAxisBlock>;
+using CoordBlockMap = Map<Vec2, Block*>;
+
+class MovableBlock;
+class Camp;
+class Player;
 
 class MapLayer : public cocos2d::LayerColor {
 public:
@@ -16,54 +28,63 @@ public:
 
     static MapLayer* getInstance();                 // 得到地图图层实例
 
-    void loadCamp();
+    //void loadCamp();
     bool loadMapData();
     void loadLevelData(short stage);                // 加载指定关卡的数据
 
-    Block* getCamp();                               // 得到大本营
-    PlayerTank* getPlayer1();                       // 得到玩家1
+    void createCamps();
+    Camp* createCamp(const cocos2d::Vec2& pos);
+    Camp* getCamp() const;
+    Camp* getEnemyCamp() const;
+    void createCampusParapetWall(const Camp* camp);
+
+    Player* getPlayer1() const;                       // 得到玩家1
     const std::string& getMapData();                // 得到地图数据
-    cocos2d::Vector<Block*>& getAllBlocks();        // 得到所有方块
-    cocos2d::Map<cocos2d::Vec2, Block*>& getPositionBlocks();
-    cocos2d::Vector<EnemyTank*>& getEnemies();      // 得到敌方坦克
-    cocos2d::Vector<PlayerTank*>& getPlayers();     // 得到玩家坦克
+    CoordBlockMap getAroundBlocks(const Block* block, int blockFloor,
+            Direction dir=Direction::NONE);
 
-    void enableAutoAddEnemies(bool b = true);       // 启用自动添加敌人
-    void enableAutoControlEnemies(bool b = true);   // 启用自动控制敌人
+    void addAndManageBlock(Block* block);
+    void removeAndUnmanageBlock(Block* block);
 
-    PlayerTank* addPlayer();                        // 添加玩家
-    void addEnemies();                              // 添加敌人
-
+    Vec3 getBlockMngmtPosition(int64_t blockId);
+    void manageBlock(Block* block);
+    void unmanageBlock(Block* block);
+    bool updateBlockPosition(MovableBlock* block);
     bool hasBlockAtPosition(const cocos2d::Vec2& pos, int floor=0) const;
 
-    bool createBlock(int i, int j, BlockType t);
-    bool createBlock(float x, float y, BlockType t);
-    bool createBlock(const cocos2d::Vec2& pos, BlockType t);
-
-    int createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t);
+    bool createBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
+    bool createBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
+    bool createBlock(const cocos2d::Vec2& pos, BlockType t, Gamer* gamer=nullptr);
+    int createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t, Gamer* gamer=nullptr);
 
     void resetMap();                                // 清理工作
-
-    unsigned char remainTank = ENEMIES_COUNT;       // 剩余未出生的敌方坦克
-    bool isCampOk = true;                           // 大本营是否完好
+    void clearBlocks();
 
 private:
     CREATE_FUNC(MapLayer);                          // 单例对象
 
-    bool _addBlock(float x, float y, BlockType t);
-    bool _addBlock(int i, int j, BlockType t);
+    bool _addBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
+    bool _addBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
 
-    void _addSpriteFrameCache();                   // 加载精灵帧缓存
-    void _addEnemy(float x, float y);              // 添加一辆敌方坦克
+    void _manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks);
+    bool _updateBlockPosition(const Vec3& updatePos, BlockType type, Block* block);
+    bool _updateBlockPosition(const Vec3& updatePos, Block* block, FloorXYAxisBlockMap& floorPosBlocks);
+    Block* _removeBlockPosition(int floor, int x, int y,  FloorXYAxisBlockMap& floorPosBlocks);
 
-    void autoAddEnemies(float);                     // 自动添加敌人
-    void autoControlEnemiesDirection(float);        // 自动控制敌人方向
-    void autoControlEnemiesShoot(float);            // 自动控制敌人发射子弹
+    void _getAroundBlocks(CoordBlockMap& posBlocks, const Block* block,
+            const XYAxisBlock& xyAxisBlock, Direction dir=Direction::NONE);
 
-    cocos2d::Vector<Block*> _blocks;                 // 管理所有方块
-    cocos2d::Map<cocos2d::Vec2, Block*> _posBlocks;
-    cocos2d::Vector<PlayerTank*> _players;           // 管理玩家坦克
-    cocos2d::Vector<EnemyTank*> _enemies;            // 管理敌方坦克
+    void initSpriteFrameCache();                   // 加载精灵帧缓存
 
-    std::string _data;                               // 地图数据
+private:
+    FloorXYAxisBlockMap _floorPosBlocks;
+    FloorXYAxisBlockMap _floorPosPlayers;
+    FloorXYAxisBlockMap _floorPosWeapons;
+    std::unordered_map<int64_t, Vec3> _blockIdPositionMap;
+
+    std::string _mapData;                               // 地图数据
+
+    Camp* _camp = nullptr;
+    Camp* _enemyCamp = nullptr;
+    Player* _player1 = nullptr;
 };

@@ -6,7 +6,7 @@
 
 using namespace cocos2d;
 
-class PlayerTank;
+class Player;
 
 class Joypad : public Layer
 {
@@ -15,10 +15,10 @@ public:
     static Joypad* getInstance();
 
     virtual bool init();
-    void setPlayer(const PlayerTank* player);
+    void setPlayer(const Player* player);
 
 private:
-    PlayerTank* _player1 = nullptr;
+    Player* _player1 = nullptr;
 };
 
 #endif // _JOYPAD_H_

@@ -1,33 +1,41 @@
 #pragma once
 
-#include "cocos2d.h"
 #include "Common.h"
+#include "Weapon.h"
 
-using BulletLevel = short;
+class Bullet : public Weapon {
+public:
+    static std::set<BlockType> CollidingAbleBlockTypes;
 
-class Bullet : public cocos2d::Sprite {
+public:
+    static void initSpriteFrameCache();
+    CREATE_FUNC(Bullet);
+
 public:
     bool init() override;
+    int getSize() const override { return BULLET_SIZE; }
+    BlockType getType() const override { return BlockType::BULLET; }
+    std::string getSpriteFrameName() const override { return "bullet"; }
 
-    void startMove();
+    void setLevel(int level);
+    int getLevel() const { return _level; }
 
-    void setDirection(Direction dir);
-    void setLevel(BulletLevel lev);
+    void setBeIntersection(bool value = true);
+    bool getBeIntersection() const;
 
-    int getFloor() const { return getLocalZOrder(); }
-    void setFloor(int floor) { setLocalZOrder(floor); }
+    virtual int getMovingStep() const override;
+    std::set<BlockType> getCollidingAbleBTs() const;
+    virtual void onBeCollided(Block* activeBlock) override;
+    virtual void onCollidedWith(cocos2d::Vector<Block*>& withBlocks) override;
 
-    static void addSpriteFrameCache();
+    virtual void changeSpriteDirection() override {}
 
 private:
-    void _autoMove(float t);
-    void _stopMove();
-    bool _isMapIntersection();                     // 检测和地图边缘的碰撞
-    bool _isBlockIntersection();                   // 检测和方块的碰撞
-    virtual bool _isTankIntersection() = 0;        // 检测和坦克的碰撞
-    virtual bool _isBulletIntersection() = 0;      // 检测和子弹的碰撞
     void _showEffect();                            // 展示碰撞特效
+    void _playEffectVoice();
+    const char* getVoicePath() const;
 
-    Direction _dir{};                                      // 子弹方向
-    BulletLevel _level{};                            // 子弹等级
+private:
+    int _level = 1;                            // 子弹等级
+    bool _isBeIntersection = false;
 };

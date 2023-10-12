@@ -1,46 +1,35 @@
-#include "Bullet.h"
-#include "Common.h"
-#include "MapLayer.h"
-#include "PlayerBullet.h"
-
 #include "AudioEngine.h"
+
+#include "Common.h"
+#include "Bullet.h"
+#include "Player.h"
+#include "MapLayer.h"
 
 USING_NS_CC;
 
-bool Bullet::init() {
-    if (!Sprite::init()) {
-        return false;
-    }
+std::set<BlockType>
+Bullet::CollidingAbleBlockTypes{
+    BlockType::MAP_BORDER,
+    BlockType::PLAYER,
+    BlockType::BULLET,
+    BlockType::WALL,
+    BlockType::STONE,
+    BlockType::CAMP
+};
 
-    this->setVisible(false);
-
-    return true;
+std::set<BlockType>
+Bullet::getCollidingAbleBTs() const {
+    return Bullet::CollidingAbleBlockTypes;
 }
 
-void Bullet::startMove() {
-    this->schedule(CC_SCHEDULE_SELECTOR(Bullet::_autoMove), 0.008f);
-}
-
-void Bullet::_stopMove() {
-    this->unschedule(CC_SCHEDULE_SELECTOR(Bullet::_autoMove));
-}
-
-void Bullet::setDirection(Direction dir) {
-    _dir = dir;
-}
-
-void Bullet::setLevel(BulletLevel lev) {
-    _level = lev;
-}
-
-void Bullet::addSpriteFrameCache() {
+void Bullet::initSpriteFrameCache() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
     // 子弹
-    auto* bullet_l = Sprite::create("images/bullet/bullet-0.png")->getSpriteFrame();
-    auto* bullet_u = Sprite::create("images/bullet/bullet-1.png")->getSpriteFrame();
-    auto* bullet_r = Sprite::create("images/bullet/bullet-2.png")->getSpriteFrame();
-    auto* bullet_d = Sprite::create("images/bullet/bullet-3.png")->getSpriteFrame();
+    auto bullet_l = Sprite::create("images/bullet/bullet-0.png")->getSpriteFrame();
+    auto bullet_u = Sprite::create("images/bullet/bullet-1.png")->getSpriteFrame();
+    auto bullet_r = Sprite::create("images/bullet/bullet-2.png")->getSpriteFrame();
+    auto bullet_d = Sprite::create("images/bullet/bullet-3.png")->getSpriteFrame();
 
     bullet_l->getTexture()->setAliasTexParameters();
     bullet_u->getTexture()->setAliasTexParameters();
@@ -53,9 +42,9 @@ void Bullet::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(bullet_d, "bullet_d");
 
     // 子弹爆炸
-    auto* bumb_0 = Sprite::create("images/bullet/bumb0.png")->getSpriteFrame();
-    auto* bumb_1 = Sprite::create("images/bullet/bumb1.png")->getSpriteFrame();
-    auto* bumb_2 = Sprite::create("images/bullet/bumb2.png")->getSpriteFrame();
+    auto bumb_0 = Sprite::create("images/bullet/bumb0.png")->getSpriteFrame();
+    auto bumb_1 = Sprite::create("images/bullet/bumb1.png")->getSpriteFrame();
+    auto bumb_2 = Sprite::create("images/bullet/bumb2.png")->getSpriteFrame();
 
     bumb_0->getTexture()->setAliasTexParameters();
     bumb_1->getTexture()->setAliasTexParameters();
@@ -64,6 +53,30 @@ void Bullet::addSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(bumb_0, "bumb_0");
     spriteFrameCache->addSpriteFrame(bumb_1, "bumb_1");
     spriteFrameCache->addSpriteFrame(bumb_2, "bumb_2");
+}
+
+bool Bullet::init() {
+    if (!Weapon::init()) {
+        return false;
+    }
+
+    this->setVisible(false);
+
+    MapLayer::getInstance()->addChild(this);
+
+    return true;
+}
+
+void Bullet::setLevel(int level) {
+    _level = level;
+}
+
+void Bullet::setBeIntersection(bool value) {
+    _isBeIntersection = value;
+}
+
+bool Bullet::getBeIntersection() const {
+    return _isBeIntersection;
 }
 
 void Bullet::_showEffect() {
@@ -79,7 +92,7 @@ void Bullet::_showEffect() {
 
     auto effect = Sprite::create();
     mapLayer->addChild(effect);
-    effect->setPosition(this->getPosition());
+    effect->setPosition(getPosition());
 
     effect->runAction(Sequence::create(
         Animate::create(animation),
@@ -90,134 +103,57 @@ void Bullet::_showEffect() {
     );
 }
 
-void Bullet::_autoMove(float t) {
-    // 1. 移动时检测和地图边缘的碰撞
-    // 2. 移动时检测和方块的碰撞
-    // 3. 移动时检测和坦克的碰撞
-    // 4. 移动时检测和子弹的碰撞
-
-    auto position = this->getPosition();
-    auto step = 1;
-    if (_level >= 1) {
-        step = 2;
-    }
-
-    // 假设可以移动
-    switch (_dir) {
-    case Direction::LEFT:
-        this->setPositionX(position.x - step);
-        break;
-    case Direction::UP:
-        this->setPositionY(position.y + step);
-        break;
-    case Direction::RIGHT:
-        this->setPositionX(position.x + step);
-        break;
-    case Direction::DOWN:
-        this->setPositionY(position.y - step);
-        break;
-    default:
-        break;
-    }
-
-    // 如果产生碰撞:
-    // <1> 隐藏子弹
-    // <2.1> 如果是敌人，则敌人掉血
-    // <2.2> 如果是方块，则方块被摧毁(根据玩家等级)
-    // <2.3> 如果是墙壁，则什么都不做
-    // <3> 展示子弹碰撞特效
-    // <4> 停止自动移动
-    if (_isBlockIntersection() || _isMapIntersection()) {
-        this->setVisible(false);
-        this->_showEffect();
-        this->_stopMove();
-        auto& players = MapLayer::getInstance()->getPlayers();
-        for (auto player : players) {
-            player->fallDownIfNextFloorIsEmpty();
+void Bullet::_playEffectVoice() {
+    // play effect voice
+    auto creator = dynamic_cast<Player*>(_creator);
+    if (creator && creator->isHost()) {
+        auto voicePath = getVoicePath();
+        if (voicePath) {
+            AudioEngine::play2d(voicePath);
         }
-    } else if (_isTankIntersection() || _isBulletIntersection()) {
-        this->setVisible(false);
-        this->_stopMove();
     }
-
 }
 
-bool Bullet::_isMapIntersection() {
-    auto position = this->getPosition();
-    if (position.x - BULLET_SIZE / 2 < 0
-        || position.y + BULLET_SIZE / 2 > CENTER_HEIGHT
-        || position.x + BULLET_SIZE / 2 > CENTER_WIDTH
-        || position.y - BULLET_SIZE / 2 < 0) {
-
-        if (dynamic_cast<PlayerBullet*>(this))
-            AudioEngine::play2d("music/bin.mp3");
-        return true;
-    }
-    return false;
+int Bullet::getMovingStep() const {
+    int step = _creator ? _creator->getMovingStep() + _level : 1;
+    return step;
 }
 
-bool Bullet::_isBlockIntersection() {
-    // 得到所有方块位置
-    auto& blocks = MapLayer::getInstance()->getAllBlocks();
-    auto& posBlocks = MapLayer::getInstance()->getPositionBlocks();
-    auto box = getBoundingBox();
-    auto count = 0;
+void Bullet::onBeCollided(Block* activeBlock) {
+}
 
-    for (auto it = blocks.begin(); it != blocks.end(); ) {
-        auto block = (*it);
-        // 碰到障碍物
-        if (getFloor() == block->getFloor()
-            && block->getCategory() == BlockCategory::OBSTACLE
-            && box.intersectsRect(block->getBoundingBox())) {
-            if (block->getType() == BlockType::WALL) {
-                // 碰到墙
-                auto result =
-                    dynamic_cast<BlockWall*>(block)->destory(_dir, box);
-
-                if (result.first) {
-                    // 发生碰撞
-                    count++;
-                    if (result.second) {
-                        // 发生碰撞且被摧毁
-                        block->removeFromParent();
-                        posBlocks.erase(block->getPosition());
-                        it = blocks.erase(it);
-                    } else {
-                        ++it;
-                    }
-                } else {
-                    ++it;
-                }
-
-
-            } else if (block->getType() == BlockType::STONE) {
-                // 碰到石头
-                if (_level >= 2) {
-                    count++;
-                    block->removeFromParent();
-                    it = blocks.erase(it);
-                } else {
-                    if (dynamic_cast<PlayerBullet*>(this))
-                        AudioEngine::play2d("music/bin.mp3");
-
-                    count++;
-                    ++it;
-                }
-            } else {
-                // 碰到大本营
-                AudioEngine::play2d("music/camp_bomb.mp3");
-                MapLayer::getInstance()->getCamp()->setTexture(
-                    SpriteFrameCache::getInstance()->getSpriteFrameByName("camp_1")->getTexture());
-                MapLayer::getInstance()->isCampOk = false;
-                count++;
-                ++it;
+void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
+    bool showEffect = false;
+    int numIgnoreBlocks = 0;
+    for (auto block : withBlocks) {
+        if (block->getType() == BlockType::PLAYER) {
+            auto player = dynamic_cast<Player*>(block);
+            if (_creator && _creator == player || // 击中的是自己
+                    _creator->getCamp() == player->getCamp() // 击中自己的队友
+                    ) {
+                numIgnoreBlocks++;
             }
-
-        } else {
-            // 没有碰到障碍物
-            ++it;
+        }
+        if (block->getType() == BlockType::MAP_BORDER ||
+                block->getType() == BlockType::WALL ||
+                block->getType() == BlockType::STONE) {
+            showEffect = true;
         }
     }
+    //printf(">>> numIgnoreBlocks: %d\n", numIgnoreBlocks);
+    //printf(">>> withBlocksi.size: %d\n", withBlocks.size());
+    if (numIgnoreBlocks > 0 && numIgnoreBlocks == withBlocks.size()) {
+        return;
+    }
 
-    return count;
+    if (showEffect) {
+        _showEffect();
+        _playEffectVoice();
+    }
+    setVisible(false);
+    stopMove();
+}
+
+const char* Bullet::getVoicePath() const {
+    return "music/bin.mp3";
 }

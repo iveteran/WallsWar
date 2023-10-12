@@ -1,27 +1,36 @@
 #include "Block.h"
+#include "ImmovableBlock.h"
+#include "Player.h"
+#include "NPC.h"
+#include "Camp.h"
 #include "MapLayer.h"
 
 USING_NS_CC;
 
-int Block::getFloor(BlockType bt) {
-    int floor = Block::Floor;
+int64_t Block::generateID() {
+    static int64_t auto_increasement_id_ = 0;
+    return ++auto_increasement_id_;
+}
+
+int Block::getDefaultFloor(BlockType bt) {
+    int floor = Block::DefaultFloor;
     switch (bt)
     {
         case BlockType::WALL:
         case BlockType::STONE:
         case BlockType::ICE:
         case BlockType::BRIDGE:
-            floor = Block::Floor;
+            floor = Block::DefaultFloor;
             break;
         case BlockType::RIVER:
         case BlockType::TRENCH:
-            floor = BlockRiver::Floor;
+            floor = BlockRiver::DefaultFloor;
             break;
         case BlockType::FOREST:
-            floor = BlockForest::Floor;
+            floor = BlockForest::DefaultFloor;
             break;
         case BlockType::CLOUD:
-            floor = BlockCloud::Floor;
+            floor = BlockCloud::DefaultFloor;
             break;
         default:
             CCLOG("[getBlockFloor] unsupported block type: %d", bt);
@@ -30,7 +39,7 @@ int Block::getFloor(BlockType bt) {
     return floor;
 }
 
-Block* Block::createBlock(BlockType type) {
+Block* Block::createBlock(BlockType type, Gamer* creator) {
     Block* block = nullptr;
     switch (type)
     {
@@ -64,231 +73,174 @@ Block* Block::createBlock(BlockType type) {
     }
     if (block) {
         block->setAnchorPoint(Vec2(0, 0));
+        block->setCreator(creator);
     }
     return block;
+}
+
+bool Block::isThisBlock(BlockType type, const Block* block_) {
+    bool yes = false;
+    Block* block = (Block*)block_;
+    switch (type)
+    {
+        case BlockType::IMMOVABLE_BLOCK:
+            yes = dynamic_cast<ImmovableBlock*>(block) != nullptr;
+            break;
+        case BlockType::MOVABLE_BLOCK:
+            yes = dynamic_cast<MovableBlock*>(block) != nullptr;
+            break;
+        case BlockType::WALL:
+            yes = dynamic_cast<BlockWall*>(block) != nullptr;
+            break;
+        case BlockType::STONE:
+            yes = dynamic_cast<BlockStone*>(block) != nullptr;
+            break;
+        case BlockType::FOREST:
+            yes = dynamic_cast<BlockForest*>(block) != nullptr;
+            break;
+        case BlockType::BRIDGE:
+            yes = dynamic_cast<BlockBridge*>(block) != nullptr;
+            break;
+        case BlockType::CLOUD:
+            yes = dynamic_cast<BlockCloud*>(block) != nullptr;
+            break;
+        case BlockType::RIVER:
+            yes = dynamic_cast<BlockRiver*>(block) != nullptr;
+            break;
+        case BlockType::TRENCH:
+            yes = dynamic_cast<BlockTrench*>(block) != nullptr;
+            break;
+        case BlockType::ICE:
+            yes = dynamic_cast<BlockIce*>(block) != nullptr;
+            break;
+        case BlockType::GAMER:
+            yes = dynamic_cast<Gamer*>(block) != nullptr;
+            break;
+        case BlockType::PLAYER:
+            yes = dynamic_cast<Player*>(block) != nullptr;
+            break;
+        case BlockType::NPC:
+            yes = dynamic_cast<NPC*>(block) != nullptr;
+            break;
+        case BlockType::WEAPON:
+            yes = dynamic_cast<Weapon*>(block) != nullptr;
+            break;
+        case BlockType::BULLET:
+            yes = dynamic_cast<Bullet*>(block) != nullptr;
+            break;
+        default:
+            CCLOG("[Block::isThisBlock] unsupported block type: %d", type);
+            break;
+    }
+    return yes;
 }
 
 bool Block::init() {
     if (!Sprite::init()) {
         return false;
     }
+    _id = generateID();
 
     return true;
 }
 
-void Block::addSpriteFrameCache() {
-    auto spriteFrameCache = SpriteFrameCache::getInstance();
-
-    // 大本营
-    auto* camp_0 = Sprite::create("images/block/camp0.png")->getSpriteFrame();
-    auto* camp_1 = Sprite::create("images/block/camp1.png")->getSpriteFrame();
-
-    camp_0->getTexture()->setAliasTexParameters();
-    camp_1->getTexture()->setAliasTexParameters();
-
-    spriteFrameCache->addSpriteFrame(camp_0, "camp_0");
-    spriteFrameCache->addSpriteFrame(camp_1, "camp_1");
-
-    // 方块
-    auto wall = Sprite::create("images/block/wall.png")->getSpriteFrame();
-    auto stone = Sprite::create("images/block/stone.png")->getSpriteFrame();
-    auto forest = Sprite::create("images/block/forest.png")->getSpriteFrame();
-    auto bridge = Sprite::create("images/block/bridge.png")->getSpriteFrame();
-    auto ice = Sprite::create("images/block/ice.png")->getSpriteFrame();
-    auto river_0 = Sprite::create("images/block/river-0.png")->getSpriteFrame();
-    auto river_1 = Sprite::create("images/block/river-1.png")->getSpriteFrame();
-    auto trench = Sprite::create("images/block/trench.png")->getSpriteFrame();
-    auto cloud = Sprite::create("images/block/cloud.png")->getSpriteFrame();
-
-    wall->getTexture()->setAliasTexParameters();
-    stone->getTexture()->setAliasTexParameters();
-    forest->getTexture()->setAliasTexParameters();
-    bridge->getTexture()->setAliasTexParameters();
-    ice->getTexture()->setAliasTexParameters();
-    river_0->getTexture()->setAliasTexParameters();
-    river_1->getTexture()->setAliasTexParameters();
-    trench->getTexture()->setAliasTexParameters();
-    cloud->getTexture()->setAliasTexParameters();
-
-    spriteFrameCache->addSpriteFrame(wall, "wall");
-    spriteFrameCache->addSpriteFrame(stone, "stone");
-    spriteFrameCache->addSpriteFrame(forest, "forest");
-    spriteFrameCache->addSpriteFrame(bridge, "bridge");
-    spriteFrameCache->addSpriteFrame(ice, "ice");
-    spriteFrameCache->addSpriteFrame(river_0, "river_0");
-    spriteFrameCache->addSpriteFrame(river_1, "river_1");
-    spriteFrameCache->addSpriteFrame(trench, "trench");
-    spriteFrameCache->addSpriteFrame(cloud, "cloud");
+bool Block::containsPoint(const Vec2& point) const {
+    return getBoundingBox().containsPoint(point);
 }
 
-bool BlockWall::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("wall");
-    this->setFloor(BlockWall::Floor);
-
-    // 创建4个遮挡精灵
-    for (int i = 0; i < 4; i++) {
-        auto block = LayerColor::create(Color4B(0, 0, 0, 255), 4, 4);
-        block->setIgnoreAnchorPointForPosition(false);
-        block->setAnchorPoint(Vec2(0, 0));
-        this->addChild(block);
-        block->setVisible(false);
-
-        block->setPosition(Vec2(i / 2 * BLOCK_SIZE / 2.0f,
-                                    i % 2 * BLOCK_SIZE / 2.0f));
-        blacks[i] = block;
-    }
-
-    return true;
+bool Block::isDownFloorEmpty() const {
+    int downFloor = getFloor() - 1;
+    return !isBlockIntersection(downFloor);
 }
 
-std::pair<bool, bool> BlockWall::destory(Direction dir, const Rect& box) {
-    bool flag = false; // 是否与子弹发生碰撞
-    auto position = this->getPosition();
-
-    for (int i = 0; i < 4; i++) {
-        // 转为坐标为相对于MapLayer的坐标
-        auto preBox = blacks[i]->getBoundingBox();
-        auto tranBox = Rect(preBox.getMinX() + position.x,
-                            preBox.getMinY() + position.y,
-                            preBox.getMaxX() - preBox.getMinX(),
-                            preBox.getMaxY() - preBox.getMinY());
-
-        // 加宽子弹
-        Rect cmpBox;
-        switch (dir) {
-        case Direction::LEFT:
-        case Direction::RIGHT:
-            cmpBox = Rect(box.getMinX(), box.getMinY() + 1 - BLOCK_SIZE,
-                          BULLET_SIZE, TANK_SIZE);
-            break;
-        case Direction::UP:
-        case Direction::DOWN:
-            cmpBox = Rect(box.getMinX() + 1 - BLOCK_SIZE,
-                          box.getMinY(), TANK_SIZE, BULLET_SIZE);
-            break;
-        default:
-            break;
+bool Block::isMapBorderIntersection(Vector<Block*>* resultList) const {
+    bool yes = false;
+    auto pos = getPosition();
+    int blockSize = getSize();
+    if (resultList) {
+        MapBorder* mapBorder = nullptr;
+        if (pos.x - blockSize / 2.0f < 0) {
+            mapBorder = MapBorder::LEFT();
+        } else if (pos.y + blockSize / 2.0f > CENTER_HEIGHT) {
+            mapBorder = MapBorder::TOP();
+        } else if (pos.x + blockSize / 2.0f > CENTER_WIDTH) {
+            mapBorder = MapBorder::RIGHT();
+        } else if (pos.y - blockSize / 2.0f < 0) {
+            mapBorder = MapBorder::BOTTOM();
         }
+        if (mapBorder) {
+            resultList->pushBack(mapBorder);
+            yes = true;
+        }
+    } else {
+        yes = pos.x - blockSize / 2.0f < 0
+            || pos.y + blockSize / 2.0f > CENTER_HEIGHT
+            || pos.x + blockSize / 2.0f > CENTER_WIDTH
+            || pos.y - blockSize / 2.0f < 0;
+    }
+    return yes;
+}
 
-        if (!blacks[i]->isVisible()
-            && tranBox.intersectsRect(cmpBox)) {
-
-            blacks[i]->setVisible(true);
-            flag = true;
+// TODO: resultList改为Set
+bool Block::isBlockIntersection(int floor, Vector<Block*>* resultList) const {
+    // 不同Floor的Block默认不产生碰撞
+    bool yes = false;
+    if (floor == NoneFloor) {
+        floor = getFloor();
+    }
+    auto box = getBoundingBox();
+    auto mapLayer = MapLayer::getInstance();
+    auto otherBlocks = mapLayer->getAroundBlocks(this, floor);
+    //printf("--------- otherBlocks size: %d\n", otherBlocks.size());
+    for (auto iter : otherBlocks) {
+        auto otherBlock = iter.second;
+        //if (otherBlock->getType() == BlockType::PLAYER) {
+        //    auto realPos = otherBlock->getPosition();
+        //    printf(">>> otherBlock: mngmt pos: (%d, %d), real pos: (%d, %d)\n",
+        //            (int)iter.first.x, (int)iter.first.y, (int)realPos.x, (int)realPos.y);
+        //    printf(">>> this: 0x%x, otherBlock: 0x%x\n", this, otherBlock);
+        //    printf(">>> this pos: (%d, %d)\n", (int)getPosition().x, (int)getPosition().y);
+        //}
+        if (otherBlock == this) {
+            continue;
+        }
+        // 玩家及子弹和桥面及冰面不产生碰撞
+        if ((getType() == BlockType::PLAYER || getType() == BlockType::BULLET) &&
+                (otherBlock->getType() == BlockType::BRIDGE ||
+                 otherBlock->getType() == BlockType::ICE)) {
+            continue;
+        }
+        auto otherBox = otherBlock->getBoundingBox();
+        if (box.equals(otherBox) || box.myIntersectsRect(otherBox)) {
+            yes = true;
+            if (resultList) {
+                resultList->pushBack(otherBlock);
+            } else {
+                break;
+            }
         }
     }
-
-    return std::make_pair(flag, _isDestory());
+    return yes;
 }
 
-bool BlockWall::_isDestory() {
-    for (int i = 0; i < 4; i++) {
-        if (!blacks[i]->isVisible()) {
-            return false;
-        }
-    }
-
-    return true;
+void Block::onBeCollided(Block* activeBlock) {
 }
 
-bool BlockStone::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("stone");
-    this->setFloor(BlockStone::Floor);
-
-    return true;
+void Block::onCollidedWith(Vector<Block*>& withBlocks) {
 }
 
-bool BlockCamp::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("camp_0");
-
-    return true;
+void Block::onDestroyed() {
 }
 
-bool BlockForest::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("forest");
-    this->setFloor(BlockForest::Floor);
-
-    return true;
-}
-
-bool BlockBridge::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("bridge");
-    this->setFloor(BlockBridge::Floor);
-
-    return true;
-}
-
-bool BlockCloud::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("cloud");
-    this->setFloor(BlockCloud::Floor);
-
-    return true;
-}
-
-bool BlockIce::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("ice");
-    this->setFloor(BlockIce::Floor);
-
-    return true;
-}
-
-bool BlockTrench::init() {
-    if (!Block::init()) {
-        return false;
-    }
-
-    this->initWithSpriteFrameName("trench");
-    this->setFloor(BlockTrench::Floor);
-
-    return true;
-}
-
-bool BlockRiver::init() {
-    if (!Block::init()) {
-        return false;
-    }
-    this->setFloor(BlockRiver::Floor);
-
-    auto spriteFrameCache = SpriteFrameCache::getInstance();
-
-    auto animation = Animation::createWithSpriteFrames({
-        spriteFrameCache->getSpriteFrameByName("river_0"),
-        spriteFrameCache->getSpriteFrameByName("river_1")
-                                                       },
-                                                       1.5f
-    );
-
-    auto animate = Animate::create(animation);
-
-    this->runAction(RepeatForever::create(animate));
-
-    return true;
+void Block::initSpriteFrameCache() {
+    Campus::initSpriteFrameCache();
+    Camp::initSpriteFrameCache();
+    BlockWall::initSpriteFrameCache();
+    BlockStone::initSpriteFrameCache();
+    BlockForest::initSpriteFrameCache();
+    BlockBridge::initSpriteFrameCache();
+    BlockCloud::initSpriteFrameCache();
+    BlockIce::initSpriteFrameCache();
+    BlockTrench::initSpriteFrameCache();
+    BlockRiver::initSpriteFrameCache();
 }

@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "Joypad.h"
-#include "PlayerTank.h"
+#include "Player.h"
 
 USING_NS_CC;
 
@@ -16,9 +16,9 @@ Joypad* Joypad::getInstance()
     return _jaypad;
 }
 
-void Joypad::setPlayer(const PlayerTank* player1)
+void Joypad::setPlayer(const Player* player1)
 {
-    _player1 = (PlayerTank*)player1;
+    _player1 = (Player*)player1;
 }
 
 

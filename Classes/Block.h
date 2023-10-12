@@ -1,15 +1,8 @@
 #pragma once
 
-#include "Common.h"
+#include <set>
 #include "cocos2d.h"
-#include <utility>
-
-// 方块分类
-enum class BlockCategory {
-    OBSTACLE,                     // 坦克不能通过，子弹可以摧毁
-    NON_OBSTACLE,                 // 坦克可以通过，子弹不能摧毁
-    RIVER                         // 坦克不能通过，子弹不能摧毁
-};
+#include "Common.h"
 
 // 方块类型
 enum class BlockType {
@@ -21,134 +14,73 @@ enum class BlockType {
     ICE,            // 冰面，floor为0，玩家在上面行走会加速，子弹可穿过，可被燃烧弹摧毁
     RIVER,          // 河流，floor为-1，玩家会掉落，3秒内未上岸将被淹死，可以用Wood搭桥，子弹可穿过
     TRENCH,         // 壕沟，floor为-1，玩家会掉落，玩家可挖掘并生成土方(Soil)且可携带，只能使用土方填埋才可以上来，子弹可穿过
+    BARRIER,        // 河流、壕沟的边界
     CLOUD,          // 云朵，floor为99，可遮罩其它所有Block，子弹可穿过，不能被摧毁
     CAMP,           // 战斗营地，floor为0，玩家加入阵营后出生地，可被摧毁，被摧毁即失败
     CAMPUS,         // 玩家营地，floor为0，玩家出生地，不可被摧毁，可进入玩家自创剧本(故事线)
+    IMMOVABLE_BLOCK,
+    MOVABLE_BLOCK,
+    GAMER,
+    PLAYER,
+    SPECTATOR,
+    NPC,
+    WEAPON,
+    BULLET,
+    ITEM,
+    MAP_BORDER,     // MAP_BORDER, 地图边界
+    ALL,            // 全部
     COUNT
 };
 
+const int NoneFloor = -999;
+const bool IsActiveCollision = true;
+
+class Gamer;
 
 class Block : public cocos2d::Sprite {
 public:
+    static const int DefaultFloor = 0;
+
+    static void initSpriteFrameCache();
+
+    static int64_t generateID();
+    static int getDefaultFloor(BlockType bt);
+    static Block* createBlock(BlockType type, Gamer* creator=nullptr);
+    static bool isThisBlock(BlockType type, const Block* block);
+
+public:
     bool init() override;             // 调用父类的init
 
-    virtual BlockCategory getCategory() = 0;
-    virtual BlockType getType() { return BlockType::UNDEFINED; }
+    int64_t id() const { return _id; }
     int getFloor() const { return getLocalZOrder(); }
     void setFloor(int floor) { setLocalZOrder(floor); }
+    void increaseFloor() { setLocalZOrder(getLocalZOrder() + 1); }
+    void decreaseFloor() { setLocalZOrder(getLocalZOrder() - 1); }
+    void setCreator(Gamer* creator) { _creator = creator; }
+    void unsetCreator() { _creator = nullptr; }
+    Gamer* getCreator() const { return _creator; }
 
-    static int getFloor(BlockType bt);
-    static Block* createBlock(BlockType type);
-    static void addSpriteFrameCache();
+    virtual BlockType getType() const = 0;
+    virtual bool movable() const = 0;
+    virtual bool canBeDestroy() const { return true; }
+    virtual int getSize() const { return BLOCK_SIZE * 2; }
 
-    static const int Floor = 0;
-};
+    bool containsPoint(const cocos2d::Vec2& point) const;
+    bool isDownFloorEmpty() const;
+    bool isMapBorderIntersection(cocos2d::Vector<Block*>* resultList=nullptr) const;
+    bool isBlockIntersection(int floor=NoneFloor, cocos2d::Vector<Block*>* resultList=nullptr) const;
+    bool isPlayerIntersection(int floor=NoneFloor) const;
 
-class __Obstacle : public Block {
-public:
-    BlockCategory getCategory() override { return BlockCategory::OBSTACLE; }
-};
+    // callbacks
+    virtual void onBeCollided(Block* activeBlock);              // 被碰撞回调
+    virtual void onCollidedWith(cocos2d::Vector<Block*>& withBlocks);    // (主动)碰撞到回调
+    virtual void onDestroyed();
 
-class __NonObstacle : public Block {
-public:
-    BlockCategory getCategory() override { return BlockCategory::NON_OBSTACLE; }
-};
+    virtual std::string getSpriteFrameName() const = 0;
 
-class __River : public Block {
-public:
-    BlockCategory getCategory() override { return BlockCategory::RIVER; }
-};
-
-class BlockCamp : public __Obstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::CAMP; }
-
-    CREATE_FUNC(BlockCamp);
-};
-
-class BlockWall : public __Obstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::WALL; }
-
-    std::pair<bool, bool> destory(Direction dir, const cocos2d::Rect& box);
-
-    CREATE_FUNC(BlockWall);
-
-    static const int Floor = 0;
+protected:
+    Gamer* _creator = nullptr;
 
 private:
-    cocos2d::LayerColor* blacks[4]{};        // 4个黑色方块，用于遮挡
-    bool _isDestory();                      // 检测方块是否被摧毁
-};
-
-class BlockStone : public __Obstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::STONE; }
-
-    CREATE_FUNC(BlockStone);
-
-    static const int Floor = 0;
-};
-
-class BlockForest : public __NonObstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::FOREST; }
-
-    CREATE_FUNC(BlockForest);
-
-    static const int Floor = 9;
-};
-
-class BlockBridge : public __NonObstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::BRIDGE; }
-
-    CREATE_FUNC(BlockBridge);
-
-    static const int Floor = 0;
-};
-
-class BlockCloud : public __NonObstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::CLOUD; }
-
-    CREATE_FUNC(BlockCloud);
-
-    static const int Floor = 99;
-};
-
-class BlockIce : public __NonObstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::ICE; }
-
-    CREATE_FUNC(BlockIce);
-
-    static const int Floor = 0;
-};
-
-class BlockTrench : public __NonObstacle {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::TRENCH; }
-
-    CREATE_FUNC(BlockTrench);
-
-    static const int Floor = -1;
-};
-
-class BlockRiver : public __River {
-public:
-    bool init() override;
-    BlockType getType() override { return BlockType::RIVER; }
-
-    CREATE_FUNC(BlockRiver);
-
-    static const int Floor = -1;
+    int64_t _id = 0;
 };

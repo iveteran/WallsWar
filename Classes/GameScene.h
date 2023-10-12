@@ -1,12 +1,11 @@
 #pragma once
 
 #include "cocos2d.h"
-#include "Common.h"
-#include <map>
 
-class PlayerTank;
+class Player;
 class ControlLayer;
 class MapLayer;
+class Camp;
 
 class GameScene : public cocos2d::Scene {
 public:
@@ -15,20 +14,12 @@ public:
     ~GameScene();
     bool init() override;
 
-    static void addSpriteFrameCache();
-    void updateInformationArea(bool first = false);                // 更新右侧信息区域
+    static void initSpriteFrameCache();
+    void updateInformationArea(bool first = false);  // 更新右侧信息区域
 
-    PlayerTank* getPlayer1() const {
-        return _player1;
-    }
-
-    ControlLayer* getControlLayer() const {
-        return _ctrlLayer;
-    }
-
-    MapLayer* getMapLayer() const {
-        return _map;
-    }
+    Player* getPlayer1() const { return _player1; }
+    ControlLayer* getControlLayer() const { return _ctrlLayer; }
+    MapLayer* getMapLayer() const { return _map; }
 
     static GameScene* create(int stage = 1) {
         auto* pRet = new(std::nothrow) GameScene();
@@ -51,9 +42,9 @@ public:
     short stage = 1;                                          // 当前关卡
 
 private:
-    PlayerTank* _player1 = nullptr;
     ControlLayer* _ctrlLayer = nullptr;                      // 游戏控制、信息和状态显示
     MapLayer* _map = nullptr;                                // 管理地图
+    Player* _player1 = nullptr;
 
     void _printGameInfo();
     void _showLoadAnimate();                                 // 展示载入关卡动画
@@ -63,7 +54,7 @@ private:
     void _gameover(float);                                   // 游戏结束动画
 };
 
-inline PlayerTank* GET_PLAYER1() {
+inline Player* GET_PLAYER1() {
     auto gameScene = dynamic_cast<GameScene*>(cocos2d::Director::getInstance()->getRunningScene());
     return gameScene != nullptr ? gameScene->getPlayer1() : nullptr;
 }

@@ -20,9 +20,11 @@ bool GameOverScene::init() {
     AudioEngine::play2d("music/fail.mp3");
     scheduleOnce(CC_SCHEDULE_SELECTOR(GameOverScene::_replaceToMenu), 2.0f);
 
+    printf(">> game over init: (%f, %f)\n", gameOver->getPosition().x, gameOver->getPosition().y);
     return true;
 }
 
 void GameOverScene::_replaceToMenu(float) {
+    printf(">> game over, replace to menu\n");
     Director::getInstance()->replaceScene(MenuScene::create());
 }

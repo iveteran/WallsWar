@@ -29,6 +29,8 @@ enum class JoyDirection
     COUNT
 };
 
+class Player;
+
 // 虚拟手柄控制层
 class Joypad2 : public Layer
 {
@@ -42,6 +44,8 @@ public:
 
     void setJoystickType(JoystickType joystick_type);
 
+    void attachPlayer(Player* player) { _player = player; }
+
 private:
     JoystickType m_type;
     float calcRad(Point p1, Point p2);
@@ -53,6 +57,8 @@ private:
 
     bool m_direction_status; // 方向键按下
     bool m_fire_status; // 开火键按下
+
+    Player* _player = nullptr;
 };
 
 #endif /* _JOYPAD2_H_ */
