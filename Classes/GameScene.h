@@ -14,6 +14,10 @@ public:
     ~GameScene();
     bool init() override;
 
+    virtual void onEnter();
+    virtual void onExit();
+    virtual void update(float dt);
+
     static void initSpriteFrameCache();
     void updateInformationArea(bool first = false);  // 更新右侧信息区域
 
@@ -47,7 +51,7 @@ private:
     Player* _player1 = nullptr;
 
     void _printGameInfo();
-    void _showLoadAnimate();                                 // 展示载入关卡动画
+    //void _showLoadAnimate();                                 // 展示载入关卡动画
     void _initMapLayer();                                    // 初始化地图数据
     void _initControlLayer();
     void _checkGameStatus(float);                            // 检查游戏状态

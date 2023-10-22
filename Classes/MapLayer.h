@@ -7,6 +7,8 @@
 #include <map>
 #include <string>
 
+using cocos2d::Node;
+using cocos2d::LayerColor;
 using cocos2d::Rect;
 using cocos2d::Vector;
 using cocos2d::Map;
@@ -22,7 +24,7 @@ class MovableBlock;
 class Camp;
 class Player;
 
-class MapLayer : public cocos2d::LayerColor {
+class MapLayer : public LayerColor {
 public:
     bool init() override;
 
@@ -33,7 +35,7 @@ public:
     void loadLevelData(short stage);                // 加载指定关卡的数据
 
     void createCamps();
-    Camp* createCamp(const cocos2d::Vec2& pos);
+    Camp* createCamp(const Vec2& pos);
     Camp* getCamp() const;
     Camp* getEnemyCamp() const;
     void createCampusParapetWall(const Camp* camp);
@@ -43,19 +45,20 @@ public:
     CoordBlockMap getAroundBlocks(const Block* block, int blockFloor,
             Direction dir=Direction::NONE);
 
-    void addAndManageBlock(Block* block);
-    void removeAndUnmanageBlock(Block* block);
+    bool addAndManageBlock(Block* block);
+    bool removeAndUnmanageBlock(Block* block);
+    void addNode(Node* node);
+    void removeNode(Node* node);
 
-    Vec3 getBlockMngmtPosition(int64_t blockId);
-    void manageBlock(Block* block);
-    void unmanageBlock(Block* block);
+    bool manageBlock(Block* block);
+    bool unmanageBlock(Block* block);
     bool updateBlockPosition(MovableBlock* block);
-    bool hasBlockAtPosition(const cocos2d::Vec2& pos, int floor=0) const;
+    bool hasBlockAtPosition(const Vec2& pos, int floor=0) const;
 
     bool createBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
     bool createBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
-    bool createBlock(const cocos2d::Vec2& pos, BlockType t, Gamer* gamer=nullptr);
-    int createBlocks(const std::vector<cocos2d::Vec2>& posList, BlockType t, Gamer* gamer=nullptr);
+    bool createBlock(const Vec2& pos, BlockType t, Gamer* gamer=nullptr);
+    int createBlocks(const std::vector<Vec2>& posList, BlockType t, Gamer* gamer=nullptr);
 
     void resetMap();                                // 清理工作
     void clearBlocks();
@@ -63,13 +66,20 @@ public:
 private:
     CREATE_FUNC(MapLayer);                          // 单例对象
 
+    using Node::addChild;           // make it private, to use addNode/addAndManageBlock instead of it
+    using Node::removeChild;        // make it private, to use removeNode/removeAndUnmanageBlock instead of it
+
     bool _addBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
     bool _addBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
 
-    void _manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks);
+    bool _manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks);
     bool _updateBlockPosition(const Vec3& updatePos, BlockType type, Block* block);
     bool _updateBlockPosition(const Vec3& updatePos, Block* block, FloorXYAxisBlockMap& floorPosBlocks);
     Block* _removeBlockPosition(int floor, int x, int y,  FloorXYAxisBlockMap& floorPosBlocks);
+
+    Vec3 _getBlockMngmtPosition(int64_t blockId);
+    void _addBlockMngmtPosition(int64_t blockId, const Vec3& mngmtPos);
+    void _removeBlockMngmtPosition(int64_t blockId);
 
     void _getAroundBlocks(CoordBlockMap& posBlocks, const Block* block,
             const XYAxisBlock& xyAxisBlock, Direction dir=Direction::NONE);

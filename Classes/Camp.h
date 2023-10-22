@@ -25,8 +25,8 @@ public:
     }
     int getRemainPlayers() const { return _remainPlayers; }
 
-    void addPlayers();
-    Player* addPlayer();
+    void addPlayers(bool enableAI);
+    Player* addPlayer(bool enableAI=false);
     void removePlayer(Player* player);
 
     void enableAI();

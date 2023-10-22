@@ -48,21 +48,28 @@ void MapLayer::initSpriteFrameCache() {
 
     // 坦克
     Player::initSpriteFrameCache();
-    Player::loadFrameAnimation(true); // for host player
-    Player::loadFrameAnimation(false); // for enemey players
+    Player::loadFrameAnimation();
 }
 
-void MapLayer::addAndManageBlock(Block* block) {
-    manageBlock(block);
+bool MapLayer::addAndManageBlock(Block* block) {
     addChild(block);
+    return manageBlock(block);
 }
 
-void MapLayer::removeAndUnmanageBlock(Block* block) {
-    unmanageBlock(block);
+bool MapLayer::removeAndUnmanageBlock(Block* block) {
     removeChild(block);
+    return unmanageBlock(block);
 }
 
-Vec3 MapLayer::getBlockMngmtPosition(int64_t blockId) {
+void MapLayer::addNode(Node* node) {
+    addChild(node);
+}
+
+void MapLayer::removeNode(Node* node) {
+    removeChild(node);
+}
+
+Vec3 MapLayer::_getBlockMngmtPosition(int64_t blockId) {
     auto iter = _blockIdPositionMap.find(blockId);
     if (iter != _blockIdPositionMap.end()) {
         return iter->second;
@@ -70,35 +77,50 @@ Vec3 MapLayer::getBlockMngmtPosition(int64_t blockId) {
     return Vec3::ZERO;
 }
 
-void MapLayer::manageBlock(Block* block) {
-    _manageBlock(block, _floorPosBlocks);
-
-    //if (block->getType() == BlockType::PLAYER) {
-    //    _manageBlock(block, _floorPosPlayers);
-    //} else if (Block::isThisBlock(BlockType::WEAPON, block)) {
-    //    _manageBlock(block, _floorPosWeapons);
-    //} else {
-    //    //_manageBlock(block, _floorPosBlocks);
-    //}
+void MapLayer::_addBlockMngmtPosition(int64_t blockId, const Vec3& mngmtPos) {
+    //_blockIdPositionMap.insert(std::make_pair(block->id(), mngmtPos));
+    _blockIdPositionMap[blockId] = mngmtPos;  // update or add element
 }
 
-void MapLayer::unmanageBlock(Block* block) {
+void MapLayer::_removeBlockMngmtPosition(int64_t blockId) {
+    _blockIdPositionMap.erase(blockId);
+}
+
+bool MapLayer::manageBlock(Block* block) {
+    bool success = _manageBlock(block, _floorPosBlocks);
+
+    //if (block->getType() == BlockType::PLAYER) {
+    //   success = _manageBlock(block, _floorPosPlayers);
+    //} else if (Block::isThisBlock(BlockType::WEAPON, block)) {
+    //    success = _manageBlock(block, _floorPosWeapons);
+    //} else {
+    //    //success = _manageBlock(block, _floorPosBlocks);
+    //}
+    return success;
+}
+
+bool MapLayer::unmanageBlock(Block* block) {
     BlockType type = block->getType();
     if (Block::isThisBlock(BlockType::WEAPON, block)) {
         type = BlockType::WEAPON;
     }
-    //printf("######## unmanageBlock, id: %d, (%f, %f)\n", block->id(),
-    //        block->getPosition().x, block->getPosition().y);
 
     // remove from blocks map
-    auto mngmtPos = getBlockMngmtPosition(block->id());
+    bool success = false;
+    auto mngmtPos = _getBlockMngmtPosition(block->id());
     if (mngmtPos != Vec3::ZERO) {
-        _updateBlockPosition(mngmtPos, type, nullptr);
-        _blockIdPositionMap.erase(block->id());
+        success = _updateBlockPosition(mngmtPos, type, nullptr);
+        _removeBlockMngmtPosition(block->id());
     }
+
+    //if (block->getType() == BlockType::WALL) {
+    //    printf("######## unmanageBlock, id: %d, type: %d, (%f, %f), success: %d\n", block->id(), block->getType(),
+    //            block->getPosition().x, block->getPosition().y, success);
+    //}
+    return success;
 }
 
-void MapLayer::_manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks) {
+bool MapLayer::_manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks) {
     int floor = block->getFloor();
     Vec2 blockPos = block->getPosition();
     int x = (int)blockPos.x;
@@ -119,13 +141,19 @@ void MapLayer::_manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks) {
         } else {
             auto yAxisBlock = &(iter2->second);
             //yAxisBlock->insert(std::make_pair(y, block));
-            (*yAxisBlock)[y] = block;
+            auto iter3 = yAxisBlock->find(y);
+            if (iter3 == yAxisBlock->end()) {
+                (*yAxisBlock)[y] = block;
+            } else {
+                // the position exists a block already
+                return false;
+            }
         }
     }
 
     Vec3 mngmtPos{(float)x, (float)y, (float)floor};
-    //_blockIdPositionMap.insert(std::make_pair(block->id(), mngmtPos));
-    _blockIdPositionMap[block->id()] = mngmtPos;  // update or add element
+    _addBlockMngmtPosition(block->id(), mngmtPos);  // update or add element
+    return true;
 }
 
 bool MapLayer::updateBlockPosition(MovableBlock* block) {
@@ -133,7 +161,7 @@ bool MapLayer::updateBlockPosition(MovableBlock* block) {
     if (Block::isThisBlock(BlockType::WEAPON, block)) {
         type = BlockType::WEAPON;
     }
-    auto mngmtPos = getBlockMngmtPosition(block->id());
+    auto mngmtPos = _getBlockMngmtPosition(block->id()); // get block current management position
     if (mngmtPos != Vec3::ZERO) {
         return _updateBlockPosition(mngmtPos, type, block);
     }
@@ -163,15 +191,18 @@ bool MapLayer::_updateBlockPosition(const Vec3& mngmtPos, Block* block,
     int x = (int)mngmtPos.x;
     int y = (int)mngmtPos.y;
 
-    auto foundBlock = _removeBlockPosition(floor, x, y, floorPosBlocks);
-    //if (block && foundBlock && foundBlock == block) {  // 只有找到并删除原位置的才更新
-    if (block) {  // 没找到和删除原位置的就新增？
+    auto foundBlock = _removeBlockPosition(floor, x, y, floorPosBlocks);  // remove block current managemant position
+    if (block && foundBlock && foundBlock == block) {  // 只有找到并删除原位置的才更新
+    //if (block) {  // 没找到和删除原位置的就新增？
         //printf("######## position update (%d, %d, %d) -> (%d, %d, %d)\n", floor, x, y,
         //        block->getFloor(), (int)block->getPosition().x, (int)block->getPosition().y);
         //printf("######## updating OR adding? %s\n", foundBlock ? "updating" : "adding");
-        _manageBlock(block, floorPosBlocks);
+        //if (foundBlock->getType() == BlockType::WALL) {
+        //    printf("######## foundBlock: id: %d, type: %d\n", foundBlock->id(), foundBlock->getType());
+        //}
+        return _manageBlock(block, floorPosBlocks);
     }
-    return true;
+    return foundBlock != nullptr;
 }
 
 Block* MapLayer::_removeBlockPosition(int floor, int x, int y,
@@ -193,8 +224,10 @@ Block* MapLayer::_removeBlockPosition(int floor, int x, int y,
                         floorPosBlocks.erase(iter);
                     }
                 }
-                //printf("######## removed (%d, %d, %d)\n", foundBlock->getFloor(),
-                //        (int)foundBlock->getPosition().x, (int)foundBlock->getPosition().y);
+                //if (foundBlock->getType() == BlockType::WALL) {
+                //    printf("######## removed id: %d, (%d, %d, %d)\n", foundBlock->id(), foundBlock->getFloor(),
+                //            (int)foundBlock->getPosition().x, (int)foundBlock->getPosition().y);
+                //}
             }
         }
     }
@@ -360,26 +393,27 @@ bool MapLayer::loadMapData() {
     int widthSize = (int)(CENTER_WIDTH / BLOCK_SIZE);
     int heightSize = (int)(CENTER_HEIGHT / BLOCK_SIZE);
     // 增加底边围墙
-    int y = 4;
-    for (int x=0; x<widthSize-1; x++)
+    int offset = 4;
+    int y = offset;
+    for (int x=offset; x<widthSize-1-offset; x++)
     {
         _addBlock(x, y, BlockType::WALL);
     }
     // 增加右边围墙
-    int x = widthSize-5;
-    for (int y=0; y<heightSize-1; y++)
+    int x = widthSize-1-offset;
+    for (int y=offset; y<heightSize-1-offset; y++)
     {
         _addBlock(x, y, BlockType::WALL);
     }
     // 增加顶边围墙
-    y = heightSize-5;
-    for (int x=0; x<widthSize; x++)
+    y = heightSize-1-offset;
+    for (int x=offset; x<widthSize-offset; x++)
     {
         _addBlock(x, y, BlockType::WALL);
     }
     // 增加左边围墙
-    x = 4;
-    for (int y=2; y<heightSize; y++)
+    x = offset;
+    for (int y=offset; y<heightSize-offset; y++)
     {
         _addBlock(x, y, BlockType::WALL);
     }
@@ -446,7 +480,7 @@ void MapLayer::loadLevelData(short stage) {
     createCamps();
 
     // 加载地图
-    //loadMapData();
+    loadMapData();
 }
 
 const std::string&

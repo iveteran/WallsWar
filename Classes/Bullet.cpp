@@ -60,11 +60,27 @@ bool Bullet::init() {
         return false;
     }
 
-    this->setVisible(false);
-
-    MapLayer::getInstance()->addChild(this);
+    setFiring(false);
+    //setPosition(1.0f, 1.0f); // NOTE: 将初始地址设为(1, 1)，避免在MapLayer更新位置时被忽略(值为Vec2(0, 0))
+    MapLayer::getInstance()->addNode(this);
 
     return true;
+}
+
+void Bullet::destroy() {
+    onDestroyed();
+    MapLayer::getInstance()->removeNode(this);
+}
+
+void Bullet::_recycle() {
+    setFiring(false);
+    stopMove();
+    MapLayer::getInstance()->unmanageBlock(this);
+
+    // 如果子弹的创建者(如玩家)不存在了就真实销毁它
+    if (!_creator) {
+        destroy();
+    }
 }
 
 void Bullet::setLevel(int level) {
@@ -79,6 +95,38 @@ bool Bullet::getBeIntersection() const {
     return _isBeIntersection;
 }
 
+void Bullet::shoot(const Vec2& startPos, Direction dir, int floor) {
+    switch (dir) {
+    case Direction::LEFT:
+        setSpriteFrame("bullet_l");
+        break;
+    case Direction::UP:
+        setSpriteFrame("bullet_u");
+        break;
+    case Direction::RIGHT:
+        setSpriteFrame("bullet_r");
+        break;
+    case Direction::DOWN:
+        setSpriteFrame("bullet_d");
+        break;
+    default:
+        break;
+    }
+
+    //printf(">> Player at (%d, %d) shoot bullet at (%d, %d)\n",
+    //        (int)_creator->getPosition().x, (int)_creator->getPosition().y,
+    //        (int)startPos.x, (int)startPos.y);
+    setPosition(startPos);
+    setFloor(floor);
+    bool success = MapLayer::getInstance()->manageBlock(this);
+    if (success) {
+        setFiring(true);
+        startMove(dir);
+    } else {
+        CCLOG("[Bullet::shoot] 子弹发射失败，离目标太近");
+    }
+}
+
 void Bullet::_showEffect() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
     auto mapLayer = MapLayer::getInstance();
@@ -91,14 +139,14 @@ void Bullet::_showEffect() {
                                                        0.05f);
 
     auto effect = Sprite::create();
-    mapLayer->addChild(effect);
+    mapLayer->addNode(effect);
     effect->setPosition(getPosition());
 
     effect->runAction(Sequence::create(
         Animate::create(animation),
         CallFunc::create([=]() {
-        mapLayer->removeChild(effect);
-    }),
+            mapLayer->removeNode(effect);
+        }),
         nullptr)
     );
 }
@@ -120,6 +168,15 @@ int Bullet::getMovingStep() const {
 }
 
 void Bullet::onBeCollided(Block* activeBlock) {
+    if (activeBlock->getType() == BlockType::BULLET) {
+        //printf(">>> [Bullet::onBeCollided] block id: %d\n", activeBlock->id());
+    }
+    // 忽略玩家对自己子弹的碰撞
+    if (activeBlock->getType() == BlockType::PLAYER && _creator != nullptr &&
+            dynamic_cast<Player*>(activeBlock)->id() == _creator->id()) {
+        return;
+    }
+    _recycle();
 }
 
 void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
@@ -128,20 +185,22 @@ void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
     for (auto block : withBlocks) {
         if (block->getType() == BlockType::PLAYER) {
             auto player = dynamic_cast<Player*>(block);
-            if (_creator && _creator == player || // 击中的是自己
-                    _creator->getCamp() == player->getCamp() // 击中自己的队友
+            if (_creator && (_creator == player || // 击中的是自己
+                    _creator->getCamp() == player->getCamp()) // 击中自己的队友
                     ) {
                 numIgnoreBlocks++;
             }
-        }
-        if (block->getType() == BlockType::MAP_BORDER ||
+        } else if (block->getType() == BlockType::MAP_BORDER ||
                 block->getType() == BlockType::WALL ||
                 block->getType() == BlockType::STONE) {
             showEffect = true;
+        } else if (block->getType() == BlockType::BULLET) {
+            //printf(">>> [Bullet::onCollidedWith] block id: %d\n", block->id());
+            showEffect = true;
         }
     }
-    //printf(">>> numIgnoreBlocks: %d\n", numIgnoreBlocks);
-    //printf(">>> withBlocksi.size: %d\n", withBlocks.size());
+    //printf(">>> [Bullet::onCollidedWith] numIgnoreBlocks: %d\n", numIgnoreBlocks);
+    //printf(">>> [Bullet::onCollidedWith] withBlocksi.size: %d\n", withBlocks.size());
     if (numIgnoreBlocks > 0 && numIgnoreBlocks == withBlocks.size()) {
         return;
     }
@@ -150,8 +209,8 @@ void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
         _showEffect();
         _playEffectVoice();
     }
-    setVisible(false);
-    stopMove();
+
+    _recycle();
 }
 
 const char* Bullet::getVoicePath() const {

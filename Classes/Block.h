@@ -43,7 +43,7 @@ public:
 
     static void initSpriteFrameCache();
 
-    static int64_t generateID();
+    static int generateID();
     static int getDefaultFloor(BlockType bt);
     static Block* createBlock(BlockType type, Gamer* creator=nullptr);
     static bool isThisBlock(BlockType type, const Block* block);
@@ -51,7 +51,7 @@ public:
 public:
     bool init() override;             // 调用父类的init
 
-    int64_t id() const { return _id; }
+    int id() const { return getTag(); }
     int getFloor() const { return getLocalZOrder(); }
     void setFloor(int floor) { setLocalZOrder(floor); }
     void increaseFloor() { setLocalZOrder(getLocalZOrder() + 1); }
@@ -80,7 +80,4 @@ public:
 
 protected:
     Gamer* _creator = nullptr;
-
-private:
-    int64_t _id = 0;
 };

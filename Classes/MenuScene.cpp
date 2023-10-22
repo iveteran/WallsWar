@@ -21,7 +21,7 @@ bool MenuScene::init() {
 
 // TODO
 void MenuScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
-    auto position = selector->getPosition();
+    auto position = _selector->getPosition();
     static int select = 0;
 
     switch (keyCode) {
@@ -36,10 +36,10 @@ void MenuScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
     case EventKeyboard::KeyCode::KEY_W:
         if (select == 0) {
             select = 2;
-            selector->setPosition(position.x, position.y - 2 * ARROWS_DIS);
+            _selector->setPosition(position.x, position.y - 2 * ARROWS_DIS);
         } else {
             select--;
-            selector->setPosition(position.x, position.y + ARROWS_DIS);
+            _selector->setPosition(position.x, position.y + ARROWS_DIS);
         }
 
         break;
@@ -47,10 +47,10 @@ void MenuScene::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::E
     case EventKeyboard::KeyCode::KEY_S:
         if (select == 2) {
             select = 0;
-            selector->setPosition(position.x, position.y + 2 * ARROWS_DIS);
+            _selector->setPosition(position.x, position.y + 2 * ARROWS_DIS);
         } else {
             select++;
-            selector->setPosition(position.x, position.y - ARROWS_DIS);
+            _selector->setPosition(position.x, position.y - ARROWS_DIS);
         }
 
         break;
@@ -68,17 +68,17 @@ bool MenuScene::onTouch(cocos2d::Touch* touch, cocos2d::Event*) {
 }
 
 void MenuScene::_initBackground() {
-    offsetNode = Node::create();
-    this->addChild(offsetNode);
-    offsetNode->setPosition(Director::getInstance()->getVisibleSize() / 2);
+    _offsetNode = Node::create();
+    addChild(_offsetNode);
+    _offsetNode->setPosition(Director::getInstance()->getVisibleSize() / 2);
 
     // 创建背景图片
-    background = Sprite::create("images/select_player.png");
-    if (!background) return;
+    _background = Sprite::create("images/select_player.png");
+    if (!_background) return;
 
-    background->getTexture()->setAliasTexParameters();
-    offsetNode->addChild(background);
-    background->setPosition(Vec2(0, Director::getInstance()->getVisibleSize().height));
+    _offsetNode->addChild(_background);
+    _background->getTexture()->setAliasTexParameters();
+    _background->setPosition(Vec2(0, Director::getInstance()->getVisibleSize().height));
 
     // 按下空格键快进
     auto* keyboardListener = EventListenerKeyboard::create();
@@ -86,8 +86,8 @@ void MenuScene::_initBackground() {
     keyboardListener->onKeyPressed = [&](EventKeyboard::KeyCode keyCode, Event*) {
         switch (keyCode) {
         case EventKeyboard::KeyCode::KEY_SPACE:
-            background->stopAllActions();
-            background->setPosition(Vec2(0.f, 0.f));
+            _background->stopAllActions();
+            _background->setPosition(Vec2(0.f, 0.f));
 
             if (!_isSelectorInit)
                 _initSelector();
@@ -101,8 +101,8 @@ void MenuScene::_initBackground() {
     // 触摸屏幕快进
     auto touchListener = EventListenerTouchOneByOne::create();
     touchListener->onTouchBegan = [&](Touch* touch, Event*) {
-        background->stopAllActions();
-        background->setPosition(Vec2(0.f, 0.f));
+        _background->stopAllActions();
+        _background->setPosition(Vec2(0.f, 0.f));
 
         if (!_isSelectorInit)
             _initSelector();
@@ -121,19 +121,19 @@ void MenuScene::_initBackground() {
         nullptr
         );
 
-    background->runAction(bkAction);
+    _background->runAction(bkAction);
 }
 
 void MenuScene::_initSelector() {
-    selector = Sprite::create("images/m0-2-1.png");
-    selector->getTexture()->setAliasTexParameters();
-    selector->setPosition(ARROWS_X, WINDOW_HEIGHT - ARROWS_Y);
+    _selector = Sprite::create("images/m0-2-1.png");
+    _selector->getTexture()->setAliasTexParameters();
+    _selector->setPosition(ARROWS_X, WINDOW_HEIGHT - ARROWS_Y);
 
     // 循环播放动画
     auto animate = _getAnimFrames();
-    selector->runAction(RepeatForever::create(animate));
+    _selector->runAction(RepeatForever::create(animate));
 
-    background->addChild(selector);
+    _background->addChild(_selector);
 
     // 使用键盘移动光标
     auto* keyBoardlistener = EventListenerKeyboard::create();
@@ -164,7 +164,7 @@ Animate* MenuScene::_getAnimFrames() {
     animFrams.pushBack(a1);
     animFrams.pushBack(a2);
 
-    auto animation = Animation::createWithSpriteFrames(animFrams, 0.01f);
+    auto animation = Animation::createWithSpriteFrames(animFrams, 0.1f);
 
     return Animate::create(animation);
 }

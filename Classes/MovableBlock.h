@@ -5,6 +5,11 @@
 using cocos2d::Vector;
 using cocos2d::Vec2;
 
+enum class PositionType {
+    FLOOR,
+    POSITION,
+};
+
 class MovableBlock : public Block {
 public:
     static std::set<BlockType> CollidingAbleBlockTypes;
@@ -30,13 +35,14 @@ public:
     void increaseFloor();
     void decreaseFloor();
 
-    void startMove(Direction dir);                      // 开启自动移动
+    void startMove(Direction dir=Direction::NONE);      // 开启自动移动
     void stopMove();                                    // 停止自动移动
 
     void fallDownIfDownFloorIsEmpty();
 
     virtual bool allowedCameraFollows() const { return _allowedCameraFollows; }
     virtual void allowCameraFollows() { _allowedCameraFollows = true; }
+    void makeCameraFollows();
 
     virtual std::string getSpriteFrameName() const = 0;
 
@@ -62,11 +68,14 @@ public:
 
 protected:
     void _autoMove(float t);                           // 自动移动
-    void _makeCameraFollows();
     void _adjustPosition();
     float _adjustNumber(int number);
 
-private:
+    bool _updateBlockManagementPosition(PositionType posOrFloor);
+    void _rollbackPosition();
+    void _rollbackFloor();
+
+protected:
     using Node::setPosition;
 
 protected:

@@ -41,7 +41,7 @@ public:
     bool init() override;
     BlockType getType() const override { return BlockType::WALL; }
 
-    std::pair<bool, bool> destory(Direction dir, const cocos2d::Rect& box);
+    std::pair<int, bool> destory(Direction dir, const cocos2d::Rect& box);
 
     virtual void onBeCollided(Block* activeBlock) override;
 

@@ -7,3 +7,6 @@ proj.android/app/release
 .idea
 .vs
 .vscode
+*.swp
+*.swo
+draft

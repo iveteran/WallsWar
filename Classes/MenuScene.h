@@ -10,9 +10,9 @@ public:
     CREATE_FUNC(MenuScene);
 
 private:
-    cocos2d::Node* offsetNode = nullptr;                              // 偏移
-    cocos2d::Sprite* background = nullptr;                            // 背景图片
-    cocos2d::Sprite* selector = nullptr;                              // 菜单选择器
+    cocos2d::Node* _offsetNode = nullptr;                              // 偏移
+    cocos2d::Sprite* _background = nullptr;                            // 背景图片
+    cocos2d::Sprite* _selector = nullptr;                              // 菜单选择器
     bool _isSelectorInit = false;
 
     void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode,        // 键盘移动光标

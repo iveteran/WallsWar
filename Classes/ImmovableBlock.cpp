@@ -49,6 +49,7 @@ void BlockWall::initSpriteFrameCache() {
     SpriteFrameCache::getInstance()->addSpriteFrame(wall, "wall");
 }
 
+// 一个墙面由4个砖块组成
 bool BlockWall::init() {
     if (!ImmovableBlock::init()) {
         return false;
@@ -57,16 +58,85 @@ bool BlockWall::init() {
     setFloor(BlockWall::DefaultFloor);
     initWithSpriteFrameName("wall");
 
-    // 创建4个遮挡精灵
+    // 创建4个遮挡精灵，分别遮挡4个砖块
     for (int i = 0; i < 4; i++) {
-        auto block = LayerColor::create(Color4B(0, 0, 0, 255), 4, 4);
+        auto block = LayerColor::create(Color4B(0, 0, 0, 255), BRICK_SIZE, BRICK_SIZE);
         block->setIgnoreAnchorPointForPosition(false);
         block->setAnchorPoint(Vec2(0, 0));
         addChild(block);
         block->setVisible(false);
 
-        block->setPosition(Vec2(i / 2 * BLOCK_SIZE / 2.0f, i % 2 * BLOCK_SIZE / 2.0f));
+        block->setPosition(Vec2(i / 2 * BRICK_SIZE, i % 2 * BRICK_SIZE));
         _blacks[i] = block;
+    }
+
+    return true;
+}
+
+std::pair<int, bool>
+BlockWall::destory(Direction dir, const Rect& box) {
+    int numCollided = 0; // 子弹发生碰撞的砖块数
+    auto position = getPosition();
+
+    int moveAnElem = 0;  // 用于子弹向前移动一个已经摧毁(已隐藏)的砖块
+    for (int i = 0; i < 4; i++) {
+
+        // 转为坐标为相对于MapLayer的坐标
+        auto preBox = _blacks[i]->getBoundingBox();
+        auto tranBox = Rect(preBox.getMinX() + position.x,
+                            preBox.getMinY() + position.y,
+                            preBox.getMaxX() - preBox.getMinX(),
+                            preBox.getMaxY() - preBox.getMinY());
+
+        // 加宽子弹
+        Rect cmpBox;
+        switch (dir) {
+        case Direction::LEFT:
+            if (_blacks[2]->isVisible() && _blacks[3]->isVisible()) {
+                moveAnElem = BRICK_SIZE * -1;
+            }
+        case Direction::RIGHT:
+            if (moveAnElem == 0) {
+                if (_blacks[0]->isVisible() && _blacks[1]->isVisible()) {
+                    moveAnElem = BRICK_SIZE;
+                }
+            }
+            cmpBox = Rect(box.getMinX() + moveAnElem, box.getMinY() + 1 - BLOCK_SIZE, BULLET_SIZE, TANK_SIZE);
+            break;
+        case Direction::UP:
+            if (_blacks[0]->isVisible() && _blacks[2]->isVisible()) {
+                moveAnElem = BRICK_SIZE;
+            }
+        case Direction::DOWN:
+            if (moveAnElem == 0) {
+                if (_blacks[1]->isVisible() && _blacks[3]->isVisible()) {
+                    moveAnElem = BRICK_SIZE * -1;
+                }
+            }
+            cmpBox = Rect(box.getMinX() + 1 - BLOCK_SIZE, box.getMinY() + moveAnElem, TANK_SIZE, BULLET_SIZE);
+            break;
+        default:
+            break;
+        }
+
+        if (!_blacks[i]->isVisible() && tranBox.intersectsRect(cmpBox)) {
+            _blacks[i]->setVisible(true);
+            ++numCollided;
+            if (numCollided == 2) {
+                // 最多一次摧毁2个砖块，因为子弹是侧面到达
+                break;
+            }
+        }
+    }
+
+    return std::make_pair(numCollided, _isDestory());
+}
+
+bool BlockWall::_isDestory() {
+    for (int i = 0; i < 4; i++) {
+        if (!_blacks[i]->isVisible()) {
+            return false;
+        }
     }
 
     return true;
@@ -80,61 +150,16 @@ void BlockWall::onBeCollided(Block* activeBlock) {
         auto bulletDir = bullet->getDirection();
         auto bulletBox = bullet->getBoundingBox();
         auto result = destory(bulletDir, bulletBox);
-        if (result.first) {
+        //printf(">> [BlockWall] destroy result: (%d, %d)\n", result.first, result.second);
+        if (result.first > 0) {
             // 发生碰撞
             if (result.second) {
                 // 发生碰撞且被摧毁
                 MapLayer::getInstance()->removeAndUnmanageBlock(this);
+                //printf(">> [BlockWall] removed, id: %d\n", id());
             }
         }
     }
-}
-
-std::pair<bool, bool>
-BlockWall::destory(Direction dir, const Rect& box) {
-    bool flag = false; // 是否与子弹发生碰撞
-    auto position = getPosition();
-
-    for (int i = 0; i < 4; i++) {
-        // 转为坐标为相对于MapLayer的坐标
-        auto preBox = _blacks[i]->getBoundingBox();
-        auto tranBox = Rect(preBox.getMinX() + position.x,
-                            preBox.getMinY() + position.y,
-                            preBox.getMaxX() - preBox.getMinX(),
-                            preBox.getMaxY() - preBox.getMinY());
-
-        // 加宽子弹
-        Rect cmpBox;
-        switch (dir) {
-        case Direction::LEFT:
-        case Direction::RIGHT:
-            cmpBox = Rect(box.getMinX(), box.getMinY() + 1 - BLOCK_SIZE, BULLET_SIZE, TANK_SIZE);
-            break;
-        case Direction::UP:
-        case Direction::DOWN:
-            cmpBox = Rect(box.getMinX() + 1 - BLOCK_SIZE, box.getMinY(), TANK_SIZE, BULLET_SIZE);
-            break;
-        default:
-            break;
-        }
-
-        if (!_blacks[i]->isVisible() && tranBox.intersectsRect(cmpBox)) {
-            _blacks[i]->setVisible(true);
-            flag = true;
-        }
-    }
-
-    return std::make_pair(flag, _isDestory());
-}
-
-bool BlockWall::_isDestory() {
-    for (int i = 0; i < 4; i++) {
-        if (!_blacks[i]->isVisible()) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 void BlockStone::initSpriteFrameCache() {
@@ -153,7 +178,6 @@ bool BlockStone::init() {
 
     return true;
 }
-
 
 void BlockStone::onBeCollided(Block* activeBlock) {
     if (!activeBlock) return;

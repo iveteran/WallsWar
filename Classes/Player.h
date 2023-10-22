@@ -27,8 +27,8 @@ private:
 
 public:
     static void initSpriteFrameCache();
-    static void loadFrameAnimation(bool isHost=false);            // 加载坦克移动帧动画
-    static void _loadFrameAnimation(const char* imgPath, const char* namePrefix, bool isHost);
+    static void loadFrameAnimation();            // 加载坦克移动帧动画
+    static void _loadFrameAnimation(const char* imgPath, const char* namePrefix);
     CREATE_FUNC(Player);
 
 public:
@@ -47,7 +47,7 @@ public:
 
     bool isHost() const { return _isHost; }
     void setHost() { _isHost = true; }
-    void makeCamaraFollowsPlayer();
+    void moveCamaraToCamp();
 
     bool beControlledByAI(const AI* ai);
     bool beControlledByUser(const User* user);

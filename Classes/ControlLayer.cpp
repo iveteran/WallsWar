@@ -67,7 +67,8 @@ void ControlLayer::_addKbdController() {
 }
 
 void ControlLayer::_addInfoArea() {
-    auto myLabel = Label::createWithSystemFont("My Label Text", "Arial", 8);
+    auto myLabel = Label::createWithSystemFont("My Label Text", "Arial", 12);
+    myLabel->setScale(0.5);  // NOTE: 通过增大字体再缩小以提高文件清析度
     //myLabel->setPosition(myLabel->getContentSize().width / 2.0f, _layout->getContentSize().height - myLabel->getContentSize().height / 2.0f);
     //_layout->addChild(myLabel);
     this->addChild(myLabel);

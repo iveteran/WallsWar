@@ -29,41 +29,39 @@ bool Camp::init() {
 
 void Camp::enableAI() {
     Player::IsHost = false;
-    addPlayers();
-    /*
-    for (auto player : _players) {
-        player->startMove();
+    bool enableAI = true;
+    addPlayers(enableAI);
+    if (enableAI) {
+        enableAutoAddPlayers();
+        enableAutoControlPlayers();
     }
-    */
-    enableAutoAddPlayers();
-    enableAutoControlPlayers();
 }
 
 void Camp::enableAutoAddPlayers(bool enable) {
     if (enable) {
         // 每隔4.5秒添加一名敌人
-        this->schedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers), 5.0f);
+        schedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers), 5.0f);
     } else {
-        this->unschedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers));
+        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers));
     }
 }
 
 void Camp::enableAutoControlPlayers(bool enable) {
     if (enable) {
-        this->schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection), 0.1f);
-        this->schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot), 0.5f);
+        schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection), 0.1f);
+        schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot), 0.5f);
     } else {
-        this->unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection));
-        this->unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot));
+        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection));
+        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot));
     }
 }
 
-void Camp::addPlayers() {
+void Camp::addPlayers(bool enableAI) {
     // 初始时添加3辆坦克
     if (_remainPlayers == ENEMIES_COUNT) {
-        addPlayer();
-        addPlayer();
-        addPlayer();
+        addPlayer(enableAI);
+        addPlayer(enableAI);
+        addPlayer(enableAI);
     } else {
         if (_remainPlayers == 0) return;
 
@@ -72,13 +70,13 @@ void Camp::addPlayers() {
             // 随机添加一辆
             switch (RandomUtil::random(0, 2)) {
             case 0:
-                addPlayer();
+                addPlayer(enableAI);
                 break;
             case 1:
-                addPlayer();
+                addPlayer(enableAI);
                 break;
             case 2:
-                addPlayer();
+                addPlayer(enableAI);
                 break;
             default:
                 break;
@@ -91,7 +89,7 @@ Player* Camp::addPlayer1() {
     Player::IsHost = true;
     auto player1 = addPlayer();
     player1->allowCameraFollows();
-    _remainPlayers == 0;
+    _remainPlayers = 0;
     return player1;
 }
 
@@ -99,14 +97,13 @@ Player* Camp::getPlayer1() {
     return _manager;
 }
 
-Player* Camp::addPlayer() {
+Player* Camp::addPlayer(bool enableAI) {
     auto mapLayer = MapLayer::getInstance();
     auto player = Player::create();
     player->joinCamp(this);
-    player->loadFrameAnimation(true);
     player->setInitialPosition();
-    if (player->isHost()) {
-        player->makeCamaraFollowsPlayer();
+    if (enableAI) {
+        player->startMove();
     }
     mapLayer->addAndManageBlock(player);
 
@@ -126,7 +123,8 @@ Player* Camp::addPlayer() {
 }
 
 void Camp::autoAddPlayers(float) {
-    addPlayers();
+    bool enableAI = true;
+    addPlayers(enableAI);
 }
 
 void Camp::autoControlPlayersDirection(float) {
@@ -150,6 +148,11 @@ void Camp::removePlayer(Player* player) {
 }
 
 void Camp::onBeCollided(Block* activeBlock) {
+    // 忽略本营地的玩家及其子弹的碰撞
+    if (activeBlock->getType() == BlockType::PLAYER && dynamic_cast<Player*>(activeBlock)->getCamp()->id() == id() ||
+            (activeBlock->getType() == BlockType::BULLET && activeBlock->getCreator()->getCamp()->id() == id())) {
+        return;
+    }
     AudioEngine::play2d("music/camp_bomb.mp3");
     setTexture(SpriteFrameCache::getInstance()->getSpriteFrameByName("camp_1")->getTexture());
     isCampOk = false;
@@ -167,7 +170,7 @@ void Camp::showLostAnimate() {
     // 显示一个从左到右的动画
     auto campLost = Sprite::create("images/gameover.png");
     campLost->getTexture()->setAliasTexParameters();
-    MapLayer::getInstance()->addChild(campLost);
+    MapLayer::getInstance()->addNode(campLost);
     campLost->setPosition(-campLost->getContentSize().width / 2, getPosition().y);
     printf(">> camp lost position: (%f, %f)\n", campLost->getPosition().x, campLost->getPosition().y);
 

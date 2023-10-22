@@ -7,8 +7,8 @@
 
 USING_NS_CC;
 
-int64_t Block::generateID() {
-    static int64_t auto_increasement_id_ = 0;
+int Block::generateID() {
+    static int auto_increasement_id_ = 0;
     return ++auto_increasement_id_;
 }
 
@@ -139,7 +139,7 @@ bool Block::init() {
     if (!Sprite::init()) {
         return false;
     }
-    _id = generateID();
+    setTag(generateID());
 
     return true;
 }
@@ -192,14 +192,16 @@ bool Block::isBlockIntersection(int floor, Vector<Block*>* resultList) const {
     auto mapLayer = MapLayer::getInstance();
     auto otherBlocks = mapLayer->getAroundBlocks(this, floor);
     //printf("--------- otherBlocks size: %d\n", otherBlocks.size());
+    //printf(">>> this pos: (%d, %d), id: %d, floor: %d, type: %d\n",
+    //        (int)getPosition().x, (int)getPosition().y, id(), getFloor(), getType());
     for (auto iter : otherBlocks) {
         auto otherBlock = iter.second;
-        //if (otherBlock->getType() == BlockType::PLAYER) {
+        //if (otherBlock->getType() == BlockType::WALL) {
         //    auto realPos = otherBlock->getPosition();
         //    printf(">>> otherBlock: mngmt pos: (%d, %d), real pos: (%d, %d)\n",
         //            (int)iter.first.x, (int)iter.first.y, (int)realPos.x, (int)realPos.y);
-        //    printf(">>> this: 0x%x, otherBlock: 0x%x\n", this, otherBlock);
-        //    printf(">>> this pos: (%d, %d)\n", (int)getPosition().x, (int)getPosition().y);
+        //    printf(">>> otherBlock: id: %d, floor: %d, type: %d\n", otherBlock->id(), otherBlock->getFloor(), otherBlock->getType());
+        //    //printf(">>> this: 0x%x, otherBlock: 0x%x\n", this, otherBlock);
         //}
         if (otherBlock == this) {
             continue;

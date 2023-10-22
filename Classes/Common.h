@@ -14,12 +14,15 @@ constexpr float ARROWS_DIS = 15;
 // 中间游戏区域大小，注：BLOCK_SIZE的倍数
 //constexpr float CENTER_WIDTH = 512;
 //constexpr float CENTER_HEIGHT = 512;
-constexpr float CENTER_WIDTH = 224;
+constexpr float CENTER_WIDTH = 256;
 constexpr float CENTER_HEIGHT = 224;
 
 // 方块大小
 constexpr float BLOCK_SIZE = 8;
 constexpr float MAX_BLOCK_SIZE = 16;
+
+// 砖块大小，墙(Wall)由4个砖块构成
+constexpr float BRICK_SIZE = BLOCK_SIZE / 2;
 
 // 坦克大小
 constexpr float TANK_SIZE = 2 * BLOCK_SIZE;

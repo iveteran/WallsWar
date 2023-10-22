@@ -51,7 +51,7 @@ void MovableBlock::moveTo(float x, float y) {
     _fromPosition = pos;
     setPosition(x, y);
     //printf("<<<< moveTo: (%f, %f) -> (%f, %f)\n", pos.x, pos.y, x, y);
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::POSITION);
 }
 
 void MovableBlock::moveBy(const Vec2& step) {
@@ -64,7 +64,7 @@ void MovableBlock::moveBy(float xStep, float yStep) {
     }
     _fromPosition = getPosition();
     setPosition(_fromPosition.x + xStep, _fromPosition.y + yStep);
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::POSITION);
 }
 
 void MovableBlock::xMoveBy(float step) {
@@ -73,7 +73,7 @@ void MovableBlock::xMoveBy(float step) {
     }
     _fromPosition = getPosition();
     setPositionX(_fromPosition.x + step);
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::POSITION);
 }
 
 void MovableBlock::yMoveBy(float step) {
@@ -82,7 +82,7 @@ void MovableBlock::yMoveBy(float step) {
     }
     _fromPosition = getPosition();
     setPositionY(_fromPosition.y + step);
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::POSITION);
 }
 
 void MovableBlock::setFloor(int floor) {
@@ -91,26 +91,47 @@ void MovableBlock::setFloor(int floor) {
     }
     _fromFloor = getFloor();
     Block::setFloor(floor);
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::FLOOR);
     CCLOG(">> [MovableBlock::setFloor] block floor change to: %d", getFloor());
 }
 
 void MovableBlock::increaseFloor() {
     _fromFloor = getFloor();
     Block::increaseFloor();
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::FLOOR);
     CCLOG(">> [MovableBlock::increaseFloor] block floor change to: %d", getFloor());
 }
 
 void MovableBlock::decreaseFloor() {
     _fromFloor = getFloor();
     Block::decreaseFloor();
-    MapLayer::getInstance()->updateBlockPosition(this);
+    _updateBlockManagementPosition(PositionType::FLOOR);
     CCLOG(">> [MovableBlock::decreaseFloor] block floor change to: %d", getFloor());
 }
 
 void MovableBlock::_adjustPosition() {
     moveTo(_adjustNumber(int(getPositionX())), _adjustNumber(int(getPositionY())));
+}
+
+bool MovableBlock::_updateBlockManagementPosition(PositionType posOrFloor) {
+    bool success = MapLayer::getInstance()->updateBlockPosition(this);
+    if (!success) {
+        // 遇到障碍物，处理碰撞检测
+        detectCollision();
+    }
+    return success;
+}
+
+void MovableBlock::_rollbackPosition() {
+    Vec2 tmpPos = getPosition();
+    setPosition(_fromPosition);
+    _fromPosition = tmpPos;
+}
+
+void MovableBlock::_rollbackFloor() {
+    int tmpFloor = getFloor();
+    setFloor(_fromFloor);
+    _fromFloor = tmpFloor;
 }
 
 float MovableBlock::_adjustNumber(int number) {
@@ -128,19 +149,21 @@ float MovableBlock::_adjustNumber(int number) {
 }
 
 void MovableBlock::startMove(Direction dir) {
-    if (!_isMoving) {
+    if (_isMoving) return;
+
+    if (dir != Direction::NONE) {
         setDirection(dir);
-        if (movingMusicEnabled()) {
-            _musicId = AudioEngine::play2d("music/player_move.mp3");
-        }
-        this->schedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove), 0.02f);
-        _isMoving = true;
-        playAnimate();
     }
+    if (movingMusicEnabled()) {
+        _musicId = AudioEngine::play2d("music/player_move.mp3");
+    }
+    schedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove), 0);  // 每帧调用
+    _isMoving = true;
+    playAnimate();
 }
 
 void MovableBlock::stopMove() {
-    this->unschedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove));
+    unschedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove));
     if (_musicId != -1) {
         AudioEngine::stop(_musicId);
     }
@@ -150,7 +173,7 @@ void MovableBlock::stopMove() {
     stopAnimate();
 }
 
-void MovableBlock::_autoMove(float /*t*/) {
+void MovableBlock::_autoMove(float dt) {
     if (!_canMove) {
         return;
     }
@@ -183,11 +206,13 @@ void MovableBlock::_autoMove(float /*t*/) {
 }
 
 void MovableBlock::onMoved() {
+    // 如果玩家所在楼层大于1，在移动后楼下层为空就使其下落
     fallDownIfDownFloorIsEmpty();
+
     if (allowedCameraFollows())
     {
         // 如果是玩家移动，让摄像头跟随他
-        _makeCameraFollows();
+        makeCameraFollows();
     }
 }
 
@@ -238,7 +263,7 @@ void MovableBlock::fallDownIfDownFloorIsEmpty() {
     }
 }
 
-void MovableBlock::_makeCameraFollows() {
+void MovableBlock::makeCameraFollows() {
     auto camera = Camera::getDefaultCamera();
     auto cameraPos = camera->getPosition();
 

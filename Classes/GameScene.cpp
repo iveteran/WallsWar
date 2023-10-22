@@ -22,6 +22,18 @@ GameScene::~GameScene() {
     CCLOG("-------- GameScene::~GameScene -----------");
 }
 
+void GameScene::onEnter()
+{
+    CCLOG("GameScene onEnter");
+    Scene::onEnter();
+}
+
+void GameScene::onExit()
+{
+    Scene::onExit();
+    CCLOG("GameScene onExit");
+}
+
 bool GameScene::init() {
     if (!Scene::init())
         return false;
@@ -32,12 +44,18 @@ bool GameScene::init() {
             AudioEngine::play2d("music/bk_sound.mp3", true);
         });*/
 
-        // 展示加载动画
-    _showLoadAnimate();
+    // 展示加载动画
+    //_showLoadAnimate();
+
+    _initMapLayer();
+    _initControlLayer();
 
     CCLOG("-------- GameScene::init -----------");
     _printGameInfo();
     CCLOG("------------------------------------");
+
+    // 默认渲染更新
+    scheduleUpdate();
 
     return true;
 }
@@ -60,6 +78,7 @@ void GameScene::_printGameInfo()
     CCLOG(">> camera viewport: (%f, %f, %f, %f)", vp.x, vp.y, vp.w, vp.h);
 }
 
+#if 0
 void GameScene::_showLoadAnimate() {
     auto width = Director::getInstance()->getVisibleSize().width;
     auto mid = Director::getInstance()->getVisibleSize().height / 2;
@@ -119,14 +138,15 @@ void GameScene::_showLoadAnimate() {
         Show::create(),
         DelayTime::create(1),
         CallFunc::create([this, node]() {
-        node->removeFromParentAndCleanup(true);
-        _initMapLayer();
-        _initControlLayer();
-        schedule(CC_SCHEDULE_SELECTOR(GameScene::_checkGameStatus), 0.2f);
-    }),
+            node->removeFromParentAndCleanup(true);
+            _initMapLayer();
+            _initControlLayer();
+            //schedule(CC_SCHEDULE_SELECTOR(GameScene::_checkGameStatus), 0.2f);
+            }),
         nullptr)
     );
 }
+#endif
 
 void GameScene::_initMapLayer() {
     _map = MapLayer::getInstance();
@@ -151,9 +171,15 @@ void GameScene::_initControlLayer() {
     addChild(_ctrlLayer);
 }
 
-void GameScene::_checkGameStatus(float) {
+void GameScene::update(float dt) {
+    //CCLOG("GameScene::update dt: %f", dt);
+    _checkGameStatus(dt);
+}
+
+void GameScene::_checkGameStatus(float dt) {
+    //CCLOG("GameScene::_checkGameStatus dt: %f", dt);
     // 停止所有音乐
-    AudioEngine::stopAll();
+    //AudioEngine::stopAll();
     if (!_map || !_map->getCamp()) {
         return;
     }
