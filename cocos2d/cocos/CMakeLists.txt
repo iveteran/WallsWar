@@ -31,6 +31,7 @@
 # The version number
 set(COCOS2D_X_VERSION 4.0)
 
+set(OpenGL_GL_PREFERENCE GLVND)
 set(COCOS_CORE_LIB cocos2d)
 project(cocos2d_libs)
 
