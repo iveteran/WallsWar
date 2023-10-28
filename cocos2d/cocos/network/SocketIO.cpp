@@ -32,7 +32,6 @@
 #include "network/Uri.h"
 #include <algorithm>
 #include <sstream>
-#include <memory>
 #include <iterator>
 #include "base/ccUTF8.h"
 #include "base/CCDirector.h"
