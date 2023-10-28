@@ -25,7 +25,7 @@
 
 cmake_minimum_required(VERSION 3.6)
 
-set(APP_NAME Tank)
+set(APP_NAME TankBattle)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
@@ -38,7 +38,7 @@ if(XCODE)
     endif()
 endif()
 
-if(NOT DEFINED BUILD_ENGINE_DONE) # to test Tank into root project
+if(NOT DEFINED BUILD_ENGINE_DONE) # to test TankBattle into root project
     set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
     set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
 
