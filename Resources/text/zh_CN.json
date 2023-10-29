@@ -1,0 +1,19 @@
+{
+    "start": "开始游戏",
+    "restart": "重新开始",
+    "settings": "设置",
+    "exitGame": "退出游戏",
+    "info": "信息",
+    "win": "游戏胜利",
+    "returnMenu": "返回主菜单",
+    "bgMusic": "背景音乐",
+    "effectMusic": "音效音量",
+    "close": "关闭",
+    "open": "打开",
+    "player_settings": "玩家设置",
+    "general_settings": "通用设置",
+    "server_settings": "服务端设置",
+    "scripts_management": "剧本管理",
+    "helloworld": "你好，世界!",
+    "demo": "演示"
+}
