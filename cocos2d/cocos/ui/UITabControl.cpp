@@ -67,8 +67,8 @@ namespace ui
             return;
         }
 
-        addProtectedChild(container, -3, -1);
-        addProtectedChild(header, -2, -1);
+        addChild(container, -3, -1);
+        addChild(header, -2, -1);
 
         _tabItems.insert(_tabItems.begin() + index, new TabItem(header, container));
         header->_tabView = this;
