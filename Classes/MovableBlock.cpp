@@ -258,7 +258,7 @@ void MovableBlock::stopAnimate() {
 void MovableBlock::fallDownIfDownFloorIsEmpty() {
     while (getFloor() > 0 && isDownFloorEmpty()) {
         decreaseFloor();
-        CCLOG(">> [MovableBlock::fallDownIfDownFloorIsEmpty] tank fall to floor: %d", getFloor());
+        CCLOG(">> [MovableBlock::fallDownIfDownFloorIsEmpty] Player fall to floor: %d", getFloor());
         playFallingAnimate();
     }
 }

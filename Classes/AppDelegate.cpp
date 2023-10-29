@@ -29,7 +29,7 @@
 #include "GameScene.h"
 
 #define USE_AUDIO_ENGINE 1
-#define APP_NAME "Tank"
+#define APP_NAME "TankBattle"
 
 #if USE_AUDIO_ENGINE
 #include "audio/include/AudioEngine.h"
