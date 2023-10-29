@@ -159,6 +159,9 @@ namespace ui {
          */
         int   getIndexInTabControl() const;
         
+        // added on 2023-10-28 by Yuu(yuu@matrix.works)
+        void setBackgroundColor(const Color3B& color, int opacity);
+        void clearBackgroundColor();
         
     protected:
         TabHeader();
@@ -176,6 +179,7 @@ namespace ui {
         
     private:
         Label*       _tabLabelRender;
+        LayerColor*  _colorRender;
         float        _tabLabelFontSize;
         TabControl*  _tabView;
         
@@ -339,6 +343,10 @@ namespace ui {
         void         setHeaderDockPlace(TabControl::Dock dockPlace);
         TabControl::Dock getHeaderDockPlace() const { return _headerDockPlace; }
 
+        // added on 2023-10-28 by Yuu(yuu@matrix.works)
+        Size getHeaderContentSize() const;
+        void setHeaderActiveBackgroundColor(const Color3B& color, int opacity);
+
         /// @}
     protected:
         TabControl();
@@ -381,6 +389,8 @@ namespace ui {
         Size        _containerSize;
         float       _currentHeaderZoom;
         bool        _ignoreHeaderTextureSize;
+        Color3B     _activeBgColor;
+        int         _activeOpacity;
 
         // for index the cells and containers
         std::vector<TabItem*> _tabItems;

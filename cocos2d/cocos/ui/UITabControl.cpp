@@ -27,6 +27,7 @@
 #include "2d/CCSprite.h"
 #include "2d/CCLabel.h"
 #include "ui/UILayout.h"
+#include "2d/CCLayer.h"
 #include "ui/UITabControl.h"
 
 NS_CC_BEGIN
@@ -167,6 +168,10 @@ namespace ui
             initTabHeadersPos(0);
         if (_headerDockPlace == Dock::TOP || _headerDockPlace == Dock::BOTTOM)
             initContainers();
+    }
+
+    Size TabControl::getHeaderContentSize() const {
+        return Size(_headerWidth, _headerHeight);
     }
 
     void TabControl::setHeaderDockPlace(TabControl::Dock dockPlace)
@@ -396,13 +401,25 @@ namespace ui
         }
     }
 
+    void TabControl::setHeaderActiveBackgroundColor(const Color3B& color, int opacity)
+    {
+        _activeBgColor = color;
+        _activeOpacity = opacity;
+    }
+
     void TabControl::activeTabItem(TabItem* item)
     {
+        for (auto& tabItem : _tabItems)
+        {
+            auto header = tabItem->header;
+            header->clearBackgroundColor();
+        }
         if (item != nullptr)
         {
             item->header->setLocalZOrder(-1);
             item->header->setScale(1.0f + _currentHeaderZoom);
             item->header->setSelected(true);
+            item->header->setBackgroundColor(_activeBgColor, _activeOpacity);
             item->container->setVisible(true);
             _reorderProtectedChildDirty = true;
         }
@@ -463,6 +480,7 @@ namespace ui
         : _tabLabelRender(nullptr)
         , _tabLabelFontSize(12)
         , _tabView(nullptr)
+        , _colorRender(nullptr)
         , _tabSelectedEvent(nullptr)
         , _fontType(FontType::SYSTEM)
     {
@@ -472,6 +490,7 @@ namespace ui
     {
         _tabLabelRender = nullptr;
         _tabView = nullptr;
+        _colorRender = nullptr;
         _tabSelectedEvent = nullptr;
     }
 
@@ -601,6 +620,25 @@ namespace ui
             return Color4B::WHITE;
         }
         return _tabLabelRender->getTextColor();
+    }
+
+    void TabHeader::setBackgroundColor(const Color3B& color, int opacity)
+    {
+        if (_tabView == nullptr) {
+            return;
+        }
+
+        _colorRender = LayerColor::create();
+        _colorRender->setContentSize(_tabView->getHeaderContentSize());
+        _colorRender->setColor(color);
+        _colorRender->setOpacity(opacity);
+        addProtectedChild(_colorRender, -2, -1);
+    }
+
+    void TabHeader::clearBackgroundColor()
+    {
+        removeProtectedChild(_colorRender);
+        _colorRender = nullptr;
     }
 
     void TabHeader::setTitleFontSize(float size)
