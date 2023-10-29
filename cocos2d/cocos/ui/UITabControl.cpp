@@ -566,6 +566,20 @@ namespace ui
         _tabLabelRender->setPosition(_contentSize * 0.5f);
     }
 
+    // added on 2023-10-28 by Yuu(yuu@matrix.works)
+    void TabHeader::setTitleLabel(Label* label)
+    {
+        if (label == _tabLabelRender)
+        {
+            return;
+        }
+        if (_tabLabelRender) {
+            removeProtectedChild(_tabLabelRender);
+        }
+        _tabLabelRender = label;
+        addChild(_tabLabelRender, 0, -1);
+    }
+
     std::string TabHeader::getTitleText() const
     {
         if (nullptr == _tabLabelRender)

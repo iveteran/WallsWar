@@ -107,6 +107,9 @@ namespace ui {
          *@param text The Header's text.
          */
         void setTitleText(const std::string& text);
+
+        // added on 2023-10-28 by Yuu(yuu@matrix.works)
+        void setTitleLabel(Label* label);
         
         /**
          * get the TabHeader text
