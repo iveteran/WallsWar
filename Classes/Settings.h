@@ -22,7 +22,7 @@ protected:
     void createServerSettingsPanel(int index, const char* title);
     void createScriptsManagementPanel(int index, const char* title);
 
-    void createSettingsTabs();
+    void createSettingsTabs(int numTabs);
     void addSettingsTab(int index, const char* title, Layout* panel);
 
 private:

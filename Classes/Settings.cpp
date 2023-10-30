@@ -19,7 +19,8 @@ bool Settings::init(int width, int height, const Color3B& bgColor, int bgOpacity
 
     setTitle(TEXT("settings"));
 
-    createSettingsTabs();
+    int numTabs = 3;
+    createSettingsTabs(numTabs);
     createPlayerSettingsPanel(0, "player_settings");
     createServerSettingsPanel(1, "server_settings");
     createScriptsManagementPanel(2, "scripts_management");
@@ -118,8 +119,7 @@ void Settings::createScriptsManagementPanel(int index, const char* title) {
     addSettingsTab(index, title, panel);
 }
 
-void Settings::createSettingsTabs() {
-    int numTabs = 3;
+void Settings::createSettingsTabs(int numTabs) {
     _tabs = TabControl::create();
     _tabs->setContentSize(Size(getWidth(), getHeight() - getTitleHeight()));
     float headerWidth = getWidth() / numTabs;
