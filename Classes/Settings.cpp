@@ -26,6 +26,7 @@ bool Settings::init(int width, int height, const Color3B& bgColor, int bgOpacity
     createScriptsManagementPanel(2, "scripts_management");
 
     _tabs->setSelectTab(0);
+    showEffect();
 
     return true;
 }

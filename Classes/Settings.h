@@ -27,6 +27,10 @@ protected:
 
 private:
     TabControl* _tabs = nullptr;
+
+    //GeneralSettings* generalSettings = nullptr;
+    //ServerSettings* serverSettings = nullptr;
+    //ScriptManagement* scriptManagement = nullptr;
 };
 
 #endif // _SETTINGS_H_

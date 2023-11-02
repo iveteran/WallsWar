@@ -54,8 +54,8 @@ bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity
     titleLayout->addChild(_titleLabel);
 
     // 创建关闭按钮，位于右上角
-    auto button = Button::create();
-    button->setTitleText("X");
+    auto button = Button::create("images/close-white-2.png");
+    //button->setTitleText("X");
     button->setScale(_fontScale);
     RelativeLayoutParameter* btnLP = RelativeLayoutParameter::create();
     btnLP->setMargin(Margin(0, 0, 2, 0)); // 右边"留白"2像素
@@ -115,7 +115,7 @@ void PopupLayer::showEffect() {
             ScaleTo::create(0.06, 1.05),
             ScaleTo::create(0.08, 0.95),
             ScaleTo::create(0.08, 1.0), NULL);
-    this->runAction(popupActions);
+    _layout->runAction(popupActions);
 }
 
 // 重写触摸事件处理函数，达到“模态”效果
