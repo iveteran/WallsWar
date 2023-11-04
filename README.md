@@ -1,5 +1,4 @@
-# Tank
+# TankBattle
 
-Screenshot
+A game simulate classical Tank Battle, written in C++ with Cocos2d-x.
 
-![screenshot](./screenshot.gif)
