@@ -60,6 +60,5 @@ void ControlLayer::_addKbdController() {
 
 void ControlLayer::_openSettingsDailog() {
     auto settingsDialog = Settings::create();
-    settingsDialog->init(300, 200, Color3B(51, 51, 51), 128);
     addChild(settingsDialog);
 }

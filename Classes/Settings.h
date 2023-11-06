@@ -14,7 +14,7 @@ class Settings : public PopupLayer {
 public:
     CREATE_FUNC(Settings);
 
-    virtual bool init() { return true; }
+    virtual bool init() override;
     bool init(int width, int height, const Color3B& bgColor, int bgOpacity);
      
 protected:

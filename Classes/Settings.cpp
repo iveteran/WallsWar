@@ -7,10 +7,17 @@
 static const char* defaultFont = "fonts/simhei.ttf";
 static const int defaultFontSize = 12;
 static const float defaultFontScale = 0.5f;
-static const Color3B defaultActiveColor = Color3B(51, 105, 173);
+static const Color3B defaultBackgroundColor = Color3B(51, 51, 51); // near gray
+static const Color3B defaultActiveColor = Color3B(51, 105, 173); // near blue
 static const int defaultOpacity = 128;
+static const Size defaultDialogSize(300, 200);
 
 USING_NS_CC;
+
+bool Settings::init() {
+    auto size = defaultDialogSize;
+    return init(size.width, size.height, defaultBackgroundColor, defaultOpacity);
+}
 
 bool Settings::init(int width, int height, const Color3B& bgColor, int bgOpacity) {
     if (!PopupLayer::init(width, height, bgColor, bgOpacity)) {
