@@ -687,7 +687,7 @@ void StatusBar::buildCampsInfoViewPages(PageView* pageView) {
 
         CampInfo campInfo;
         campInfo.index = i;
-        campInfo.name = std::string("name_") + std::to_string(i);
+        campInfo.name = std::string("队名") + std::to_string(i+1);
         campInfo.container = layout;
         _campsInfo.items.push_back(campInfo);
     }
@@ -735,7 +735,7 @@ void StatusBar::showCampMark(CampInfo& campInfo, bool addSep) {
 void StatusBar::showCampIndexAndName(CampInfo& campInfo, bool addSep) {
     if (!campInfo.campIndexLabel) {
         char buf[20] = {0};
-        snprintf(buf, sizeof(buf), "[%d] %s", campInfo.index, campInfo.name.c_str());
+        snprintf(buf, sizeof(buf), "[%d/%s]", campInfo.index+1, campInfo.name.c_str());
         campInfo.campIndexLabel = createCustomizedLabel(nullptr, buf, campInfo.container);
         if (addSep) {
             createSeperateLabel(campInfo.container);
