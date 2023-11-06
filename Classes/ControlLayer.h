@@ -25,6 +25,8 @@ protected:
 
     void _openSettingsDailog();
     void _onSettingsDailogClosed();
+    void _openMessagesBox();
+    void _onMessagesBoxClosed();
 
 private:
     //Joypad* _joypad = nullptr;
@@ -34,4 +36,5 @@ private:
     Layout* _layout = nullptr;
 
     bool _isSettingsDailogOpen = false;
+    bool _isMessagesBoxOpen = false;
 };

@@ -60,6 +60,7 @@ bool StatusBar::init(int width, int height, const Color3B& bgColor, int opacity,
     // 置于屏幕正上方
     auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_TOP_CENTER_HORIZONTAL);
+    lp->setRelativeName("status_bar"); //给组件布局属性设置一个名字，别人可以找到它
     setLayoutParameter(lp);
 
     buildStatusGroups();
@@ -70,8 +71,12 @@ bool StatusBar::init(int width, int height, const Color3B& bgColor, int opacity,
     return true;
 }
 
-void StatusBar::setOpenSettingsCallback(const openSettingsCallback& callback) {
+void StatusBar::setOpenSettingsCallback(const targetClickedCallback& callback) {
     _openSettingsCallback = callback;
+}
+
+void StatusBar::setOpenMessagesBoxCallback(const targetClickedCallback& callback) {
+    _openMessagesBoxCallback = callback;
 }
 
 void StatusBar::buildStatusGroups() {
@@ -158,6 +163,7 @@ void StatusBar::toggleExpandingStatusBar(const ToggleButton* sender) {
     auto statusBar = StatusBar::create();
     statusBar->init(!_expandingMode, _useColorful);
     statusBar->setOpenSettingsCallback(_openSettingsCallback);
+    statusBar->setOpenMessagesBoxCallback(_openMessagesBoxCallback);
 
     auto parent = getParent();
     removeFromParent();
@@ -282,9 +288,33 @@ void StatusBar::buildSettingButtonsGroup(int numButtons) {
     layout->setLayoutParameter(lp);
     addChild(layout);
 
+    createMessagesButton(layout);
     createServerPlayingButton(layout);
-    createServerSettingsButton(layout);
+    //createServerSettingsButton(layout);
     createSettingsButton(layout);
+}
+
+void StatusBar::createMessagesButton(Layout* parentLayout) {
+    auto button = Button::create("images/messages.png");
+    button->setScale(defaultFontScale);
+    auto lp = LinearLayoutParameter::create();
+    float margin = _buttonMargin;
+    lp->setMargin(Margin(margin, margin, margin, margin));
+    button->setLayoutParameter(lp);
+    button->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
+        switch (type)
+        {
+        case Widget::TouchEventType::BEGAN:
+            break;
+        case Widget::TouchEventType::ENDED:
+            printf("Game messagesBox button clicked\n");
+            _openMessagesBoxCallback();
+            break;
+        default:
+            break;
+        }
+    });
+    parentLayout->addChild(button);
 }
 
 void StatusBar::createServerPlayingButton(Layout* parentLayout) {

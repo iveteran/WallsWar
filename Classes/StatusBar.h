@@ -8,7 +8,7 @@
 
 #include "Camp.h"
 
-typedef std::function<void()> openSettingsCallback;
+typedef std::function<void()> targetClickedCallback;
 
 USING_NS_CC;
 
@@ -97,7 +97,8 @@ public:
     bool init(bool expandingMode, bool colorful);
     bool init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage=nullptr);
 
-    void setOpenSettingsCallback(const openSettingsCallback& callback);
+    void setOpenSettingsCallback(const targetClickedCallback& callback);
+    void setOpenMessagesBoxCallback(const targetClickedCallback& callback);
 
 protected:
     void buildStatusGroups();
@@ -116,6 +117,7 @@ protected:
     void buildPlayerInfoGroup(Layout* parentLayout);
 
     void buildSettingButtonsGroup(int numButtons);
+    void createMessagesButton(Layout* parentLayout);
     void createServerPlayingButton(Layout* parentLayout);
     void createServerSettingsButton(Layout* parentLayout);
     void createSettingsButton(Layout* parentLayout);
@@ -171,7 +173,8 @@ private:
     PlayerInfo _playerInfo;
     CampsInfo _campsInfo;
 
-    openSettingsCallback _openSettingsCallback = nullptr;
+    targetClickedCallback _openSettingsCallback = nullptr;
+    targetClickedCallback _openMessagesBoxCallback = nullptr;
 };
 
 #endif  // _STATUS_BAR_H_

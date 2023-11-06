@@ -4,6 +4,7 @@
 #include "KbdController.h"
 #include "Settings.h"
 #include "StatusBar.h"
+#include "MessagesBox.h"
 #include "TranslateText.h"
 
 #include "ui/CocosGUI.h"
@@ -31,6 +32,7 @@ bool ControlLayer::init() {
     auto statusBar = StatusBar::create();
     statusBar->init(StatusBar::UNEXPANDING, StatusBar::COLORFUL);
     statusBar->setOpenSettingsCallback(CC_CALLBACK_0(ControlLayer::_openSettingsDailog, this));
+    statusBar->setOpenMessagesBoxCallback(CC_CALLBACK_0(ControlLayer::_openMessagesBox, this));
     _layout->addChild(statusBar);
 
     return true;
@@ -70,4 +72,18 @@ void ControlLayer::_openSettingsDailog() {
 
 void ControlLayer::_onSettingsDailogClosed() {
     _isSettingsDailogOpen = false;
+}
+
+void ControlLayer::_openMessagesBox() {
+    if (_isMessagesBoxOpen) {
+        return;
+    }
+    auto messagesBox = MessagesBox::create();
+    messagesBox->setClosedCallback(CC_CALLBACK_0(ControlLayer::_onMessagesBoxClosed, this));
+    _layout->addChild(messagesBox);
+    _isMessagesBoxOpen = true;
+}
+
+void ControlLayer::_onMessagesBoxClosed() {
+    _isMessagesBoxOpen = false;
 }
