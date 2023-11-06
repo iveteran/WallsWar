@@ -24,6 +24,7 @@ protected:
     void _addKbdController();
 
     void _openSettingsDailog();
+    void _onSettingsDailogClosed();
 
 private:
     //Joypad* _joypad = nullptr;
@@ -31,4 +32,6 @@ private:
     KbdController* _kbd_ctrler = nullptr;
 
     Layout* _layout = nullptr;
+
+    bool _isSettingsDailogOpen = false;
 };

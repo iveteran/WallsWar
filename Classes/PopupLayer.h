@@ -10,6 +10,8 @@ namespace cocos2d::ui {
     class Text;
 }
 using namespace cocos2d::ui;
+
+using dialogClosedCallback = std::function<void()>;
  
 class PopupLayer : public Layout {
 public:
@@ -18,6 +20,7 @@ public:
     bool init(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
     bool initWithModal(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
      
+    void setClosedCallback(const dialogClosedCallback& callback);
     void setFont(const char* font, int size, float scale);
     void setTitle(const char* title);
     void setTitleBackgroundColor(const Color3B& color);
@@ -46,6 +49,8 @@ private:
     const char* _font = nullptr;
     int _fontSize = 12;
     float _fontScale = 0.5f;
+
+    dialogClosedCallback _closedCallback = nullptr;
 };
 
 #endif  // _POPUP_LAYER_H_

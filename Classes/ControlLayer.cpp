@@ -59,6 +59,15 @@ void ControlLayer::_addKbdController() {
 }
 
 void ControlLayer::_openSettingsDailog() {
+    if (_isSettingsDailogOpen) {
+        return;
+    }
     auto settingsDialog = Settings::create();
+    settingsDialog->setClosedCallback(CC_CALLBACK_0(ControlLayer::_onSettingsDailogClosed, this));
     addChild(settingsDialog);
+    _isSettingsDailogOpen = true;
+}
+
+void ControlLayer::_onSettingsDailogClosed() {
+    _isSettingsDailogOpen = false;
 }

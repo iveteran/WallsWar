@@ -82,6 +82,7 @@ bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacit
         case Widget::TouchEventType::BEGAN:
             break;
         case Widget::TouchEventType::ENDED:
+            _closedCallback();
             this->removeFromParentAndCleanup(true);
             break;
         default:
@@ -91,6 +92,10 @@ bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacit
     titleLayout->addChild(button);
 
     return true;
+}
+
+void PopupLayer::setClosedCallback(const dialogClosedCallback& callback) {
+    _closedCallback = callback;
 }
 
 void PopupLayer::setFont(const char* font, int size, float scale) {
