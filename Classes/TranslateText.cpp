@@ -23,5 +23,5 @@ const char* TEXT(const char* name) {
         printf(">> TEXT %s -> %s\n", name, value);
         return value;
     }
-    return nullptr;
+    return name;
 }
