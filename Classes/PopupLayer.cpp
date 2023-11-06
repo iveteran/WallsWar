@@ -10,10 +10,13 @@ static const int defaultTitleHeight = 10;
 USING_NS_CC;
 
 bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
-    // 设置模态背景颜色
-    if (!LayerColor::initWithColor(Color4B(0, 0, 0, opacity))) {
+    if (!Layout::init()) {
         return false;
     }
+    // 设置模态背景颜色和透明度
+    setBackGroundColor(Color3B(0, 0, 0));
+    setBackGroundColorOpacity(opacity);
+
     auto visibleSize = Director::getInstance()->getVisibleSize();
     setContentSize(visibleSize); // 设置模态背景大小
 

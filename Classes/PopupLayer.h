@@ -2,16 +2,16 @@
 #define _POPUP_LAYER_H_
 
 #include "cocos2d.h"
+#include "ui/UILayout.h"
 
 USING_NS_CC;
 
 namespace cocos2d::ui {
-    class Layout;
     class Text;
 }
 using namespace cocos2d::ui;
  
-class PopupLayer : public LayerColor {
+class PopupLayer : public Layout {
 public:
     CREATE_FUNC(PopupLayer);
 
