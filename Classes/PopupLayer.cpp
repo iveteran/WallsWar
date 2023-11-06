@@ -13,15 +13,29 @@ bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity
     if (!Layout::init()) {
         return false;
     }
+    setContentSize(Size(width, height));
+
+    return _init(width, height, bgColor, opacity, bgImage);
+}
+
+bool PopupLayer::initWithModal(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
+    if (!Layout::init()) {
+        return false;
+    }
+
     // 设置模态背景颜色和透明度
     setBackGroundColor(Color3B(0, 0, 0));
     setBackGroundColorOpacity(opacity);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
-    setContentSize(visibleSize); // 设置模态背景大小
+    setContentSize(visibleSize);   // 设置模态背景大小：窗口大小
 
     setSwallowTouches();
 
+    return _init(width, height, bgColor, opacity, bgImage);
+}
+
+bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
     _font = defaultFont;
 
     _layout = Layout::create();
@@ -29,9 +43,7 @@ bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity
     _layout->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
     _layout->setBackGroundColor(bgColor);
     _layout->setBackGroundColorOpacity(opacity);
-    _layout->setPosition(
-            Vec2((getContentSize().width - _layout->getContentSize().width) / 2,
-            (getContentSize().height - _layout->getContentSize().height) / 2));
+    _layout->setPosition((getContentSize() - _layout->getContentSize()) / 2); // 居中
     _layout->setLayoutType(Layout::Type::RELATIVE);
     addChild(_layout);
 
@@ -39,7 +51,7 @@ bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity
     auto titleLayout = Layout::create();
     titleLayout->setContentSize(Size(_layout->getContentSize().width, defaultTitleHeight));
     titleLayout->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-    //titleLayout->setBackGroundColorOpacity(defaultOpacity);
+    titleLayout->setBackGroundColorOpacity(defaultOpacity);
     titleLayout->setBackGroundColor(_titleBgColor);
     titleLayout->setLayoutType(Layout::Type::RELATIVE);
 

@@ -16,6 +16,7 @@ public:
     CREATE_FUNC(PopupLayer);
 
     bool init(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
+    bool initWithModal(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
      
     void setFont(const char* font, int size, float scale);
     void setTitle(const char* title);
@@ -28,6 +29,7 @@ public:
 
 protected:
     virtual bool init() { return true; }
+    bool _init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage);
     void showEffect();
      
     // 需要重写触摸事件处理函数，达到“模态”效果

@@ -20,7 +20,7 @@ bool Settings::init() {
 }
 
 bool Settings::init(int width, int height, const Color3B& bgColor, int bgOpacity) {
-    if (!PopupLayer::init(width, height, bgColor, bgOpacity)) {
+    if (!PopupLayer::initWithModal(width, height, bgColor, bgOpacity)) {
         return false;
     }
 
