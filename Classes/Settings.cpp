@@ -58,7 +58,7 @@ void Settings::createPlayerSettingsPanel(int index, const char* title) {
             break;
         }
     });
-    RelativeLayoutParameter* lp = RelativeLayoutParameter::create();
+    auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT);
     button->setLayoutParameter(lp);
     panel->addChild(button);
@@ -86,7 +86,7 @@ void Settings::createServerSettingsPanel(int index, const char* title) {
             break;
         }
     });
-    RelativeLayoutParameter* lp = RelativeLayoutParameter::create();
+    auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT);
     button->setLayoutParameter(lp);
     panel->addChild(button);
@@ -115,7 +115,7 @@ void Settings::createScriptsManagementPanel(int index, const char* title) {
             break;
         }
     });
-    RelativeLayoutParameter* lp = RelativeLayoutParameter::create();
+    auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT);
     button->setLayoutParameter(lp);
     panel->addChild(button);
@@ -136,10 +136,6 @@ void Settings::createSettingsTabs(int numTabs) {
     _tabs->setHeaderActiveBackgroundColor(defaultActiveColor, defaultOpacity);
     _tabs->setHeaderSelectedZoom(0.0f);
     _tabs->setHeaderDockPlace(TabControl::Dock::TOP);
-
-    RelativeLayoutParameter* tabsLP = RelativeLayoutParameter::create();
-    tabsLP->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_BOTTOM_CENTER_HORIZONTAL);
-    _tabs->setLayoutParameter(tabsLP);
     _tabs->setTabChangedEventListener(
         [&](int index, TabControl::EventType evtType) {
             printf("tab %d selected\n", index);

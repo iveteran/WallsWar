@@ -125,6 +125,10 @@ float PopupLayer::getHeight() const {
 }
 
 void PopupLayer::addMainPanel(Widget* widget) {
+    auto lp = RelativeLayoutParameter::create();
+    lp->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_BOTTOM_CENTER_HORIZONTAL);
+    widget->setLayoutParameter(lp);
+
     _layout->addChild(widget);
 }
 
