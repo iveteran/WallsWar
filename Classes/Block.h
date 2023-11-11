@@ -24,6 +24,7 @@ enum class BlockType {
     PLAYER,
     SPECTATOR,
     NPC,
+    MANAGER,        // game manager
     WEAPON,
     BULLET,
     ITEM,
