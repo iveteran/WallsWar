@@ -1,7 +1,7 @@
 #include "Block.h"
 #include "ImmovableBlock.h"
 #include "Player.h"
-#include "NPC.h"
+#include "npc.h"
 #include "Camp.h"
 #include "MapLayer.h"
 
