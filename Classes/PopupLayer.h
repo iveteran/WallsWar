@@ -27,6 +27,7 @@ public:
     int getTitleHeight() const;
     float getWidth() const;
     float getHeight() const;
+    Size getMainPanelSize() const;
 
     void addMainPanel(Widget* widget);
 
