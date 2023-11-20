@@ -40,6 +40,7 @@ bool StatusBar::init(int width, int height, const Color3B& bgColor, int opacity,
     if (!Layout::init()) {
         return false;
     }
+    setName("status_bar");
 
     _numInfoGroups = 3;
     _numButtons = 4;
@@ -60,7 +61,7 @@ bool StatusBar::init(int width, int height, const Color3B& bgColor, int opacity,
     // 置于屏幕正上方
     auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_TOP_CENTER_HORIZONTAL);
-    lp->setRelativeName("status_bar"); //给组件布局属性设置一个名字，别人可以找到它
+    lp->setRelativeName(getName()); //给组件布局属性设置一个名字，别人可以找到它
     setLayoutParameter(lp);
 
     buildStatusGroups();
