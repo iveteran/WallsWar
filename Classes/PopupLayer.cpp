@@ -9,16 +9,18 @@ static const int defaultTitleHeight = 10;
 
 USING_NS_CC;
 
-bool PopupLayer::init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
+bool PopupLayer::init(int width, int height, const Color3B& bgColor,
+        int opacity, bool enableTitle, const char* bgImage) {
     if (!Layout::init()) {
         return false;
     }
     setContentSize(Size(width, height));
 
-    return _init(width, height, bgColor, opacity, bgImage);
+    return _init(width, height, bgColor, opacity, enableTitle, bgImage);
 }
 
-bool PopupLayer::initWithModal(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
+bool PopupLayer::initWithModal(int width, int height, const Color3B& bgColor,
+        int opacity, bool enableTitle, const char* bgImage) {
     if (!Layout::init()) {
         return false;
     }
@@ -32,10 +34,11 @@ bool PopupLayer::initWithModal(int width, int height, const Color3B& bgColor, in
 
     setSwallowTouches();
 
-    return _init(width, height, bgColor, opacity, bgImage);
+    return _init(width, height, bgColor, opacity, enableTitle, bgImage);
 }
 
-bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage) {
+bool PopupLayer::_init(int width, int height, const Color3B& bgColor,
+        int opacity, bool enableTitle, const char* bgImage) {
     _font = defaultFont;
 
     _layout = Layout::create();
@@ -47,6 +50,14 @@ bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacit
     _layout->setLayoutType(Layout::Type::RELATIVE);
     addChild(_layout);
 
+    if (enableTitle) {
+        addTitle("No Title");
+    }
+
+    return true;
+}
+
+void PopupLayer::addTitle(const char* title) {
     // 创建Title栏
     auto titleLayout = Layout::create();
     titleLayout->setContentSize(Size(_layout->getContentSize().width, defaultTitleHeight));
@@ -61,7 +72,7 @@ bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacit
     _layout->addChild(titleLayout);
 
     // 创建Title text
-    _titleLabel = Text::create("No Title", _font, _fontSize);
+    _titleLabel = Text::create(title, _font, _fontSize);
     _titleLabel->setScale(_fontScale);  // NOTE: 通过增大字体再缩小以提高文件清析度
     RelativeLayoutParameter* lp2 = RelativeLayoutParameter::create();
     lp2->setAlign(RelativeLayoutParameter::RelativeAlign::CENTER_IN_PARENT);
@@ -90,8 +101,6 @@ bool PopupLayer::_init(int width, int height, const Color3B& bgColor, int opacit
         }
     });
     titleLayout->addChild(button);
-
-    return true;
 }
 
 void PopupLayer::setClosedCallback(const dialogClosedCallback& callback) {
