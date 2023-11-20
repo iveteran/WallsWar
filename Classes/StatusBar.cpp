@@ -2,6 +2,8 @@
 #include "Camp.h"
 #include "Player.h"
 #include "Common.h"
+#include "GameScene.h"
+#include "ControlLayer.h"
 
 #include "ui/CocosGUI.h"
 #include "ui/UILayout.h"
@@ -335,10 +337,12 @@ void StatusBar::createServerPlayingButton(Layout* parentLayout) {
 
 void StatusBar::pauseServerPlaying(const ToggleButton* sender) {
     printf("StatusBar::pauseServerPlaying called\n");
+    GET_CONTROL_LAYER()->addNotice("Game server paused", NoticeLevel::WARNING);
 }
 
 void StatusBar::startServerPlaying(const ToggleButton* sender) {
     printf("StatusBar::startServerPlaying called\n");
+    GET_CONTROL_LAYER()->addNotice("Game server started or resumed", NoticeLevel::WARNING);
 }
 
 void StatusBar::createServerSettingsButton(Layout* parentLayout) {
