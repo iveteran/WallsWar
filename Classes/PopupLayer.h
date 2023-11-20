@@ -29,7 +29,7 @@ public:
     float getHeight() const;
     Size getMainPanelSize() const;
 
-    void addMainPanel(Widget* widget);
+    void addMainPanel(Widget* widget, float margin=0.0f);
 
 protected:
     virtual bool init() { return true; }

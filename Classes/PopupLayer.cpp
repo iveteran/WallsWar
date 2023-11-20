@@ -128,9 +128,12 @@ Size PopupLayer::getMainPanelSize() const {
     return Size(getWidth(), getHeight() - getTitleHeight());
 }
 
-void PopupLayer::addMainPanel(Widget* widget) {
+void PopupLayer::addMainPanel(Widget* widget, float margin) {
     auto lp = RelativeLayoutParameter::create();
     lp->setAlign(RelativeLayoutParameter::RelativeAlign::PARENT_BOTTOM_CENTER_HORIZONTAL);
+    if (margin > 0) {
+        lp->setMargin(Margin(margin, margin, margin, margin));
+    }
     widget->setLayoutParameter(lp);
 
     _layout->addChild(widget);
