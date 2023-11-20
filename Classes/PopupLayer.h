@@ -11,7 +11,9 @@ namespace cocos2d::ui {
 }
 using namespace cocos2d::ui;
 
-using dialogClosedCallback = std::function<void()>;
+class PopupLayer;
+
+using dialogClosedCallback = std::function<void(PopupLayer*)>;
  
 class PopupLayer : public Layout {
 public:

@@ -93,8 +93,7 @@ void PopupLayer::addTitle(const char* title) {
         case Widget::TouchEventType::BEGAN:
             break;
         case Widget::TouchEventType::ENDED:
-            _closedCallback();
-            this->removeFromParentAndCleanup(true);
+            _closedCallback(this);
             break;
         default:
             break;
