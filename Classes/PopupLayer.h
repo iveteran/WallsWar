@@ -11,15 +11,20 @@ namespace cocos2d::ui {
 }
 using namespace cocos2d::ui;
 
-using dialogClosedCallback = std::function<void()>;
+class PopupLayer;
+
+using dialogClosedCallback = std::function<void(PopupLayer*)>;
  
 class PopupLayer : public Layout {
 public:
     CREATE_FUNC(PopupLayer);
 
-    bool init(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
-    bool initWithModal(int width, int height, const Color3B& color, int opacity, const char* bgImage=nullptr);
+    bool init(int width, int height, const Color3B& color, int opacity,
+            bool enableTitle=true, const char* bgImage=nullptr);
+    bool initWithModal(int width, int height, const Color3B& color, int opacity,
+            bool enableTitle=true, const char* bgImage=nullptr);
      
+    void addTitle(const char* title);
     void setClosedCallback(const dialogClosedCallback& callback);
     void setFont(const char* font, int size, float scale);
     void setTitle(const char* title);
@@ -29,11 +34,12 @@ public:
     float getHeight() const;
     Size getMainPanelSize() const;
 
-    void addMainPanel(Widget* widget);
+    void addMainPanel(Widget* widget, float margin=0.0f);
 
 protected:
     virtual bool init() { return true; }
-    bool _init(int width, int height, const Color3B& bgColor, int opacity, const char* bgImage);
+    bool _init(int width, int height, const Color3B& bgColor, int opacity,
+            bool enableTitle, const char* bgImage);
     void showEffect();
      
     // 需要重写触摸事件处理函数，达到“模态”效果
