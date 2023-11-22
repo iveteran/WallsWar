@@ -5,6 +5,7 @@
 #include "Settings.h"
 #include "StatusBar.h"
 #include "MessagesBox.h"
+#include "ZoomOutMap.h"
 #include "TranslateText.h"
 
 #include "ui/CocosGUI.h"
@@ -39,6 +40,9 @@ bool ControlLayer::init() {
     statusBar->setOpenSettingsCallback(CC_CALLBACK_0(ControlLayer::_toggleSettingsDailog, this));
     statusBar->setOpenMessagesBoxCallback(CC_CALLBACK_0(ControlLayer::_toggleMessagesBox, this));
     _layout->addChild(statusBar);
+
+    auto zoomOutMap = ZoomOutMap::create();
+    _layout->addChild(zoomOutMap);
 
     addDemoNotices(this);
 
