@@ -4,6 +4,9 @@
 #include "Block.h"
 #include "Vec2Hash.h"
 
+#include "constants/MapConstants.h"
+#include "Direction.h"
+
 #include <map>
 #include <string>
 

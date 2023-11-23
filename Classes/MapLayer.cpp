@@ -1,11 +1,10 @@
-#include "Common.h"
-
 #include "MapLayer.h"
 #include "Player.h"
 #include "Block.h"
 #include "Bullet.h"
-#include "Camp.h"
 #include "GameScene.h"
+#include "Camp.h"
+#include "constants/CampConstants.h"
 
 #include <string>
 
@@ -261,8 +260,8 @@ MapLayer::getAroundBlocks(const Block* block, int blockFloor, Direction dir) {
 void MapLayer::_getAroundBlocks(CoordBlockMap& posBlocks, const Block* block,
         const XYAxisBlock& xyAxisBlock, Direction dir) {
     Vec2 blockPos = block->getPosition();
-    int xyOffset = block->getSize() / 2 + MAX_BLOCK_SIZE;
-    int length = block->getSize() + MAX_BLOCK_SIZE * 2;
+    int xyOffset = block->getSize() / 2 + Block::MAX_SIZE;
+    int length = block->getSize() + Block::MAX_SIZE * 2;
     int originX = blockPos.x - xyOffset;
     int originY = blockPos.y - xyOffset;
 
@@ -360,33 +359,33 @@ void MapLayer::createCampusParapetWall(const Camp* camp) {
     auto campManager = camp->getManager();
     // 上侧护墙，从左到右
     int x, y;
-    y = campPos.y + CAMP_SIZE / 2;
+    y = campPos.y + Camp::SIZE / 2;
     if (y < CENTER_HEIGHT) {  // 如果在游戏地图外就不创建
-        for (int x=campPos.x-CAMP_SIZE/2; x<CENTER_WIDTH && x<=campPos.x+CAMP_SIZE/2; x+=BLOCK_SIZE)
+        for (int x = (campPos.x - Camp::SIZE / 2); x < CENTER_WIDTH && x <= (campPos.x + Camp::SIZE / 2); x += Block::SIZE)
         {
             _addBlock((float)x, (float)y, BlockType::STONE, campManager);
         }
     }
     // 右侧护墙，从上到下
-    x = campPos.x + CAMP_SIZE / 2;
+    x = campPos.x + Camp::SIZE / 2;
     if (x < CENTER_WIDTH) {
-        for (int y=campPos.y+CAMP_SIZE/2-BLOCK_SIZE; y>=0 && y>=campPos.y-CAMP_SIZE/2-BLOCK_SIZE; y-=BLOCK_SIZE)
+        for (int y = (campPos.y + Camp::SIZE / 2 - Block::SIZE); y >= 0 && y >= (campPos.y- Camp::SIZE / 2 - Block::SIZE); y -= Block::SIZE)
         {
             _addBlock((float)x, (float)y, BlockType::STONE, campManager);
         }
     }
     // 下侧护墙，从右到左
-    y = campPos.y - CAMP_SIZE / 2 - BLOCK_SIZE;
+    y = campPos.y - Camp::SIZE / 2 - Block::SIZE;
     if (y >= 0) {  // 如果在游戏地图外就不创建
-        for (int x=campPos.x+CAMP_SIZE/2-BLOCK_SIZE; x>=0 && x>=campPos.x-CAMP_SIZE/2-BLOCK_SIZE; x-=BLOCK_SIZE)
+        for (int x = (campPos.x + Camp::SIZE / 2 - Block::SIZE); x >= 0 && x >= (campPos.x - Camp::SIZE / 2 - Block::SIZE); x -= Block::SIZE)
         {
             _addBlock((float)x, (float)y, BlockType::STONE, campManager);
         }
     }
     // 左侧护墙，从下到上
-    x = campPos.x - CAMP_SIZE / 2 - BLOCK_SIZE;
+    x = campPos.x - Camp::SIZE / 2 - Block::SIZE;
     if (x >= 0) {
-        for (int y=campPos.y-CAMP_SIZE/2; y<CENTER_HEIGHT && y<=campPos.y+CAMP_SIZE/2; y+=BLOCK_SIZE)
+        for (int y = (campPos.y - Camp::SIZE / 2); y < CENTER_HEIGHT && y <= (campPos.y + Camp::SIZE / 2); y += Block::SIZE)
         {
             _addBlock((float)x, (float)y, BlockType::STONE, campManager);
         }
@@ -395,8 +394,8 @@ void MapLayer::createCampusParapetWall(const Camp* camp) {
 
 bool MapLayer::loadMapData() {
     // TODO: load from store
-    int widthSize = (int)(CENTER_WIDTH / BLOCK_SIZE);
-    int heightSize = (int)(CENTER_HEIGHT / BLOCK_SIZE);
+    int widthSize = (int)(CENTER_WIDTH / Block::SIZE);
+    int heightSize = (int)(CENTER_HEIGHT / Block::SIZE);
     // 增加底边围墙
     int offset = 4;
     int y = offset;
@@ -451,7 +450,7 @@ bool MapLayer::_addBlock(float x, float y, BlockType t, Gamer* gamer) {
 }
 
 bool MapLayer::_addBlock(int i, int j, BlockType t, Gamer* gamer) {
-    return _addBlock((float)i * BLOCK_SIZE, (float)j * BLOCK_SIZE, t, gamer);
+    return _addBlock((float)i * Block::SIZE, (float)j * Block::SIZE, t, gamer);
 }
 
 bool MapLayer::createBlock(int i, int j, BlockType t, Gamer* gamer) {

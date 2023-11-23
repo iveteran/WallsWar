@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "Direction.h"
 
 Direction reverseDirection(Direction dir) {
     if (dir == Direction::RIGHT || dir == Direction::DOWN) {

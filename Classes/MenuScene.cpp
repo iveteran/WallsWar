@@ -1,8 +1,11 @@
 #include "MenuScene.h"
-#include "Common.h"
 #include "GameScene.h"
 #include "AudioEngine.h"
 #include "CCEventListener.h"
+
+#include "constants/AppConstants.h"
+#include "constants/SceneConstants.h"
+#include "constants/PlayerConstants.h"
 
 USING_NS_CC;
 
@@ -155,8 +158,8 @@ Animate* MenuScene::_getAnimFrames() {
     Vector<SpriteFrame*> animFrams;
     animFrams.reserve(2);
 
-    auto a1 = SpriteFrame::create("images/m0-2-1.png", Rect(0, 0, TANK_SIZE, TANK_SIZE));
-    auto a2 = SpriteFrame::create("images/m0-2-2.png", Rect(0, 0, TANK_SIZE, TANK_SIZE));
+    auto a1 = SpriteFrame::create("images/m0-2-1.png", Rect(0, 0, PLAYER_SIZE, PLAYER_SIZE));
+    auto a2 = SpriteFrame::create("images/m0-2-2.png", Rect(0, 0, PLAYER_SIZE, PLAYER_SIZE));
     
     a1->getTexture()->setAliasTexParameters();
     a2->getTexture()->setAliasTexParameters();

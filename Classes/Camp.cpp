@@ -7,6 +7,9 @@
 
 USING_NS_CC;
 
+// 敌方坦克总数
+constexpr unsigned char ENEMIES_COUNT = 20;
+
 void Camp::initSpriteFrameCache() {
     auto camp_0 = Sprite::create("images/block/camp0.png")->getSpriteFrame();
     auto camp_1 = Sprite::create("images/block/camp1.png")->getSpriteFrame();

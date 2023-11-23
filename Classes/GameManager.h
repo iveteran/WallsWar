@@ -5,7 +5,7 @@
 class GameManager : public Gamer {
 public:
     bool init() override { return Gamer::init(); }
-    int getSize() const override { return TANK_SIZE; }
+    int getSize() const override { return Gamer::SIZE; }
     BlockType getType() const override { return BlockType::MANAGER; }
     void setName(const std::string& name) { _name = name; };
 

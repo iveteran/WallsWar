@@ -2,6 +2,7 @@
 
 #include "Gamer.h"
 #include "Bullet.h"
+#include "Direction.h"
 
 using cocos2d::Vector;
 using cocos2d::Animate;
@@ -17,6 +18,9 @@ class Block;
 
 class Player : public Gamer {
 public:
+    static constexpr float SIZE = Gamer::SIZE;
+    static constexpr int MAX_MOVE_DISTANCE = 100;
+
     static std::set<BlockType> CollidingAbleBlockTypes;
     static bool IsHost;
 

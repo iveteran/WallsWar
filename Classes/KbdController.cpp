@@ -1,7 +1,5 @@
-#include "Common.h"
 #include "KbdController.h"
 #include "Player.h"
-//#include "GameScene.h"
 
 USING_NS_CC;
 
@@ -9,14 +7,6 @@ bool KbdController::init()
 {
     if (!Node::init())
         return false;
-
-    /*
-    auto player1 = GET_PLAYER1();
-    if (player1 == nullptr) {
-        printf("!!! player1 is null\n");
-        return false;
-    }
-    */
 
     // 初始化控制键表
     _table[EventKeyboard::KeyCode::KEY_A] = Direction::LEFT;

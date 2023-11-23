@@ -1,9 +1,9 @@
 #include "StatusBar.h"
 #include "Camp.h"
 #include "Player.h"
-#include "Common.h"
 #include "GameScene.h"
 #include "ControlLayer.h"
+#include "constants/MapConstants.h"
 
 #include "ui/CocosGUI.h"
 #include "ui/UILayout.h"

@@ -6,10 +6,10 @@
 #include "NumberUtil.h"
 
 #include "GameScene.h"
-#include "Common.h"
 #include "MapLayer.h"
 #include "Camp.h"
 #include "ControlLayer.h"
+#include "constants/SceneConstants.h"
 
 USING_NS_CC;
 

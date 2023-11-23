@@ -9,12 +9,14 @@ class Player;
 
 class Campus : public ImmovableBlock {
 public:
+    static constexpr float SIZE = Block::SIZE * 2;
+
     static void initSpriteFrameCache();
     CREATE_FUNC(Campus);
 
 public:
     bool init() override;
-    int getSize() const override { return CAMP_SIZE; }
+    int getSize() const override { return SIZE; }
     BlockType getType() const override { return BlockType::CAMPUS; }
     virtual bool canBeDestroy() const { return false; }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Block.h"
+#include "Direction.h"
 
 class ImmovableBlock : public Block {
 public:
@@ -32,6 +33,8 @@ public:
 
 class BlockWall : public ImmovableBlock {
 public:
+    static constexpr float BRICK_SIZE = Block::SIZE / 2;
+
     static const int DefaultFloor = 0;
 
     CREATE_FUNC(BlockWall);

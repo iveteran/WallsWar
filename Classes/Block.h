@@ -2,7 +2,8 @@
 
 #include <set>
 #include "cocos2d.h"
-#include "Common.h"
+
+#include "constants/BlockConstants.h"
 
 // 方块类型
 enum class BlockType {
@@ -40,6 +41,9 @@ class Gamer;
 
 class Block : public cocos2d::Sprite {
 public:
+    static constexpr float SIZE = BLOCK_SIZE;
+    static constexpr float MAX_SIZE = MAX_BLOCK_SIZE;
+
     static const int DefaultFloor = 0;
 
     static void initSpriteFrameCache();
@@ -64,7 +68,7 @@ public:
     virtual BlockType getType() const = 0;
     virtual bool movable() const = 0;
     virtual bool canBeDestroy() const { return true; }
-    virtual int getSize() const { return BLOCK_SIZE * 2; }
+    virtual int getSize() const { return SIZE * 2; }
 
     bool containsPoint(const cocos2d::Vec2& point) const;
     bool isDownFloorEmpty() const;

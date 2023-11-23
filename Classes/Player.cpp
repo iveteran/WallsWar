@@ -4,6 +4,7 @@
 #include "GameScene.h"
 #include "Bullet.h"
 #include "Camp.h"
+#include "constants/CampConstants.h"
 
 #include "RandomUtil.h"
 #include "AudioEngine.h"
@@ -28,7 +29,7 @@ Player::CollidingAbleBlockTypes{
     BlockType::CAMP
 };
 
-static const float minBordGrap = TANK_SIZE * 2;
+static const float minBordGrap = Player::SIZE * 2;
 
 Vec2 convertToMapPosition(const Vec2& pos);
 
@@ -99,7 +100,7 @@ void Player::loadFrameAnimation() {
 void Player::_loadFrameAnimation(const char* imgPath, const char* namePrefix) {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
-    Rect tankRect(0, 0, TANK_SIZE, TANK_SIZE);
+    Rect playerRect(0, 0, Player::SIZE, Player::SIZE);
     bool isHost = strcmp(namePrefix, "player1") == 0;
 
     // 总共4个等级，从0到3
@@ -113,14 +114,14 @@ void Player::_loadFrameAnimation(const char* imgPath, const char* namePrefix) {
             } else { // for enemy
                 snprintf(buf, sizeof(buf), "%s/%d-%d-1.png", imgPath, level+1, dir+1);
             }
-            auto player_1 = SpriteFrame::create(buf, tankRect);
+            auto player_1 = SpriteFrame::create(buf, playerRect);
             // FIXME: 修改图片名称使其统一
             if (isHost) {
                 snprintf(buf, sizeof(buf), "%s/m%d-%d-2.png", imgPath, level, dir);
             } else { // for enemy
                 snprintf(buf, sizeof(buf), "%s/%d-%d-2.png", imgPath, level+1, dir+1);
             }
-            auto player_2 = SpriteFrame::create(buf, tankRect);
+            auto player_2 = SpriteFrame::create(buf, playerRect);
             auto player = Animation::createWithSpriteFrames({ player_1, player_2 }, 0.05f);
 
             player_1->getTexture()->setAliasTexParameters();
@@ -227,7 +228,7 @@ void Player::setInitialDirection() {
 void Player::setInitialPosition() {
     bool done = false;
     auto campPos = _joinedCamp->getPosition();
-    int offset = CAMP_SIZE / 2 + BLOCK_SIZE + TANK_SIZE / 2;  // 营地大小的一半+围墙大小+玩家大小的一半
+    int offset = Camp::SIZE / 2 + BLOCK_SIZE + Player::SIZE / 2;  // 营地大小的一半+围墙大小+玩家大小的一半
     // Camp的上边
     Vec2 pos1 = Vec2(campPos.x, campPos.y + offset);
     // Camp的右上
@@ -246,13 +247,13 @@ void Player::setInitialPosition() {
         moveTo(pos);
         //printf(">>> player pos: (%f, %f)\n", pos.x, pos.y);
         if (!detectCollision()) {
-            //return pos;
             done = true;
             break;
         }
     }
     if (!done) {
-        // TODO: to try next second later
+        // to try next second later
+        //scheduleOnce(CC_SCHEDULE_SELECTOR(Player::setInitialPosition), 1.0f);
     }
 }
 
@@ -330,15 +331,15 @@ void Player::birth(const std::string& frameName) {
     auto action = this->runAction(Sequence::create(
         animate,
         CallFunc::create([=]() {
-        this->initWithSpriteFrameName(frameName);
-        _canMove = true;
-        if (_isHost) {
-            this->beInvincible(3);
-            moveCamaraToCamp();
-        }
-    }),
+            this->initWithSpriteFrameName(frameName);
+            _canMove = true;
+            if (_isHost) {
+                this->beInvincible(3);
+                moveCamaraToCamp();
+            }
+        }),
         nullptr
-        ));
+    ));
 }
 
 void Player::moveCamaraToCamp() {
@@ -354,21 +355,21 @@ void Player::moveCamaraToCamp() {
     auto visibleSize = Director::getInstance()->getVisibleSize();
     float xOffset = 0, yOffset = 0;
     if (cameraPos.x > campPos.x) {
-        xOffset = cameraPos.x - campPos.x - visibleSize.width / 2 + CAMP_SIZE  / 2;
-        xOffset += std::min(campPos.x - CAMP_SIZE / 2, minBordGrap);
+        xOffset = cameraPos.x - campPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
+        xOffset += std::min(campPos.x - Camp::SIZE / 2, minBordGrap);
         xOffset = xOffset > 0 ? xOffset * -1 : 0;
     } else {
-        xOffset = campPos.x - cameraPos.x - visibleSize.width / 2 + CAMP_SIZE  / 2;
-        xOffset += std::min(CENTER_WIDTH - campPos.x - CAMP_SIZE / 2, minBordGrap);
+        xOffset = campPos.x - cameraPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
+        xOffset += std::min(CENTER_WIDTH - campPos.x - Camp::SIZE / 2, minBordGrap);
         xOffset = xOffset > 0 ? xOffset : 0;
     }
     if (cameraPos.y > campPos.y) {
-        yOffset = cameraPos.y - campPos.y - visibleSize.height / 2 + CAMP_SIZE / 2;
-        yOffset += std::min(campPos.y - CAMP_SIZE / 2, minBordGrap);
+        yOffset = cameraPos.y - campPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
+        yOffset += std::min(campPos.y - Camp::SIZE / 2, minBordGrap);
         yOffset = yOffset > 0 ? yOffset * -1 : 0;
     } else {
-        yOffset = campPos.y - cameraPos.y - visibleSize.height / 2 + CAMP_SIZE / 2;
-        yOffset += std::min(CENTER_HEIGHT - campPos.y - CAMP_SIZE / 2, minBordGrap);
+        yOffset = campPos.y - cameraPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
+        yOffset += std::min(CENTER_HEIGHT - campPos.y - Camp::SIZE / 2, minBordGrap);
         yOffset = yOffset > 0 ? yOffset : 0;
     }
 
@@ -416,7 +417,7 @@ void Player::beInvincible(int time) {
 }
 
 void Player::changeDirection() {
-    if (_moveDistance < MAX_MOVE_DISTANCE) {
+    if (_moveDistance < Player::MAX_MOVE_DISTANCE) {
         return;
     }
     _moveDistance = 0;
@@ -465,16 +466,16 @@ void Player::_shoot(Bullet* bullet) {
     auto playerPos = getPosition();
     switch (_dir) {
     case Direction::LEFT:
-        startPos = Vec2(playerPos.x - TANK_SIZE / 2.0f, playerPos.y);
+        startPos = Vec2(playerPos.x - Player::SIZE / 2.0f, playerPos.y);
         break;
     case Direction::UP:
-        startPos = Vec2(playerPos.x, playerPos.y + TANK_SIZE / 2.0f);
+        startPos = Vec2(playerPos.x, playerPos.y + Player::SIZE / 2.0f);
         break;
     case Direction::RIGHT:
-        startPos = Vec2(playerPos.x + TANK_SIZE / 2.0f, playerPos.y);
+        startPos = Vec2(playerPos.x + Player::SIZE / 2.0f, playerPos.y);
         break;
     case Direction::DOWN:
-        startPos = Vec2(playerPos.x, playerPos.y - TANK_SIZE / 2.0f);
+        startPos = Vec2(playerPos.x, playerPos.y - Player::SIZE / 2.0f);
         break;
     default:
         break;
@@ -593,7 +594,7 @@ void Player::onCollidedWith(Vector<Block*>& withBlocks) {
     }
     if (!_isHost) {
         // 敌方坦克碰撞后可以改变方向
-        _moveDistance = MAX_MOVE_DISTANCE;
+        _moveDistance = Player::MAX_MOVE_DISTANCE;
         changeDirection();
     }
 }

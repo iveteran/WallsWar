@@ -1,7 +1,5 @@
-#include "Common.h"
 #include "Joypad2.h"
 #include "Player.h"
-//#include "GameScene.h"
 
 const double PI = 3.141592654;
 

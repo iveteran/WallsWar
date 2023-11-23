@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Common.h"
 #include "Weapon.h"
 
 class Bullet : public Weapon {
 public:
+    static constexpr float SIZE = 4;
     static std::set<BlockType> CollidingAbleBlockTypes;
 
 public:
@@ -14,7 +14,7 @@ public:
 public:
     bool init() override;
     void destroy();
-    int getSize() const override { return BULLET_SIZE; }
+    int getSize() const override { return SIZE; }
     BlockType getType() const override { return BlockType::BULLET; }
     std::string getSpriteFrameName() const override { return "bullet"; }
 

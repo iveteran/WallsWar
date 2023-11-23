@@ -24,9 +24,9 @@
 
 #include "AppDelegate.h"
 
-#include "Common.h"
 #include "MenuScene.h"
 #include "GameScene.h"
+#include "constants/AppConstants.h"
 
 #define USE_AUDIO_ENGINE 1
 #define APP_NAME "TankBattle"

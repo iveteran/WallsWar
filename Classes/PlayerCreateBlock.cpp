@@ -15,14 +15,14 @@ bool Player::createBlock1(Direction dir) {
             break;
         case Direction::RIGHT:
             x = playerPos.x;
-            y = playerPos.y - BLOCK_SIZE;
+            y = playerPos.y - Block::SIZE;
             break;
         case Direction::DOWN:
-            x = playerPos.x - BLOCK_SIZE;
-            y = playerPos.y - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
+            y = playerPos.y - Block::SIZE;
             break;
         case Direction::LEFT:
-            x = playerPos.x - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
             y = playerPos.y;
             break;
         default:
@@ -68,7 +68,7 @@ bool Player::createBlock2(Direction dir) {
     float x = 0, y = 0;
     switch (dir) {
         case Direction::UP:
-            x = playerPos.x - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
             y = playerPos.y;
             posList.push_back(Vec2(x, y));
             x = playerPos.x;
@@ -76,19 +76,19 @@ bool Player::createBlock2(Direction dir) {
             posList.push_back(Vec2(x, y));
             break;
         case Direction::DOWN:
-            x = playerPos.x - BLOCK_SIZE;
-            y = playerPos.y - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
+            y = playerPos.y - Block::SIZE;
             posList.push_back(Vec2(x, y));
             x = playerPos.x;
-            y = playerPos.y - BLOCK_SIZE;
+            y = playerPos.y - Block::SIZE;
             posList.push_back(Vec2(x, y));
             break;
         case Direction::LEFT:
-            x = playerPos.x - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
             y = playerPos.y;
             posList.push_back(Vec2(x, y));
-            x = playerPos.x - BLOCK_SIZE;
-            y = playerPos.y - BLOCK_SIZE;
+            x = playerPos.x - Block::SIZE;
+            y = playerPos.y - Block::SIZE;
             posList.push_back(Vec2(x, y));
             break;
         case Direction::RIGHT:
@@ -96,7 +96,7 @@ bool Player::createBlock2(Direction dir) {
             y = playerPos.y;
             posList.push_back(Vec2(x, y));
             x = playerPos.x;
-            y = playerPos.y - BLOCK_SIZE;
+            y = playerPos.y - Block::SIZE;
             posList.push_back(Vec2(x, y));
             break;
         default:
@@ -141,12 +141,12 @@ bool Player::createBlock4() {
     y = playerPos.y;
     posList.push_back(Vec2(x, y));
     x = playerPos.x;
-    y = playerPos.y - BLOCK_SIZE;
+    y = playerPos.y - Block::SIZE;
     posList.push_back(Vec2(x, y));
-    x = playerPos.x - BLOCK_SIZE;
-    y = playerPos.y - BLOCK_SIZE;
+    x = playerPos.x - Block::SIZE;
+    y = playerPos.y - Block::SIZE;
     posList.push_back(Vec2(x, y));
-    x = playerPos.x - BLOCK_SIZE;
+    x = playerPos.x - Block::SIZE;
     y = playerPos.y;
     posList.push_back(Vec2(x, y));
 

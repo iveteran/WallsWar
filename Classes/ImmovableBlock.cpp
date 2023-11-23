@@ -1,6 +1,7 @@
 #include "ImmovableBlock.h"
 #include "Bullet.h"
 #include "MapLayer.h"
+#include "constants/PlayerConstants.h"
 
 USING_NS_CC;
 
@@ -101,7 +102,7 @@ BlockWall::destory(Direction dir, const Rect& box) {
                     moveAnElem = BRICK_SIZE;
                 }
             }
-            cmpBox = Rect(box.getMinX() + moveAnElem, box.getMinY() + 1 - BLOCK_SIZE, BULLET_SIZE, TANK_SIZE);
+            cmpBox = Rect(box.getMinX() + moveAnElem, box.getMinY() + 1 - Block::SIZE, Bullet::SIZE, PLAYER_SIZE);
             break;
         case Direction::UP:
             if (_blacks[0]->isVisible() && _blacks[2]->isVisible()) {
@@ -113,7 +114,7 @@ BlockWall::destory(Direction dir, const Rect& box) {
                     moveAnElem = BRICK_SIZE * -1;
                 }
             }
-            cmpBox = Rect(box.getMinX() + 1 - BLOCK_SIZE, box.getMinY() + moveAnElem, TANK_SIZE, BULLET_SIZE);
+            cmpBox = Rect(box.getMinX() + 1 - Block::SIZE, box.getMinY() + moveAnElem, PLAYER_SIZE, Bullet::SIZE);
             break;
         default:
             break;

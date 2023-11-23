@@ -3,7 +3,7 @@
 // PC键盘控制
 
 #include "cocos2d.h"
-#include "Common.h"
+#include "Direction.h"
 
 using namespace cocos2d;
 

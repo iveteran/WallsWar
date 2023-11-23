@@ -4,6 +4,7 @@
 #include "MapLayer.h"
 #include "GameScene.h"
 #include "ControlLayer.h"
+#include "constants/PlayerConstants.h"
 
 USING_NS_CC;
 
@@ -12,7 +13,7 @@ MovableBlock::CollidingAbleBlockTypes{
     BlockType::MAP_BORDER
 };
 
-static const int minBordGrap = TANK_SIZE * 2;
+static const int minBordGrap = PLAYER_SIZE * 2;
 
 std::set<BlockType>
 MovableBlock::getCollidingAbleBTs() const {

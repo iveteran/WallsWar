@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Block.h"
+#include "Direction.h"
 
 using cocos2d::Vector;
 using cocos2d::Vec2;

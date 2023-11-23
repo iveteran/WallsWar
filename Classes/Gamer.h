@@ -6,8 +6,11 @@ class Camp;
 
 class Gamer : public MovableBlock {
 public:
+    static constexpr float SIZE = Block::SIZE * 2;
+
+public:
     bool init() override { return MovableBlock::init(); }
-    int getSize() const override { return TANK_SIZE; }
+    int getSize() const override { return SIZE; }
     BlockType getType() const override { return BlockType::GAMER; }
 
     void setName(const std::string& name) { _name = name; };

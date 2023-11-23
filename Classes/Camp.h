@@ -4,6 +4,8 @@
 
 class Camp : public Campus {
 public:
+    static constexpr float SIZE = Campus::SIZE;
+
     static void initSpriteFrameCache();
     CREATE_FUNC(Camp);
 
