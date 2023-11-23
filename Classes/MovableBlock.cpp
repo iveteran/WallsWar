@@ -15,6 +15,14 @@ MovableBlock::CollidingAbleBlockTypes{
 
 static const int minBordGrap = PLAYER_SIZE * 2;
 
+bool isGamer(BlockType bType) {
+    return bType == BlockType::GAMER ||
+        bType == BlockType::PLAYER ||
+        bType == BlockType::NPC ||
+        bType == BlockType::SPECTATOR ||
+        bType == BlockType::MANAGER;
+}
+
 std::set<BlockType>
 MovableBlock::getCollidingAbleBTs() const {
     return MovableBlock::CollidingAbleBlockTypes;
@@ -210,7 +218,9 @@ void MovableBlock::_autoMove(float dt) {
 
 void MovableBlock::onMoved() {
     // 如果玩家所在楼层大于1，在移动后楼下层为空就使其下落
-    fallDownIfDownFloorIsEmpty();
+    if (isGamer(getType())) {
+        fallDownIfDownFloorIsEmpty();
+    }
 
     if (allowedCameraFollows())
     {

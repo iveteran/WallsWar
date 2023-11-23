@@ -11,6 +11,8 @@ enum class PositionType {
     POSITION,
 };
 
+bool isGamer(BlockType bType);
+
 class MovableBlock : public Block {
 public:
     static std::set<BlockType> CollidingAbleBlockTypes;
