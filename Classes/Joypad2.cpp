@@ -10,6 +10,7 @@ bool Joypad2::init()
 
     // 此处是4方向
     m_type = JoystickType::KEY4;
+    m_can_move = true;
 
     // 锚点在圆心
     m_wheel = Sprite::create("images/joypad/wheel_alpha.png"); // alpha 70%
@@ -22,8 +23,6 @@ bool Joypad2::init()
     m_stick->setScale(0.5);
     m_stick->setPosition(m_wheel->getPosition());
     addChild(m_stick);
-
-    m_can_move = true;
 
     // 开火键
     m_attack = Sprite::create("images/joypad/attack_alpha.png"); // alpha 70%

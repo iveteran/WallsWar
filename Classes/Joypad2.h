@@ -38,23 +38,24 @@ public:
     CREATE_FUNC(Joypad2);
     virtual bool init();
 
-    virtual void onTouchesBegan(const std::vector<Touch*>& touches, Event* event);
-    virtual void onTouchesMoved(const std::vector<Touch*>& touches, Event* event);
-    virtual void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
-
     void setJoystickType(JoystickType joystick_type);
-
     void attachPlayer(Player* player) { _player = player; }
 
-private:
-    JoystickType m_type;
+protected:
+    void onTouchesBegan(const std::vector<Touch*>& touches, Event* event);
+    void onTouchesMoved(const std::vector<Touch*>& touches, Event* event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
+
     float calcRad(Point p1, Point p2);
     Vec2 getAnglePosition(float R, float rad);
-    Sprite* m_wheel;
-    Sprite* m_stick;
-    Sprite* m_attack;
-    bool m_can_move;
 
+private:
+    Sprite* m_wheel = nullptr;
+    Sprite* m_stick = nullptr;
+    Sprite* m_attack = nullptr;
+
+    JoystickType m_type;
+    bool m_can_move;
     bool m_direction_status; // 方向键按下
     bool m_fire_status; // 开火键按下
 
