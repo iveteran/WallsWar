@@ -28,6 +28,10 @@ Player::CollidingAbleBlockTypes{
     BlockType::CAMP
 };
 
+static const float minBordGrap = TANK_SIZE * 2;
+
+Vec2 convertToMapPosition(const Vec2& pos);
+
 std::set<BlockType>
 Player::getCollidingAbleBTs() const {
     return Player::CollidingAbleBlockTypes;
@@ -338,29 +342,53 @@ void Player::birth(const std::string& frameName) {
 }
 
 void Player::moveCamaraToCamp() {
-
-#if 1
-    // 玩家重生摄像头重回出生地：地图左下角,
-    // visible_size: V, CENTER_SIZE: C, => V/2 - (C/2 - V/2) => V - C/2
-    Size visible_size = Director::getInstance()->getVisibleSize();
-    float x = visible_size.width - CENTER_WIDTH / 2;
-    float y = visible_size.height - CENTER_HEIGHT / 2;
-    Vec2 campPos(x, y);
-#else
-    // TODO: Camara定位到玩家Camp的位置
-    auto campPos = _joinedCamp->getPosition();
-#endif
-
     auto camera = Camera::getDefaultCamera();
-    camera->setPosition(campPos);
+    auto originCameraPos = camera->getPosition();
+    printf(">> camera pos: (%f, %f)\n", originCameraPos.x, originCameraPos.y);
+    auto cameraPos = convertToMapPosition(originCameraPos);
+    printf(">> camera pos for map: (%f, %f)\n", cameraPos.x, cameraPos.y);
 
-    // 重置ControlLayer的位置，使其跟随摄像头，从而固定在屏幕相应位置
-    auto ctrlLayer = GET_CONTROL_LAYER();
-    if (ctrlLayer != nullptr) {
-        ctrlLayer->setPosition(campPos);
+    auto campPos = _joinedCamp->getPosition();
+    printf(">> camp pos: (%f, %f)\n", campPos.x, campPos.y);
+
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    float xOffset = 0, yOffset = 0;
+    if (cameraPos.x > campPos.x) {
+        xOffset = cameraPos.x - campPos.x - visibleSize.width / 2 + CAMP_SIZE  / 2;
+        xOffset += std::min(campPos.x - CAMP_SIZE / 2, minBordGrap);
+        xOffset = xOffset > 0 ? xOffset * -1 : 0;
+    } else {
+        xOffset = campPos.x - cameraPos.x - visibleSize.width / 2 + CAMP_SIZE  / 2;
+        xOffset += std::min(CENTER_WIDTH - campPos.x - CAMP_SIZE / 2, minBordGrap);
+        xOffset = xOffset > 0 ? xOffset : 0;
     }
-    CCLOG(">> [moveCamaraToCamp] camera move to position: (%f, %f)",
-            camera->getPosition().x, camera->getPosition().y);
+    if (cameraPos.y > campPos.y) {
+        yOffset = cameraPos.y - campPos.y - visibleSize.height / 2 + CAMP_SIZE / 2;
+        yOffset += std::min(campPos.y - CAMP_SIZE / 2, minBordGrap);
+        yOffset = yOffset > 0 ? yOffset * -1 : 0;
+    } else {
+        yOffset = campPos.y - cameraPos.y - visibleSize.height / 2 + CAMP_SIZE / 2;
+        yOffset += std::min(CENTER_HEIGHT - campPos.y - CAMP_SIZE / 2, minBordGrap);
+        yOffset = yOffset > 0 ? yOffset : 0;
+    }
+
+    printf(">> offset: (%f, %f)\n", xOffset, yOffset);
+    if (xOffset != 0 || yOffset != 0 ) {
+        // make moving effect
+        float movingTime = std::max(abs(xOffset), abs(yOffset)) * 0.01f;
+        movingTime = std::min(movingTime, 3.0f);
+        printf(">> movingTime: %f\n", movingTime);
+
+        camera->runAction(MoveBy::create(movingTime, Vec2(xOffset, yOffset)));
+
+        auto ctrlLayer = GET_CONTROL_LAYER();
+        if (ctrlLayer != nullptr) {
+            ctrlLayer->runAction(MoveBy::create(movingTime, Vec2(xOffset, yOffset)));
+        }
+
+        CCLOG(">> [moveCamaraToCamp] camera move to position: (%f, %f)",
+                camera->getPosition().x, camera->getPosition().y);
+    }
 }
 
 void Player::beInvincible(int time) {
@@ -568,4 +596,11 @@ void Player::onCollidedWith(Vector<Block*>& withBlocks) {
         _moveDistance = MAX_MOVE_DISTANCE;
         changeDirection();
     }
+}
+
+Vec2 convertToMapPosition(const Vec2& pos) {
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    float x = pos.x + (CENTER_WIDTH - visibleSize.width) / 2;
+    float y = pos.y + (CENTER_HEIGHT - visibleSize.height) / 2;
+    return Vec2(x, y);
 }
