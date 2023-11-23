@@ -12,6 +12,8 @@ MovableBlock::CollidingAbleBlockTypes{
     BlockType::MAP_BORDER
 };
 
+static const int minBordGrap = TANK_SIZE * 2;
+
 std::set<BlockType>
 MovableBlock::getCollidingAbleBTs() const {
     return MovableBlock::CollidingAbleBlockTypes;
@@ -270,7 +272,6 @@ void MovableBlock::makeCameraFollows() {
     Size visible_size = Director::getInstance()->getVisibleSize();
     auto pos = getPosition();
 
-    static const int minBordGrap = TANK_SIZE * 2;
     int xOffset = 0, yOffset = 0;
     int gap = 0;
     float cameraGap = 0;

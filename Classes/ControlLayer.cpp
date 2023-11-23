@@ -22,7 +22,7 @@ void addDemoNotices(ControlLayer* cl) {
 }
 
 bool ControlLayer::init() {
-    if (!cocos2d::Layer::init()) {
+    if (!Layer::init()) {
         return false;
     }
 

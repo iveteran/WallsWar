@@ -152,14 +152,12 @@ void GameScene::_initMapLayer() {
     _map = MapLayer::getInstance();
     addChild(_map);
 
-    // 设置地图位置
-    _map->setContentSize(Size(CENTER_WIDTH, CENTER_HEIGHT));
-    _map->setIgnoreAnchorPointForPosition(false);
-    _map->setPosition(Director::getInstance()->getVisibleSize() / 2);
-
     // 加载地图数据
     _map->loadLevelData(stage);
     _player1 = _map->getPlayer1();
+    if (_ctrlLayer) {
+        _ctrlLayer->attachPlayer(_player1);
+    }
 
     // 更新信息
     //updateInformationArea(true);
@@ -167,7 +165,9 @@ void GameScene::_initMapLayer() {
 
 void GameScene::_initControlLayer() {
     _ctrlLayer = ControlLayer::create();
-    _ctrlLayer->attachPlayer(_player1);
+    if (_player1) {
+        _ctrlLayer->attachPlayer(_player1);
+    }
     addChild(_ctrlLayer);
 }
 

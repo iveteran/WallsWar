@@ -18,6 +18,11 @@ bool MapLayer::init() {
         return false;
     }
 
+    // 设置地图位置
+    setContentSize(Size(CENTER_WIDTH, CENTER_HEIGHT));
+    setIgnoreAnchorPointForPosition(false);
+    setPosition(Director::getInstance()->getVisibleSize() / 2);
+
     // 设置背景颜色为黑色
     //this->initWithColor(Color4B(0, 0, 0, 255));
 
