@@ -34,6 +34,8 @@ enum class BlockType {
     COUNT
 };
 
+using BlockTypeSet = std::set<BlockType>;
+
 const int NoneFloor = -999;
 const bool IsActiveCollision = true;
 

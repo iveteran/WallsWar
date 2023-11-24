@@ -2,6 +2,11 @@
 
 USING_NS_CC;
 
+bool isCampus(BlockType btype) {
+    return btype == BlockType::CAMPUS ||
+        btype == BlockType::CAMP;
+}
+
 void Campus::initSpriteFrameCache() {
     // TODO
 }

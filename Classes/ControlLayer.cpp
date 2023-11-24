@@ -41,8 +41,8 @@ bool ControlLayer::init() {
     statusBar->setOpenMessagesBoxCallback(CC_CALLBACK_0(ControlLayer::_toggleMessagesBox, this));
     _layout->addChild(statusBar);
 
-    auto zoomOutMap = ZoomOutMap::create();
-    _layout->addChild(zoomOutMap);
+    _zoomOutMap = ZoomOutMap::create();
+    _layout->addChild(_zoomOutMap);
 
     addDemoNotices(this);
 
@@ -53,6 +53,7 @@ void ControlLayer::attachPlayer(Player* player) {
     //_player = player;
     _joypad2->attachPlayer(player);
     _kbd_ctrler->attachPlayer(player);
+    _zoomOutMap->attachPlayer(player);
 }
 
 //void ControlLayer::_addJoypad() {

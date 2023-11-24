@@ -7,6 +7,8 @@ using cocos2d::Map;
 
 class Player;
 
+bool isCampus(BlockType btype);
+
 class Campus : public ImmovableBlock {
 public:
     static constexpr float SIZE = Block::SIZE * 2;

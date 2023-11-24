@@ -239,6 +239,58 @@ Block* MapLayer::_removeBlockPosition(int floor, int x, int y,
 }
 
 CoordBlockMap
+MapLayer::getInsideCircleBlocks(const Vec2& center, float radius,
+        const BlockTypeSet& btSet, int floor) {
+    auto origin = Vec2(center.x - radius, center.y - radius);
+    float sideLength = radius * 2;
+    auto posInCircleFilter = std::bind(isPointInCirle, center, radius, std::placeholders::_1);
+    return getInsideSquareBlocks(origin, sideLength, btSet, posInCircleFilter, floor);
+}
+
+CoordBlockMap
+MapLayer::getInsideSquareBlocks(const Vec2& origin, float sideLength,
+        const BlockTypeSet& btSet, const BlockPositionFilter& positionFilter, int floor) {
+
+    CoordBlockMap posBlocks;
+    if (floor != NoneFloor) {
+        auto iter = _floorPosBlocks.find(floor);
+        if (iter != _floorPosBlocks.end()) {
+            auto xyAxisBlock = iter->second;
+            _getInsideSquareBlocks(posBlocks, origin, sideLength, btSet, positionFilter, xyAxisBlock);
+        }
+    } else {
+        for (auto iter : _floorPosBlocks) {
+            auto xyAxisBlock = iter.second;
+            _getInsideSquareBlocks(posBlocks, origin, sideLength, btSet, positionFilter, xyAxisBlock);
+        }
+    }
+    return posBlocks;
+}
+
+void MapLayer::_getInsideSquareBlocks(CoordBlockMap& posBlocks,/* output */
+        const Vec2& origin, float sideLength, const BlockTypeSet& btSet,
+        const BlockPositionFilter& positionFilter,
+        const XYAxisBlock& xyAxisBlock) {
+
+    auto iterBegin = xyAxisBlock.upper_bound(origin.x);
+    auto iterEnd = xyAxisBlock.lower_bound(origin.x + sideLength);
+    for (auto iter2 = iterBegin; iter2 != iterEnd; ++iter2) {
+        float x = iter2->first;
+        auto yAxisBlock = iter2->second;
+        auto iter2Begin = yAxisBlock.upper_bound(origin.y);
+        auto iter2End = yAxisBlock.upper_bound(origin.y + sideLength);
+        for (auto iter3 = iter2Begin; iter3 != iter2End; ++iter3) {
+            float y = iter3->first;
+            auto gotBlock = iter3->second;
+            if ((btSet.empty() || btSet.find(gotBlock->getType()) != btSet.end()) && // check contains
+                    (!positionFilter || positionFilter(gotBlock->getPosition()))) {   // check in circle if the filter available
+                posBlocks.insert(Vec2(x, y), gotBlock);
+            }
+        }
+    }
+}
+
+CoordBlockMap
 MapLayer::getAroundBlocks(const Block* block, int blockFloor, Direction dir) {
     CoordBlockMap posBlocks;
 

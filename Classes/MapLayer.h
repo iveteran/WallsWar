@@ -6,6 +6,7 @@
 
 #include "constants/MapConstants.h"
 #include "Direction.h"
+#include "Utils.h"
 
 #include <map>
 #include <string>
@@ -22,6 +23,8 @@ using YAxisBlock = std::map<int, Block*>;
 using XYAxisBlock = std::map<int, YAxisBlock>;
 using FloorXYAxisBlockMap = std::map<int, XYAxisBlock>;
 using CoordBlockMap = Map<Vec2, Block*>;
+
+using BlockPositionFilter = std::function<bool(const Vec2&)>;
 
 class MovableBlock;
 class Camp;
@@ -45,8 +48,13 @@ public:
 
     Player* getPlayer1() const;                       // 得到玩家1
     const std::string& getMapData();                // 得到地图数据
-    CoordBlockMap getAroundBlocks(const Block* block, int blockFloor,
+
+    CoordBlockMap getAroundBlocks(const Block* block, int blockFloor=NoneFloor,
             Direction dir=Direction::NONE);
+    CoordBlockMap getInsideSquareBlocks(const Vec2& origin, float sideLength,
+            const BlockTypeSet& btSet, const BlockPositionFilter& positionFilter, int floor=NoneFloor);
+    CoordBlockMap getInsideCircleBlocks(const Vec2& center, float radius,
+            const BlockTypeSet& btSet, int floor=NoneFloor);
 
     bool addAndManageBlock(Block* block);
     bool removeAndUnmanageBlock(Block* block);
@@ -86,6 +94,10 @@ private:
 
     void _getAroundBlocks(CoordBlockMap& posBlocks, const Block* block,
             const XYAxisBlock& xyAxisBlock, Direction dir=Direction::NONE);
+    void _getInsideSquareBlocks(CoordBlockMap& posBlocks,/* output */
+        const Vec2& origin, float sideLength, const BlockTypeSet& btSet,
+        const BlockPositionFilter& positionFilter,
+        const XYAxisBlock& xyAxisBlock);
 
     void initSpriteFrameCache();                   // 加载精灵帧缓存
 

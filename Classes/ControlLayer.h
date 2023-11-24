@@ -10,6 +10,7 @@ using namespace cocos2d::ui;
 //class Joypad;
 class Joypad2;
 class KbdController;
+class ZoomOutMap;
 class Player;
 class Settings;
 class StatusBar;
@@ -40,6 +41,7 @@ private:
     //Joypad* _joypad = nullptr;
     Joypad2* _joypad2 = nullptr;
     KbdController* _kbd_ctrler = nullptr;
+    ZoomOutMap* _zoomOutMap = nullptr;
 
     Layout* _layout = nullptr;
 
