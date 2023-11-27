@@ -13,11 +13,14 @@ static const float defaultRadius = 30.0f;
 static const Color4B defaultStartColor = Color4B(51, 51, 51, 128);  // near gray
 static const Color4B defaultEndColor = Color4B(0, 0, 0, 0);
 static const float defaultExpand = 1.0;
+static const float defaultIconScale = 0.3f;
+static const float masterIconScale = 0.5f;
+static const float campusIconScale = 0.5f;
 
 ZoomOutEntity* ZoomOutEntity::Master(const Vec2& pos) {
     auto entity = ZoomOutEntity::create("images/zoomout-entity-master.png", pos);
     entity->setType(EntityType::MASTER);
-    entity->setScale(0.5); // master scale is 0.5
+    entity->setScale(masterIconScale); // master scale is 0.5
     return entity;
 }
 
@@ -36,7 +39,7 @@ ZoomOutEntity* ZoomOutEntity::GuestCampus(const Vec2& pos) {
 ZoomOutEntity* ZoomOutEntity::CampusWithIcon(const Vec2& pos, const char* icon) {
     auto entity = ZoomOutEntity::create(icon, pos);
     entity->setType(EntityType::CAMPUS);
-    entity->setScale(0.5); // campus scale is 0.5
+    entity->setScale(campusIconScale); // campus scale is 0.5
     return entity;
 }
 
@@ -61,7 +64,7 @@ bool ZoomOutEntity::init(const char* img, const Vec2& pos) {
     if (!Button::init(img)) {
         return false;
     }
-    setScale(0.3); // set default scale
+    setScale(defaultIconScale); // set default scale
     setPosition(pos);
 
     addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
