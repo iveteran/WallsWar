@@ -39,6 +39,8 @@ public:
     bool init() override;
     BlockType getType() const override { return BlockType::PLAYER; }
 
+    const char* getAvatar() const;
+
     virtual void playAnimate() override;                         // 播放移动动画
     virtual void playFallingAnimate() override;
     virtual void stopAnimate() override;                         // 停止播放动画
@@ -63,6 +65,7 @@ public:
 
     void joinCamp(Camp* camp);
     void exitCamp();
+    bool hasTeammates() const;
 
     void setEnemyCamp(Camp* camp) { _enemyCamp = camp; setInitialDirection(); }
     Camp* getEnemyCamp() const { return _enemyCamp; }

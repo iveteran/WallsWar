@@ -1,11 +1,12 @@
 #include "ControlLayer.h"
-//#include "Joypad.h"
 #include "Joypad2.h"
 #include "KbdController.h"
 #include "Settings.h"
 #include "StatusBar.h"
 #include "MessagesBox.h"
 #include "ZoomOutMap.h"
+#include "TeammatesPanel.h"
+#include "Player.h"
 #include "TranslateText.h"
 
 #include "ui/CocosGUI.h"
@@ -16,15 +17,58 @@
 
 USING_NS_CC;
 
+static bool _tmOpAdding = true;
+static std::queue<int> _playerIdList;
+
 void addDemoNotices(ControlLayer* cl) {
     cl->addNotice("hello world", NoticeLevel::WARNING);
     cl->addNotice("hi guys", NoticeLevel::INFO);
+}
+
+void addDemoTeammates(TeammatesPanel* tp) {
+    for (int i=0; i< 2; i++) {
+        auto testPlayer = Player::create();
+        _playerIdList.push(testPlayer->id());
+        tp->addTeammate(testPlayer);
+    }
+}
+
+void addAndRemoveDemoTeammates(TeammatesPanel* tp) {
+    if (!tp) {
+        return;
+    }
+    if (_playerIdList.empty()) {
+        _tmOpAdding = true;
+    } else if (_playerIdList.size() >= 6) {
+        _tmOpAdding = false;
+    }
+    if (_tmOpAdding) {
+        auto testPlayer = Player::create();
+        _playerIdList.push(testPlayer->id());
+        tp->addTeammate(testPlayer);
+    } else {
+        int playerId = _playerIdList.front();
+        _playerIdList.pop();
+        tp->removeTeammate(playerId);
+    }
+}
+
+bool ControlLayer::onTouchBegan(Touch* touch, Event* event) {
+    //printf(">> ControlLayer touch began\n");
+
+    addAndRemoveDemoTeammates(_teammatesPanel);
+
+    return true;
 }
 
 bool ControlLayer::init() {
     if (!Layer::init()) {
         return false;
     }
+
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan = CC_CALLBACK_2(ControlLayer::onTouchBegan, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     _layout = Layout::create();
     _layout->setContentSize(getContentSize());
@@ -44,22 +88,34 @@ bool ControlLayer::init() {
     _zoomOutMap = ZoomOutMap::create();
     _layout->addChild(_zoomOutMap);
 
+    /*
+    auto rectNode = DrawNode::create();
+    Vec2 rectangle[4];
+    rectangle[0] = Vec2(0.0f, 0.0f);
+    rectangle[1] = Vec2(clipper->getContentSize().width, 0.0f);
+    rectangle[2] = Vec2(clipper->getContentSize().width, clipper->getContentSize().height);
+    rectangle[3] = Vec2(0.0f, clipper->getContentSize().height);
+    Color4F white(1, 1, 1, 1);
+    rectNode->drawPolygon(rectangle, 4, white, 1, white);
+    _layout->addChild(rectNode);
+    */
+
     addDemoNotices(this);
 
     return true;
 }
 
 void ControlLayer::attachPlayer(Player* player) {
-    //_player = player;
+    _player = player;
     _joypad2->attachPlayer(player);
     _kbd_ctrler->attachPlayer(player);
     _zoomOutMap->attachPlayer(player);
-}
 
-//void ControlLayer::_addJoypad() {
-//    _joypad = Joypad::getInstance();
-//    this->addChild(_joypad);
-//}
+    if (player->hasTeammates()) {
+        _addTeammatesPanel();
+        addDemoTeammates(_teammatesPanel);
+    }
+}
 
 void ControlLayer::_addJoypad2() {
     _joypad2 = Joypad2::create();
@@ -131,4 +187,10 @@ void ControlLayer::_onNoticeRemoved(const NoticeItem* noticeItem) {
         removeChild(_noticeBar);
         _noticeBar = nullptr;
     }
+}
+
+void ControlLayer::_addTeammatesPanel() {
+    _teammatesPanel = TeammatesPanel::create();
+    _teammatesPanel->initWithPlayer(_player);
+    _layout->addChild(_teammatesPanel);
 }

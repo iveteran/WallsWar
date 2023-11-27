@@ -142,6 +142,14 @@ void Player::_loadFrameAnimation(const char* imgPath, const char* namePrefix) {
     }
 }
 
+const char* Player::getAvatar() const {
+    if (_isHost) {
+        return "images/yuu-avatar.jpg";
+    } else {
+        return "images/game-manager.png";
+    }
+}
+
 bool Player::init() {
     if (!Gamer::init()) {
         return false;
@@ -546,6 +554,11 @@ void Player::exitCamp() {
         _joinedCamp->removePlayer(this);
         _joinedCamp = nullptr;
     }
+}
+
+bool Player::hasTeammates() const {
+    //return _joinedCamp && _joinedCamp->count() > 1;
+    return true; // just for test
 }
 
 void Player::onBeCollided(Block* activeBlock) {

@@ -26,6 +26,7 @@ public:
 
     Map<int64_t, Player*> getPlayers() const { return _players; }
     Player* getManager() const { return _manager; }
+    int count() const { return _players.size(); }
 
 protected:
     Map<int64_t, Player*> _players;

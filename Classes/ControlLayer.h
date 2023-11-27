@@ -7,10 +7,10 @@ namespace cocos2d::ui {
 }
 using namespace cocos2d::ui;
 
-//class Joypad;
 class Joypad2;
 class KbdController;
 class ZoomOutMap;
+class TeammatesPanel;
 class Player;
 class Settings;
 class StatusBar;
@@ -29,6 +29,7 @@ public:
 protected:
     void _addJoypad2();
     void _addKbdController();
+    void _addTeammatesPanel();
 
     void _toggleSettingsDailog();
     void _onCloseSettingsDailog(PopupLayer* dialog);
@@ -37,8 +38,10 @@ protected:
     void _makeSureMessagesBoxCreated();
     void _onNoticeRemoved(const NoticeItem* noticeItem);
 
+    virtual bool onTouchBegan(Touch* touch, Event* event);
+
 private:
-    //Joypad* _joypad = nullptr;
+    Player* _player = nullptr;
     Joypad2* _joypad2 = nullptr;
     KbdController* _kbd_ctrler = nullptr;
     ZoomOutMap* _zoomOutMap = nullptr;
@@ -48,4 +51,5 @@ private:
     Settings* _settingsDialog = nullptr;
     MessagesBox* _messagesBox = nullptr;
     NoticeBar* _noticeBar = nullptr;
+    TeammatesPanel* _teammatesPanel = nullptr;
 };
