@@ -23,7 +23,7 @@ bool ToggleButton::init(const string& onButtonImage, const string& offButtonImag
         const cbToggleButtonClicked& toggleOnCallback, const cbToggleButtonClicked& toggleOffCallback,
         bool isOn) {
 
-    if (!Widget::init()) {
+    if (!Button::init()) {
         return false;
     }
 
