@@ -36,6 +36,7 @@ public:
     static constexpr float BRICK_SIZE = Block::SIZE / 2;
 
     static const int DefaultFloor = 0;
+    static const constexpr char* UIIcon = "images/block-icon-brick-wall.png";
 
     CREATE_FUNC(BlockWall);
     static void initSpriteFrameCache();
@@ -58,6 +59,7 @@ private:
 class BlockStone : public ImmovableBlock {
 public:
     static const int DefaultFloor = 0;
+    static const constexpr char* UIIcon = "images/block-icon-stone-wall.png";
 
     CREATE_FUNC(BlockStone);
     static void initSpriteFrameCache();
@@ -72,6 +74,7 @@ public:
 class BlockForest : public ImmovableBlock {
 public:
     static const int DefaultFloor = 9;
+    static const constexpr char* UIIcon = "images/block-icon-forest.png";
 
     CREATE_FUNC(BlockForest);
     static void initSpriteFrameCache();
@@ -84,6 +87,7 @@ public:
 class BlockBridge : public ImmovableBlock {
 public:
     static const int DefaultFloor = 0;
+    static const constexpr char* UIIcon = "images/block-icon-bridge.png";
 
     CREATE_FUNC(BlockBridge);
     static void initSpriteFrameCache();
@@ -96,6 +100,7 @@ public:
 class BlockCloud : public ImmovableBlock {
 public:
     static const int DefaultFloor = 99;
+    static const constexpr char* UIIcon = "images/block-icon-cloud.png";
 
     CREATE_FUNC(BlockCloud);
     static void initSpriteFrameCache();
@@ -108,6 +113,7 @@ public:
 class BlockIce : public ImmovableBlock {
 public:
     static const int DefaultFloor = 0;
+    static const constexpr char* UIIcon = "images/block-icon-ice.png";
 
     CREATE_FUNC(BlockIce);
     static void initSpriteFrameCache();
@@ -120,6 +126,7 @@ public:
 class BlockTrench : public ImmovableBlock {
 public:
     static const int DefaultFloor = -1;
+    static const constexpr char* UIIcon = "images/block-icon-trench.png";
 
     CREATE_FUNC(BlockTrench);
     static void initSpriteFrameCache();
@@ -132,6 +139,7 @@ public:
 class BlockRiver : public ImmovableBlock {
 public:
     static const int DefaultFloor = -1;
+    static const constexpr char* UIIcon = "images/block-icon-river.png";
 
     CREATE_FUNC(BlockRiver);
     static void initSpriteFrameCache();
@@ -140,3 +148,16 @@ public:
     bool init() override;
     BlockType getType() const override { return BlockType::RIVER; }
 };
+
+//class BlockBarrier : public ImmovableBlock {
+//public:
+//    static const int DefaultFloor = -1;
+//    static const constexpr char* UIIcon = "images/block-icon-barrier.png";
+//
+//    CREATE_FUNC(BlockBarrier);
+//    static void initSpriteFrameCache();
+//
+//public:
+//    bool init() override;
+//    BlockType getType() const override { return BlockType::BARRIER; }
+//};

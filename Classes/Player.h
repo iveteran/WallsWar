@@ -91,7 +91,8 @@ public:
     bool createBlock2();
     bool createBlock2(Direction dir);
     bool createBlock4();
-    void choiceCreatingBlockType(RRDirection rrd);
+    void scrollCreatingBlockType(RRDirection rrd);
+    void choiceCreatingBlockType(BlockType type);
 
     std::set<BlockType> getCollidingAbleBTs() const;
 

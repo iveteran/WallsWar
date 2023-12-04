@@ -5,6 +5,7 @@
 #include "StatusBar.h"
 #include "MessagesBox.h"
 #include "ZoomOutMap.h"
+#include "BlockSelector.h"
 #include "TeammatesPanel.h"
 #include "Player.h"
 #include "TranslateText.h"
@@ -88,17 +89,8 @@ bool ControlLayer::init() {
     _zoomOutMap = ZoomOutMap::create();
     _layout->addChild(_zoomOutMap);
 
-    /*
-    auto rectNode = DrawNode::create();
-    Vec2 rectangle[4];
-    rectangle[0] = Vec2(0.0f, 0.0f);
-    rectangle[1] = Vec2(clipper->getContentSize().width, 0.0f);
-    rectangle[2] = Vec2(clipper->getContentSize().width, clipper->getContentSize().height);
-    rectangle[3] = Vec2(0.0f, clipper->getContentSize().height);
-    Color4F white(1, 1, 1, 1);
-    rectNode->drawPolygon(rectangle, 4, white, 1, white);
-    _layout->addChild(rectNode);
-    */
+    _blockSelector = BlockSelector::create();
+    _layout->addChild(_blockSelector);
 
     addDemoNotices(this);
 
@@ -110,6 +102,7 @@ void ControlLayer::attachPlayer(Player* player) {
     _joypad2->attachPlayer(player);
     _kbd_ctrler->attachPlayer(player);
     _zoomOutMap->attachPlayer(player);
+    _blockSelector->attachPlayer(player);
 
     if (player->hasTeammates()) {
         _addTeammatesPanel();
@@ -125,7 +118,33 @@ void ControlLayer::_addJoypad2() {
 
 void ControlLayer::_addKbdController() {
     _kbd_ctrler = KbdController::create();
+    _kbd_ctrler->setEventCallback(CC_CALLBACK_1(ControlLayer::_onKbdEvent, this));
+    //_kbd_ctrler->setEventCallback(std::bind(&ControlLayer::_onKbdEvent, this, std::placeholders::_1));  // same as above
     this->addChild(_kbd_ctrler);
+}
+
+void ControlLayer::_onKbdEvent(KbdEvent event) {
+    if (_blockSelector) {
+        switch (event) {
+            case KbdEvent::PageUp:
+                _blockSelector->scrollUp();
+                break;
+            case KbdEvent::PageDown:
+                _blockSelector->scrollDown();
+                break;
+            case KbdEvent::PressC:
+                _blockSelector->switchTo1X();
+                break;
+            case KbdEvent::PressV:
+                _blockSelector->switchTo2X();
+                break;
+            case KbdEvent::PressX:
+                _blockSelector->switchTo4X();
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void ControlLayer::_toggleSettingsDailog() {

@@ -12,6 +12,7 @@ bool isCampus(BlockType btype);
 class Campus : public ImmovableBlock {
 public:
     static constexpr float SIZE = Block::SIZE * 2;
+    static const constexpr char* UIIcon = "images/block-icon-campus.png";
 
     static void initSpriteFrameCache();
     CREATE_FUNC(Campus);

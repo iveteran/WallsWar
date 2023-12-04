@@ -5,6 +5,7 @@
 class Camp : public Campus {
 public:
     static constexpr float SIZE = Campus::SIZE;
+    static const constexpr char* UIIcon = "images/block-icon-camp.png";
 
     static void initSpriteFrameCache();
     CREATE_FUNC(Camp);

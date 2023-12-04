@@ -1,6 +1,7 @@
 #include "cocos2d.h"
 
 #include "NoticeBar.h"
+#include "KbdController.h"
 
 namespace cocos2d::ui {
     class Layout;
@@ -10,6 +11,7 @@ using namespace cocos2d::ui;
 class Joypad2;
 class KbdController;
 class ZoomOutMap;
+class BlockSelector;
 class TeammatesPanel;
 class Player;
 class Settings;
@@ -31,6 +33,7 @@ protected:
     void _addKbdController();
     void _addTeammatesPanel();
 
+    void _onKbdEvent(KbdEvent event);
     void _toggleSettingsDailog();
     void _onCloseSettingsDailog(PopupLayer* dialog);
     void _toggleMessagesBox();
@@ -45,6 +48,7 @@ private:
     Joypad2* _joypad2 = nullptr;
     KbdController* _kbd_ctrler = nullptr;
     ZoomOutMap* _zoomOutMap = nullptr;
+    BlockSelector* _blockSelector = nullptr;
 
     Layout* _layout = nullptr;
 

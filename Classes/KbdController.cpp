@@ -53,20 +53,35 @@ bool KbdController::init()
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_C:
             _player->createBlock1();
+            if (_eventCallback) {
+                _eventCallback(KbdEvent::PressC);
+            }
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_V:
             _player->createBlock2();
+            if (_eventCallback) {
+                _eventCallback(KbdEvent::PressV);
+            }
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_X:
             _player->createBlock4();
+            if (_eventCallback) {
+                _eventCallback(KbdEvent::PressX);
+            }
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_LESS_THAN:
         case cocos2d::EventKeyboard::KeyCode::KEY_PG_DOWN:
-            _player->choiceCreatingBlockType(RRDirection::BACKWARD);
+            _player->scrollCreatingBlockType(RRDirection::BACKWARD);
+            if (_eventCallback) {
+                _eventCallback(KbdEvent::PageDown);
+            }
             break;
         case cocos2d::EventKeyboard::KeyCode::KEY_GREATER_THAN:
         case cocos2d::EventKeyboard::KeyCode::KEY_PG_UP:
-            _player->choiceCreatingBlockType(RRDirection::FORWARD);
+            _player->scrollCreatingBlockType(RRDirection::FORWARD);
+            if (_eventCallback) {
+                _eventCallback(KbdEvent::PageUp);
+            }
             break;
         default:
             break;

@@ -169,7 +169,7 @@ bool Player::createBlock4() {
     return success;
 }
 
-void Player::choiceCreatingBlockType(RRDirection rrd) {
+void Player::scrollCreatingBlockType(RRDirection rrd) {
     int beginIndex = (int)BlockType::UNDEFINED;
     int endIndex = (int)BlockType::IMMOVABLE_BLOCK;
     if (rrd == RRDirection::FORWARD) {
@@ -185,5 +185,10 @@ void Player::choiceCreatingBlockType(RRDirection rrd) {
             _creatingBlock = endIndex - 1;
         }
     }
-    CCLOG(">> [Player::choiceCreatingBlockType] switch to type: %d", _creatingBlock);
+    CCLOG(">> [Player::scrollCreatingBlockType] switch to type: %d", _creatingBlock);
+}
+
+void Player::choiceCreatingBlockType(BlockType type) {
+    _creatingBlock = (int)type;
+    CCLOG(">> [Player::choiceCreatingBlockType] choice creating block: %d", _creatingBlock);
 }
