@@ -243,7 +243,7 @@ MapLayer::getInsideCircleBlocks(const Vec2& center, float radius,
         const BlockTypeSet& btSet, int floor) {
     auto origin = Vec2(center.x - radius, center.y - radius);
     float sideLength = radius * 2;
-    auto posInCircleFilter = std::bind(isPointInCirle, center, radius, std::placeholders::_1);
+    auto posInCircleFilter = std::bind(isPointInCircle, center, radius, std::placeholders::_1);
     return getInsideSquareBlocks(origin, sideLength, btSet, posInCircleFilter, floor);
 }
 

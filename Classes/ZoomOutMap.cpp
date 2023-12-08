@@ -133,7 +133,7 @@ void ZoomOutMap::addCampus() {
     auto playerPos = _player->getPosition();
     auto campusPos = _player->getCamp()->getPosition();
     auto zoomOutPos = (campusPos - playerPos) * (_radius / _scanningRadius) + Vec2(_radius, _radius);
-    if (isPointInCirle(_center, _radius, zoomOutPos)) {
+    if (isPointInCircle(_center, _radius, zoomOutPos)) {
         zoEntity = ZoomOutEntity::Campus(zoomOutPos);
     } else {
         // calculate the point at cicle edge nearest from campus position

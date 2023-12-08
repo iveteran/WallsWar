@@ -2,7 +2,7 @@
 
 static const double PI = 3.141592654;
 
-bool isPointInCirle(const Vec2& center, float radius, const Vec2& point) {
+bool isPointInCircle(const Vec2& center, float radius, const Vec2& point) {
 	float x = point.x - center.x;
 	float y = point.y - center.y;
 	float distance = sqrt(pow(x, 2) + pow(y, 2));
