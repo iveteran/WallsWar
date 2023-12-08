@@ -4,6 +4,9 @@
 
 const double PI = 3.141592654;
 
+std::tuple<Point, Point>
+getTouchPointPair(const std::vector<Touch*>& touches);
+
 bool Joypad2::init()
 {
     if (!Layer::init())
@@ -50,22 +53,8 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
 {
 //    CCLOG("onTouchBegan");
     // 某一时刻可能是一个或两个触点
-    Point point1 = touches.front()->getLocation();
-    Point point2 = touches.back()->getLocation();
-
-    // 区分左右触点，可能是同一个
-    Point left_point;
-    Point right_point;
-    if (point1.x < point2.x)
-    {
-        left_point = point1;
-        right_point = point2;
-    }
-    else
-    {
-        left_point = point2;
-        right_point = point1;
-    }
+    Point left_point, right_point;
+    std::tie(left_point, right_point) = getTouchPointPair(touches);
 
     // 左触点在圈内才能移动
     if (m_wheel->getBoundingBox().containsPoint(left_point))
@@ -94,27 +83,12 @@ void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     Size visible_size = Director::getInstance()->getVisibleSize();
 
-    // 某一时刻可能是一个或两个触点
-    Point point1 = touches.front()->getLocation();
-    Point point2 = touches.back()->getLocation();
+    // 区分左右触点，可能是同一个
+    Point left_point, right_point;
+    std::tie(left_point, right_point) = getTouchPointPair(touches);
 
     Point wheel_center = m_wheel->getPosition();
     float wheel_radius = m_wheel->getContentSize().width / 2;
-//    float stick_radius = m_stick->getContentSize().width / 2;
-
-    // 区分左右触点，可能是同一个
-    Point left_point;
-    Point right_point;
-    if (point1.x < point2.x)
-    {
-        left_point = point1;
-        right_point = point2;
-    }
-    else
-    {
-        left_point = point2;
-        right_point = point1;
-    }
 
     // 只有左触点在左半边屏才判断摇杆
     if (left_point.x < visible_origin.x + visible_size.width / 2)
@@ -181,23 +155,9 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     Point visible_origin = Director::getInstance()->getVisibleOrigin();
     Size visible_size = Director::getInstance()->getVisibleSize();
 
-    // 某一时刻可能是一个或两个触点
-    Point point1 = touches.front()->getLocation();
-    Point point2 = touches.back()->getLocation();
-
     // 区分左右触点，可能是同一个
-    Point left_point;
-    Point right_point;
-    if (point1.x < point2.x)
-    {
-        left_point = point1;
-        right_point = point2;
-    }
-    else
-    {
-        left_point = point2;
-        right_point = point1;
-    }
+    Point left_point, right_point;
+    std::tie(left_point, right_point) = getTouchPointPair(touches);
 
     // 左触点松开
     if (left_point.x < visible_origin.x + visible_size.width / 2)
@@ -236,4 +196,24 @@ void Joypad2::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
         //    CCLOG("[WARNING] the joypad does not attach player");
         //}
     }
+}
+
+std::tuple<Point, Point>
+getTouchPointPair(const std::vector<Touch*>& touches) {
+
+    // 某一时刻可能是一个或两个触点
+    Point point1 = touches.front()->getLocation();
+    Point point2 = touches.back()->getLocation();
+
+    // 区分左右触点，可能是同一个
+    Point left_point, right_point;
+    if (point1.x < point2.x) {
+        left_point = point1;
+        right_point = point2;
+    } else {
+        left_point = point2;
+        right_point = point1;
+    }
+
+    return std::make_tuple(left_point, right_point);
 }
