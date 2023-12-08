@@ -46,9 +46,6 @@ protected:
     void onTouchesMoved(const std::vector<Touch*>& touches, Event* event);
     void onTouchesEnded(const std::vector<Touch*>& touches, Event* event);
 
-    float calcRad(Point p1, Point p2);
-    Vec2 getAnglePosition(float R, float rad);
-
 private:
     Sprite* m_wheel = nullptr;
     Sprite* m_stick = nullptr;
