@@ -9,6 +9,10 @@ bool isPointInCircle(const Vec2& center, float radius, const Vec2& point) {
 	return distance <= radius;
 }
 
+bool isPointInRing(const Vec2& center, float outerRadius, float innerRadius, const Vec2& point) {
+    return isPointInCircle(center, outerRadius, point) && !isPointInCircle(center, innerRadius, point);
+}
+
 // 获取以p1为圆心，p2p1与x轴正方向的弧度值
 float calcRad(const Point& p1, const Point& p2) {
     float xx = p2.x - p1.x;
@@ -25,4 +29,36 @@ float calcRad(const Point& p1, const Point& p2) {
 // 得到与角度对应的半径为R的圆上一坐标点, 相对值
 Vec2 getAnglePosition(float R, float rad) {
     return Point(R * cos(rad), R * sin(rad));
+}
+
+float calculateAgreeOfTwoPoints(const Vec2& prevPoint, const Vec2& currPoint) {
+    float x1 = currPoint.x;
+    float y1 = currPoint.y;
+    float x2 = prevPoint.x;
+    float y2 = prevPoint.y;
+
+    float mo = std::sqrt(x1 * x1 + y1 * y1) * std::sqrt(x2 * x2 + y2 * y2);
+    if (mo == 0) {
+        return 0.f;
+    }
+    float ji = x1 * x2 + y1 * y2;
+    float agree = std::acos(ji / mo) / PI * 180.0;
+    return agree;
+}
+
+// result is 0(equal), 1(large than) or -1(less than)
+int compareTwoPointsAgree(const Vec2& p1, const Vec2& p2) {
+    Vec2 xAxis(1, 0); // x轴，正向
+    if (p2.y < 0) {
+        xAxis.x *= -1; // 负向
+    }
+    float agree1 = calculateAgreeOfTwoPoints(p1, xAxis);
+    float agree2 = calculateAgreeOfTwoPoints(p2, xAxis);
+    return agree1 == agree2 ? 0 : (agree1 > agree2 ? 1 : -1);
+}
+
+float floatModInt(float v1, int v2) {
+    int mod = (int)v1 % v2;
+    float decimalPart = v1 - (int)v1;
+    return mod + decimalPart;
 }

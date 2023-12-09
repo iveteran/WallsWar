@@ -30,6 +30,7 @@ enum class JoyDirection
 };
 
 class Player;
+class WeaponWheel;
 
 // 虚拟手柄控制层
 class Joypad2 : public Layer
@@ -39,7 +40,7 @@ public:
     virtual bool init();
 
     void setJoystickType(JoystickType joystick_type);
-    void attachPlayer(Player* player) { _player = player; }
+    void attachPlayer(Player* player);
 
 protected:
     void onTouchesBegan(const std::vector<Touch*>& touches, Event* event);
@@ -49,7 +50,8 @@ protected:
 private:
     Sprite* m_wheel = nullptr;
     Sprite* m_stick = nullptr;
-    Sprite* m_attack = nullptr;
+    //Sprite* m_attack = nullptr;
+    WeaponWheel* _weaponWheel = nullptr;
 
     JoystickType m_type;
     bool m_can_move;

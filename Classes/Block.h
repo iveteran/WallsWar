@@ -28,6 +28,13 @@ enum class BlockType {
     MANAGER,        // game manager
     WEAPON,
     BULLET,
+    BOMB,
+    SMOKE_BOMB,
+    FLASH_BOMB,
+    FIRE_BOMB,
+    LANDMINE,
+    AXE,
+    SPADE,
     ITEM,
     MAP_BORDER,     // MAP_BORDER, 地图边界
     ALL,            // 全部

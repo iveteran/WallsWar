@@ -1,4 +1,5 @@
 #include "Joypad2.h"
+#include "WeaponWheel.h"
 #include "Utils.h"
 #include "Player.h"
 
@@ -28,11 +29,42 @@ bool Joypad2::init()
     m_stick->setPosition(m_wheel->getPosition());
     addChild(m_stick);
 
+    // 武器发射轮
+    _weaponWheel = WeaponWheel::create();
+    _weaponWheel->setPosition(Vec2(getContentSize().width - 50, 50));
+    addChild(_weaponWheel);
+
+#if 0
     // 开火键
     m_attack = Sprite::create("images/joypad/attack_alpha.png"); // alpha 70%
-    m_attack->setScale(0.7);
+    m_attack->setScale(0.65);
     m_attack->setPosition(getContentSize().width - 50, 50);
     addChild(m_attack);
+#endif
+
+#if 0
+    // 开火键
+    auto _attack = Button::create("images/joypad/shoot.png");
+    _attack->setScale(0.3);
+    _attack->setPosition(Vec2(getContentSize().width - 50, 50));
+    addChild(_attack);
+    _attack->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
+        switch (type)
+        {
+        case Widget::TouchEventType::BEGAN:
+            break;
+        case Widget::TouchEventType::ENDED:
+            if (_player != nullptr) {
+                _player->shoot();
+            } else {
+                CCLOG("[WARNING] the joypad does not attach player");
+            }
+            break;
+        default:
+            break;
+        }
+    });
+#endif
 
     // 触摸监听,多点触控
     auto touch_listener = EventListenerTouchAllAtOnce::create();
@@ -49,6 +81,11 @@ void Joypad2::setJoystickType(JoystickType joystick_type)
     m_type = joystick_type;
 }
 
+void Joypad2::attachPlayer(Player* player) {
+    _player = player;
+    _weaponWheel->attachPlayer(player);
+}
+
 void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
 {
 //    CCLOG("onTouchBegan");
@@ -60,6 +97,7 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
     if (m_wheel->getBoundingBox().containsPoint(left_point))
         m_can_move = true;
 
+#if 0
     // 右触点开火
     if (m_attack->getBoundingBox().containsPoint(right_point))
     {
@@ -71,6 +109,7 @@ void Joypad2::onTouchesBegan(const std::vector<Touch*>& touches, Event* event)
             CCLOG("[WARNING] the joypad does not attach player");
         }
     }
+#endif
 }
 
 void Joypad2::onTouchesMoved(const std::vector<Touch*>& touches, Event* event)
