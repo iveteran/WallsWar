@@ -10,6 +10,7 @@ static int defaultFontSize = 14;
 static const Color4B defaultFontColor = Color4B(200, 200, 200, 128);  // near gray
 static const float defaultRadius = 30.0f;
 static const float defaultIconScale = 0.3f;
+static const float defaultIconScale2 = 0.7f;
 static const int AGREE_OF_ONE_UNIT = 45;
 static const float AGREE_OF_HALF_UNIT = 22.5;
 
@@ -67,7 +68,7 @@ bool WeaponEmitter::init(BlockType type, const char* icon, int slot) {
     _type = type;
     _slot = slot;
     _btn = Button::create(icon);
-    _btn->setScale(0.7);
+    _btn->setScale(defaultIconScale2);
     _btn->setPosition(getContentSize() / 2);
     addChild(_btn);
     _btn->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
@@ -174,7 +175,7 @@ bool WeaponWheel::init() {
 
     // 开火键
     auto attack = Button::create("images/joypad/shoot.png");
-    attack->setScale(0.3);
+    attack->setScale(defaultIconScale);
     attack->setPosition(getContentSize() / 2);
     addChild(attack);
     attack->addTouchEventListener([&](Ref* sender, Widget::TouchEventType type) {
