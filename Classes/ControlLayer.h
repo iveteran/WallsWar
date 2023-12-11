@@ -13,6 +13,7 @@ class KbdController;
 class ZoomOutMap;
 class BlockSelector;
 class TeammatesPanel;
+class MultiBagsPanel;
 class Player;
 class Settings;
 class StatusBar;
@@ -56,4 +57,5 @@ private:
     MessagesBox* _messagesBox = nullptr;
     NoticeBar* _noticeBar = nullptr;
     TeammatesPanel* _teammatesPanel = nullptr;
+    MultiBagsPanel* _bagsPanel = nullptr;
 };

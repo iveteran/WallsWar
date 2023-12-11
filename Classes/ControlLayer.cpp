@@ -7,6 +7,7 @@
 #include "ZoomOutMap.h"
 #include "BlockSelector.h"
 #include "TeammatesPanel.h"
+#include "BagsPanel.h"
 #include "Player.h"
 #include "TranslateText.h"
 
@@ -20,6 +21,10 @@ USING_NS_CC;
 
 static bool _tmOpAdding = true;
 static std::queue<int> _playerIdList;
+
+static bool isAddItem = true;
+static int gunpowderItemId = 0;
+static int adCardItemId = 0;
 
 void addDemoNotices(ControlLayer* cl) {
     cl->addNotice("hello world", NoticeLevel::WARNING);
@@ -54,10 +59,60 @@ void addAndRemoveDemoTeammates(TeammatesPanel* tp) {
     }
 }
 
+void addDemoItems(MultiBagsPanel* bagsPanel) {
+
+    auto soil = Soil::create();
+    bagsPanel->addItem(soil);
+    auto soil2 = Soil::create();
+    bagsPanel->addItem(soil2);
+
+    auto wood = Wood::create();
+    bagsPanel->addItem(wood);
+
+    auto iron = Iron::create();
+    bagsPanel->addItem(iron);
+
+    auto mineral = Mineral::create();
+    bagsPanel->addItem(mineral);
+
+    //auto gunpowder = Gunpowder::create();
+    //bagsPanel->addItem(gunpowder);
+
+    //auto adItem = AdCard::create();
+    //bagsPanel->addItem(adItem);
+}
+
+void addAndRemoveDemoItems(MultiBagsPanel* bagsPanel) {
+    if (isAddItem) {
+        auto gunpowder = Gunpowder::create();
+        bagsPanel->addItem(gunpowder);
+        gunpowderItemId = gunpowder->id();
+
+        auto adItem = AdCard::create();
+        bagsPanel->addItem(adItem);
+        adCardItemId = adItem->id();
+
+        isAddItem = false;
+    } else {
+        bagsPanel->dropItem(gunpowderItemId);
+        gunpowderItemId = 0;
+
+        bagsPanel->dropItem(adCardItemId);
+        adCardItemId = 0;
+
+        isAddItem = true;
+    }
+
+    // always adding
+    auto iron = Iron::create();
+    bagsPanel->addItem(iron);
+}
+
 bool ControlLayer::onTouchBegan(Touch* touch, Event* event) {
     //printf(">> ControlLayer touch began\n");
 
     addAndRemoveDemoTeammates(_teammatesPanel);
+    addAndRemoveDemoItems(_bagsPanel);
 
     return true;
 }
@@ -92,7 +147,14 @@ bool ControlLayer::init() {
     _blockSelector = BlockSelector::create();
     _layout->addChild(_blockSelector);
 
+    _bagsPanel = MultiBagsPanel::create();
+    _layout->addChild(_bagsPanel);
+
+    // just for test
     addDemoNotices(this);
+
+    // just for test
+    addDemoItems(_bagsPanel);
 
     return true;
 }
@@ -106,6 +168,7 @@ void ControlLayer::attachPlayer(Player* player) {
 
     if (player->hasTeammates()) {
         _addTeammatesPanel();
+        // just for test
         addDemoTeammates(_teammatesPanel);
     }
 }
