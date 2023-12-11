@@ -3,7 +3,6 @@
 #include "AudioEngine.h"
 #include "CCEventListener.h"
 
-#include "constants/AppConstants.h"
 #include "constants/SceneConstants.h"
 #include "constants/PlayerConstants.h"
 
@@ -130,7 +129,8 @@ void MenuScene::_initBackground() {
 void MenuScene::_initSelector() {
     _selector = Sprite::create("images/m0-2-1.png");
     _selector->getTexture()->setAliasTexParameters();
-    _selector->setPosition(ARROWS_X, WINDOW_HEIGHT - ARROWS_Y);
+    float windowHeight = Director::getInstance()->getOpenGLView()->getDesignResolutionSize().height;
+    _selector->setPosition(ARROWS_X, windowHeight - ARROWS_Y);
 
     // 循环播放动画
     auto animate = _getAnimFrames();
