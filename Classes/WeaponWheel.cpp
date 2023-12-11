@@ -154,6 +154,7 @@ bool WeaponWheel::init() {
     if (!Widget::init()) {
         return false;
     }
+    setName("weapon_wheel");
     setContentSize(Size(defaultRadius, defaultRadius) * 2);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();

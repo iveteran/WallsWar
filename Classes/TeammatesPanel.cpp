@@ -139,6 +139,8 @@ void TeammatesPanel::addTeammate(Player* player, int index) {
         _teammateViews->insertCustomItem(teammate, index);
     } else {
         _teammateViews->pushBackCustomItem(teammate);
+        _teammateViews->doLayout();
+
         //float delaySec = count();
         float delaySec = 1.0f;
         _teammateViews->scrollToRight(delaySec, false);
