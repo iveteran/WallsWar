@@ -42,6 +42,7 @@ static cocos2d::Size smallResolutionSize = cocos2d::Size(480, 320);
 static cocos2d::Size mediumResolutionSize = cocos2d::Size(1280, 768);
 static cocos2d::Size largeResolutionSize = cocos2d::Size(2048, 1536);
 static cocos2d::Size designResolutionSize = smallResolutionSize;
+static const float frameZoomFactor = 3.0;
 
 AppDelegate::AppDelegate() {}
 
@@ -92,7 +93,12 @@ bool AppDelegate::applicationDidFinishLaunching() {
     glview->setIcon("images/icon-goe-40.png");
 
     // 模拟屏幕大小
-    glview->setFrameSize(1280, 768);
+#if 1
+    glview->setFrameZoomFactor(frameZoomFactor);
+    glview->alignToCenter();
+#else
+    glview->setFullscreen(0);
+#endif
 
     register_all_packages();
 
