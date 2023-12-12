@@ -663,6 +663,16 @@ void GLViewImpl::setFrameSize(float width, float height)
     updateFrameSize();
 }
 
+void GLViewImpl::alignToCenter() {
+    if (isFullscreen()) return;
+
+    int realW = 0, realH = 0;
+    glfwGetWindowSize(_mainWindow, &realW, &realH);
+
+    const auto monitorSize = getMonitorSize();
+    glfwSetWindowPos(_mainWindow, (monitorSize.width - realW * _frameZoomFactor) / 2, (monitorSize.height - realH * _frameZoomFactor) / 2);
+}
+
 void GLViewImpl::setViewPortInPoints(float x , float y , float w , float h)
 {
     Viewport vp;

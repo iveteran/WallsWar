@@ -88,6 +88,7 @@ public:
     void setWindowed(int width, int height);
     int getMonitorCount() const;
     Size getMonitorSize() const;
+    void alignToCenter();
 
     /* override functions */
     virtual bool isOpenGLReady() override;
