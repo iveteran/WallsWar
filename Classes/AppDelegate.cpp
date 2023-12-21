@@ -23,9 +23,7 @@
  ****************************************************************************/
 
 #include "AppDelegate.h"
-
-#include "MenuScene.h"
-#include "GameScene.h"
+#include "WelcomeScene.h"
 
 #define USE_AUDIO_ENGINE 1
 #define APP_NAME "TankBattle"
@@ -94,6 +92,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // 模拟屏幕大小
 #if 1
+    //glview->setFrameSize(1280, 768);
     glview->setFrameZoomFactor(frameZoomFactor);
     glview->alignToCenter();
 #else
@@ -103,7 +102,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     register_all_packages();
 
     // create a scene. it's an autorelease object
-    auto scene = MenuScene::createScene();
+    auto scene = WelcomeScene::create();
 
     // run
     director->runWithScene(scene);
