@@ -91,11 +91,11 @@ Layout* LocalNMGamesScene::buildScanningPanel(float width, float height) {
 
 void LocalNMGamesScene::onMyGamesButtonClicked(const UISceneTitlePanel* titlePanel) {
     printf("LocalNMGamesScene my games button clicked\n");
-    Director::getInstance()->pushScene(PlayerGamesScene::create(NetworkingMode::LOCAL));
+    Director::getInstance()->pushScene(PlayerGamesScene::create(NetworkingMode::LAN));
 }
 
 void LocalNMGamesScene::addDemoGameCard() {
-    auto gameCard = GameCard::createDemo();
+    auto gameCard = GameCard::createDemo(NetworkingMode::LAN, GameEndpoint::REMOTE);
     _gameCards->addCard(gameCard);
 }
 

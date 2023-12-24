@@ -37,7 +37,7 @@ bool OnlineNMGamesScene::init() {
     searchBar->setLayoutParameter(lpH->clone());
     layout->addChild(searchBar);
 
-    _gameCards = CardsView::create(winSize.width, winSize.height * 0.7);
+    _gameCards = CardsView::create(winSize.width, winSize.height - (UISceneTitlePanel::HEIGHT + SearchBar::HEIGHT));
     _gameCards->setLayoutParameter(lpH->clone());
     layout->addChild(_gameCards);
 
@@ -57,6 +57,6 @@ void OnlineNMGamesScene::getTopN(const SearchBar* sb, int topN) {
 }
 
 void OnlineNMGamesScene::addDemoGameCard() {
-    auto gameCard = GameCard::createDemo();
+    auto gameCard = GameCard::createDemo(NetworkingMode::ONLINE, GameEndpoint::REMOTE);
     _gameCards->addCard(gameCard);
 }

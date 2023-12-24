@@ -3,7 +3,7 @@
 enum class NetworkingMode {
     NONE,
     SINGLE,
-    LOCAL,
+    LAN,
     ONLINE,
 };
 

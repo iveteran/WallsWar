@@ -30,7 +30,7 @@ bool StoriesPanel::init(float width, float height, NetworkingMode nm) {
     _searchBar->setLayoutParameter(lpV->clone());
     addChild(_searchBar);
 
-    _storyCards = CardsView::create(width, height * 0.8);
+    _storyCards = CardsView::create(width, height - SearchBar::HEIGHT);
     _storyCards->setLayoutParameter(lpV->clone());
     addChild(_storyCards);
 

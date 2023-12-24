@@ -53,7 +53,7 @@ bool PlayerGamesScene::init(NetworkingMode nm) {
     searchBar->setLayoutParameter(lpH->clone());
     layout->addChild(searchBar);
 
-    _gameCards = CardsView::create(winSize.width, winSize.height * 0.5);
+    _gameCards = CardsView::create(winSize.width, winSize.height - (UISceneTitlePanel::HEIGHT + SearchBar::HEIGHT));
     _gameCards->setLayoutParameter(lpH->clone());
     layout->addChild(_gameCards);
 
@@ -73,14 +73,15 @@ void PlayerGamesScene::doSearch(const SearchBar* sb, const char* keywords) {
 }
 
 void PlayerGamesScene::addDemoGameCard() {
-    auto gameCard = GameCard::createDemo();
+    auto gameCard = GameCard::createDemo(_networkingMode, GameEndpoint::LOCAL);
     _gameCards->addCard(gameCard);
 }
 
 void PlayerGamesScene::addBattleCityGameCard() {
     auto story = createBattleCityStoryCard();
     auto winSize = Director::getInstance()->getVisibleSize();
-    auto gameCard = GameCard::create(story, winSize.width * 0.3, winSize.height * 0.5);
+    auto gameCard = GameCard::create(NetworkingMode::SINGLE, GameEndpoint::LOCAL,
+            story, winSize.width * 0.3, winSize.height * 0.5);
     _gameCards->addCard(gameCard);
 }
 

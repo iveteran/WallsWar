@@ -26,7 +26,7 @@ bool StoryMarketPanel::init(float width, float height, NetworkingMode nm) {
     setTitle("故事市场");
 
     auto layout = Layout::create();
-    layout->setContentSize(Size(width, height - 10));
+    layout->setContentSize(Size(width, height - getTitleHeight()));
     layout->setLayoutType(Layout::Type::VERTICAL);
     addMainPanel(layout);
 
@@ -34,12 +34,13 @@ bool StoryMarketPanel::init(float width, float height, NetworkingMode nm) {
     lpH->setGravity(LinearLayoutParameter::LinearGravity::CENTER_HORIZONTAL);
 
     auto searchBar = SearchBar::create();
+    const int topN = 10;
     searchBar->setSearchingCallback(CC_CALLBACK_2(StoryMarketPanel::doSearch, this));
-    searchBar->setGettingTopNCallback(CC_CALLBACK_2(StoryMarketPanel::getTopN, this), 10);
+    searchBar->setGettingTopNCallback(CC_CALLBACK_2(StoryMarketPanel::getTopN, this), topN);
     searchBar->setLayoutParameter(lpH->clone());
     layout->addChild(searchBar);
 
-    _storyCards = CardsView::create(width, height * 0.8);
+    _storyCards = CardsView::create(width, height - (getTitleHeight() + SearchBar::HEIGHT));
     _storyCards->setLayoutParameter(lpH->clone());
     layout->addChild(_storyCards);
 
