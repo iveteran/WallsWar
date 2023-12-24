@@ -73,6 +73,8 @@ void WelcomeScene::update(float delta) {
         // update loading info
         auto loadingInfo = StringUtils::format("Loading %0.2f, elapsed: %0.2f", loadingPercent, _elapsed);
         _elapsedLabel->setString(loadingInfo);
+    } else if (loadingPercent >= PERCENT_100) {
+        gotoNextScene();
     }
 }
 

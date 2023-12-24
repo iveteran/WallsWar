@@ -147,7 +147,6 @@ bool MessageInput::init() {
     _kbdInputField->setPlaceHolder("在此输入消息");
     _kbdInputField->setPlaceholderFont(defaultFont, defaultFontSize - 2);
     _kbdInputField->setDelegate(this);
-    _kbdInputField->setVisible(true);
     _kbdInputField->setVisible(false);
     _kbdInputField->setLayoutParameter(lp2);
     addChild(_kbdInputField);
