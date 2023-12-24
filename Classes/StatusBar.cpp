@@ -333,11 +333,23 @@ void StatusBar::createServerPlayingButton(Layout* parentLayout) {
     toggleButton->setLayoutParameter(lp);
 
     parentLayout->addChild(toggleButton);
+
+    if (_isGameSuspended) {
+        // TODO: reload game
+        Director::getInstance()->pushScene(GameScene::createScene());
+        _isGameSuspended = false;
+    }
 }
 
 void StatusBar::pauseServerPlaying(const ToggleButton* sender) {
     printf("StatusBar::pauseServerPlaying called\n");
     GET_CONTROL_LAYER()->addNotice("Game server paused", NoticeLevel::WARNING);
+
+    if (!_isGameSuspended) {
+        // TODO: save/suspend game
+        Director::getInstance()->popScene();
+        _isGameSuspended = true;
+    }
 }
 
 void StatusBar::startServerPlaying(const ToggleButton* sender) {

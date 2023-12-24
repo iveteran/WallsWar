@@ -173,6 +173,8 @@ private:
     PlayerInfo _playerInfo;
     CampsInfo _campsInfo;
 
+    bool _isGameSuspended = false;
+
     targetClickedCallback _openSettingsCallback = nullptr;
     targetClickedCallback _openMessagesBoxCallback = nullptr;
 };
