@@ -8,6 +8,6 @@ bool isPointInCircle(const Vec2& center, float radius, const Vec2& point);
 bool isPointInRing(const Vec2& center, float outerRadius, float innerRadius, const Vec2& point);
 float calcRad(const Point& p1, const Point& p2);
 Vec2 getAnglePosition(float R, float rad);
-float calculateAgreeOfTwoPoints(const Vec2& currPoint, const Vec2& prevPoint);
-int compareTwoPointsAgree(const Vec2& p1, const Vec2& p2);
+float calculateDegreeOfTwoPoints(const Vec2& currPoint, const Vec2& prevPoint);
+int compareTwoPointsDegree(const Vec2& p1, const Vec2& p2);
 float floatModInt(float v1, int v2);

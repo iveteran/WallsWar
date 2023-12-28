@@ -11,10 +11,10 @@ static const Color4B defaultFontColor = Color4B(200, 200, 200, 128);  // near gr
 static const float defaultRadius = 30.0f;
 static const float defaultIconScale = 0.3f;
 static const float defaultIconScale2 = 0.7f;
-static const int AGREE_OF_ONE_UNIT = 45;
-static const float AGREE_OF_HALF_UNIT = 22.5;
+static const int DEGREE_OF_ONE_UNIT = 45;
+static const float DEGREE_OF_HALF_UNIT = 22.5;
 
-float getAgreeByWheelSlot(int slot);
+float getDegreeByWheelSlot(int slot);
 
 WeaponEmitter* WeaponEmitter::Empty(int slot) {
     return WeaponEmitter::create(BlockType::UNDEFINED, "images/icon-weapon-empty.png", slot);
@@ -125,12 +125,12 @@ void WeaponEmitter::updateCountLabel() {
     }
 }
 
-void WeaponEmitter::rotateIconBy(float agree) {
+void WeaponEmitter::rotateIconBy(float degree) {
     float duration = 0.f;
-    auto rotateBy = RotateBy::create(duration, agree);
+    auto rotateBy = RotateBy::create(duration, degree);
     _btn->runAction(rotateBy);
     if (_countLabel) {
-        auto rotateBy = RotateBy::create(duration, agree);
+        auto rotateBy = RotateBy::create(duration, degree);
         _countLabel->runAction(rotateBy);
     }
 }
@@ -219,9 +219,9 @@ Vec2 WeaponWheel::convertToNodeLocation(const Vec2& point) {
     return Vec2(point.x - getPosition().x, point.y - getPosition().y);
 }
 
-void WeaponWheel::rotateAllWeaponsBy(float agree) {
+void WeaponWheel::rotateAllWeaponsBy(float degree) {
     for (auto item : _slots) {
-        item->rotateIconBy(agree);
+        item->rotateIconBy(degree);
     }
 }
 
@@ -232,7 +232,7 @@ bool WeaponWheel::onTouchBegan(Touch* touch, Event* event) {
         return true;
     }
     _prevMovingPoint = point;
-    _accumAgree = 0;
+    _accumDegree = 0;
 
     return true;
 }
@@ -249,18 +249,18 @@ void WeaponWheel::onTouchMoved(Touch* touch, Event* event) {
 
     //printf(">> touch prev point: (%f, %f)\n", _prevMovingPoint.x, _prevMovingPoint.y);
     //printf(">> touch moving point: (%f, %f)\n", point.x, point.y);
-    float agree = calculateAgreeOfTwoPoints(_prevMovingPoint, point);
-    //printf(">> touch moving agree: %f\n", agree);
-    if (agree == 0) {
+    float degree = calculateDegreeOfTwoPoints(_prevMovingPoint, point);
+    //printf(">> touch moving degree: %f\n", degree);
+    if (degree == 0) {
         return;
     }
     // result is 0(equal), 1(large than) or -1(less than)
-    int direction = compareTwoPointsAgree(_prevMovingPoint, point);
-    //printf(">> touch moving agree direction: %d\n", direction);
-    float agreeDelta = agree * direction;
-    //printf("?? rotate agree: %f\n", agreeDelta);
-    rotateByAgree(agreeDelta);
-    _accumAgree += agreeDelta;
+    int direction = compareTwoPointsDegree(_prevMovingPoint, point);
+    //printf(">> touch moving degree direction: %d\n", direction);
+    float degreeDelta = degree * direction;
+    //printf("?? rotate degree: %f\n", degreeDelta);
+    rotateByDegree(degreeDelta);
+    _accumDegree += degreeDelta;
     _prevMovingPoint = point;
 }
 
@@ -274,23 +274,23 @@ void WeaponWheel::onTouchEnded(Touch* touch, Event* event) {
 
     // 确保以一个或多个单元格进行滚动
     int direction = 1;
-    if (_accumAgree < 0) {
+    if (_accumDegree < 0) {
         direction = -1;
     }
-    float accumAgreeAbs = abs(_accumAgree);
-    float mod = floatModInt(accumAgreeAbs, AGREE_OF_ONE_UNIT);
+    float accumDegreeAbs = abs(_accumDegree);
+    float mod = floatModInt(accumDegreeAbs, DEGREE_OF_ONE_UNIT);
     if (mod == 0) {
         return;
     }
-    float agree = 0;
-    if (mod < AGREE_OF_HALF_UNIT) {
-        agree = mod * -1 * direction; // 小于半个单元格，回滚
-    } else if (mod >= AGREE_OF_HALF_UNIT) {
-        agree = (AGREE_OF_ONE_UNIT - mod) * direction;  // 大于半个半元格，补齐一个单元格
+    float degree = 0;
+    if (mod < DEGREE_OF_HALF_UNIT) {
+        degree = mod * -1 * direction; // 小于半个单元格，回滚
+    } else if (mod >= DEGREE_OF_HALF_UNIT) {
+        degree = (DEGREE_OF_ONE_UNIT - mod) * direction;  // 大于半个半元格，补齐一个单元格
     }
-    //printf("?? _accumAgree: %f, mod: %f, rotate agree: %f\n", _accumAgree, mod, agree);
-    rotateByAgree(agree);
-    _accumAgree = 0;
+    //printf("?? _accumDegree: %f, mod: %f, rotate degree: %f\n", _accumDegree, mod, degree);
+    rotateByDegree(degree);
+    _accumDegree = 0;
 }
 
 bool WeaponWheel::add(BlockType type, int slot) {
@@ -374,21 +374,21 @@ void WeaponWheel::remove(int slot) {
 
 void WeaponWheel::rotateByGrid(int unit) {
     float duration = 0.5f;
-    float agree = AGREE_OF_ONE_UNIT * unit;
-    rotateByAgree(agree, duration);
+    float degree = DEGREE_OF_ONE_UNIT * unit;
+    rotateByDegree(degree, duration);
 }
 
-void WeaponWheel::rotateByAgree(float agree, float duration) {
-    if (agree == 0) {
+void WeaponWheel::rotateByDegree(float degree, float duration) {
+    if (degree == 0) {
         return;
     }
     // duration is zero means to do immediately
-    auto rotateBy = RotateBy::create(duration, agree);
+    auto rotateBy = RotateBy::create(duration, degree);
     _weaponWheel->runAction(rotateBy);
-    rotateAllWeaponsBy(agree * -1); // 和滚轮滚动方向相反
-    _offsetAgree = floatModInt(_offsetAgree + agree, 360);
-    //printf("?? agree: %f, _offsetAgree: %f, offset slots: %f\n",
-    //        agree, _offsetAgree, _offsetAgree / AGREE_OF_ONE_UNIT);
+    rotateAllWeaponsBy(degree * -1); // 和滚轮滚动方向相反
+    _offsetDegree = floatModInt(_offsetDegree + degree, 360);
+    //printf("?? degree: %f, _offsetDegree: %f, offset slots: %f\n",
+    //        degree, _offsetDegree, _offsetDegree / DEGREE_OF_ONE_UNIT);
 }
 
 int WeaponWheel::getNextEmptySlot(int start) {
@@ -422,53 +422,53 @@ Vec2 WeaponWheel::calculatePositionForWeapon(int slot) {
 
 Vec2 WeaponWheel::calculatePositionForWeaponCount(int slot) {
     float radiusOffset = -2;
-    float agreeOffset = 18;
-    return calculatePositionForWheelSlot(slot, radiusOffset, agreeOffset);
+    float degreeOffset = 18;
+    return calculatePositionForWheelSlot(slot, radiusOffset, degreeOffset);
 }
 
-Vec2 WeaponWheel::calculatePositionForWheelSlot(int slot, float radiusOffset, float agreeOffset) {
+Vec2 WeaponWheel::calculatePositionForWheelSlot(int slot, float radiusOffset, float degreeOffset) {
     Vec2 pos;
-    float agree = getAgreeByWheelSlot(slot);
-    if (agree < 0) {
+    float degree = getDegreeByWheelSlot(slot);
+    if (degree < 0) {
         return pos;
     }
-    agree += agreeOffset;
+    degree += degreeOffset;
     float r = _radius + radiusOffset;
-    pos.x = _center.x + r * std::cos(CC_DEGREES_TO_RADIANS(agree));
-    pos.y = _center.y + r * std::sin(CC_DEGREES_TO_RADIANS(agree));
+    pos.x = _center.x + r * std::cos(CC_DEGREES_TO_RADIANS(degree));
+    pos.y = _center.y + r * std::sin(CC_DEGREES_TO_RADIANS(degree));
     return pos;
 }
 
 // 将圆中8等份的slot转为角度，从45分钟处开始间隔90分钟
-float getAgreeByWheelSlot(int slot) {
-    float agree = -1.0f;
+float getDegreeByWheelSlot(int slot) {
+    float degree = -1.0f;
     switch (slot) {
         case 0:
-            agree = 90 - AGREE_OF_HALF_UNIT; // 时钟45分钟处
+            degree = 90 - DEGREE_OF_HALF_UNIT; // 时钟45分钟处
             break;
         case 1:
-            agree = 0 + AGREE_OF_HALF_UNIT;  // 时钟2:15处
+            degree = 0 + DEGREE_OF_HALF_UNIT;  // 时钟2:15处
             break;
         case 2:
-            agree = 360 - AGREE_OF_HALF_UNIT; // 时钟3:45处
+            degree = 360 - DEGREE_OF_HALF_UNIT; // 时钟3:45处
             break;
         case 3:
-            agree = 270 + AGREE_OF_HALF_UNIT;
+            degree = 270 + DEGREE_OF_HALF_UNIT;
             break;
         case 4:
-            agree = 270 - AGREE_OF_HALF_UNIT;
+            degree = 270 - DEGREE_OF_HALF_UNIT;
             break;
         case 5:
-            agree = 180 + AGREE_OF_HALF_UNIT;
+            degree = 180 + DEGREE_OF_HALF_UNIT;
             break;
         case 6:
-            agree = 180 - AGREE_OF_HALF_UNIT;
+            degree = 180 - DEGREE_OF_HALF_UNIT;
             break;
         case 7:
-            agree = 90 + AGREE_OF_HALF_UNIT;
+            degree = 90 + DEGREE_OF_HALF_UNIT;
             break;
         default:
             break;
     }
-    return agree;
+    return degree;
 }

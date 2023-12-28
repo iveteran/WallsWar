@@ -31,7 +31,7 @@ Vec2 getAnglePosition(float R, float rad) {
     return Point(R * cos(rad), R * sin(rad));
 }
 
-float calculateAgreeOfTwoPoints(const Vec2& prevPoint, const Vec2& currPoint) {
+float calculateDegreeOfTwoPoints(const Vec2& prevPoint, const Vec2& currPoint) {
     float x1 = currPoint.x;
     float y1 = currPoint.y;
     float x2 = prevPoint.x;
@@ -42,19 +42,19 @@ float calculateAgreeOfTwoPoints(const Vec2& prevPoint, const Vec2& currPoint) {
         return 0.f;
     }
     float ji = x1 * x2 + y1 * y2;
-    float agree = std::acos(ji / mo) / PI * 180.0;
-    return agree;
+    float degree = std::acos(ji / mo) / PI * 180.0;
+    return degree;
 }
 
 // result is 0(equal), 1(large than) or -1(less than)
-int compareTwoPointsAgree(const Vec2& p1, const Vec2& p2) {
+int compareTwoPointsDegree(const Vec2& p1, const Vec2& p2) {
     Vec2 xAxis(1, 0); // x轴，正向
     if (p2.y < 0) {
         xAxis.x *= -1; // 负向
     }
-    float agree1 = calculateAgreeOfTwoPoints(p1, xAxis);
-    float agree2 = calculateAgreeOfTwoPoints(p2, xAxis);
-    return agree1 == agree2 ? 0 : (agree1 > agree2 ? 1 : -1);
+    float degree1 = calculateDegreeOfTwoPoints(p1, xAxis);
+    float degree2 = calculateDegreeOfTwoPoints(p2, xAxis);
+    return degree1 == degree2 ? 0 : (degree1 > degree2 ? 1 : -1);
 }
 
 float floatModInt(float v1, int v2) {

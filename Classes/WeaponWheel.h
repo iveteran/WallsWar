@@ -35,7 +35,7 @@ public:
     bool init(BlockType type, const char* icon, int index);
 
     void attachCountLabel(Text* countLabel);
-    void rotateIconBy(float agree);
+    void rotateIconBy(float degree);
 
     bool isEmpty() const { return _type == BlockType::UNDEFINED; }
     int increase(int num = 1);
@@ -72,14 +72,14 @@ public:
 
 protected:
     Vec2 convertToNodeLocation(const Vec2& point);
-    void rotateAllWeaponsBy(float agree);
+    void rotateAllWeaponsBy(float degree);
     Vec2 calculatePositionForWeapon(int slot);
     Vec2 calculatePositionForWeaponCount(int slot);
-    Vec2 calculatePositionForWheelSlot(int slot, float radiusOffset, float agreeOffset);
+    Vec2 calculatePositionForWheelSlot(int slot, float radiusOffset, float degreeOffset);
     int getNextEmptySlot(int start = 0);
 
     void rotateByGrid(int unit=1);
-    void rotateByAgree(float agree, float duration=0.f);
+    void rotateByDegree(float degree, float duration=0.f);
     void update(float dt);
     float _accumDt = 0;
 
@@ -96,8 +96,8 @@ private:
     ImageView* _weaponWheel = nullptr;
     Vector<WeaponEmitter*> _slots;
     Vec2 _prevMovingPoint;
-    float _accumAgree = 0.f;
-    float _offsetAgree = 0.f;
+    float _accumDegree = 0.f;
+    float _offsetDegree = 0.f;
 
     Player* _player = nullptr;
 };
