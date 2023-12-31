@@ -4,14 +4,14 @@
 
 class Camp;
 
-class Gamer : public MovableBlock {
+class Actor : public MovableBlock {
 public:
     static constexpr float SIZE = Block::SIZE * 2;
 
 public:
     bool init() override { return MovableBlock::init(); }
     int getSize() const override { return SIZE; }
-    BlockType getType() const override { return BlockType::GAMER; }
+    BlockType getType() const override { return BlockType::ACTOR; }
 
     void setName(const std::string& name) { _name = name; };
 

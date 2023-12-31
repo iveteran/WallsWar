@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Gamer.h"
+#include "Actor.h"
 #include "Bullet.h"
 #include "Direction.h"
 
@@ -16,9 +16,9 @@ class Camp;
 class Campus;
 class Block;
 
-class Player : public Gamer {
+class Player : public Actor {
 public:
-    static constexpr float SIZE = Gamer::SIZE;
+    static constexpr float SIZE = Actor::SIZE;
     static constexpr int MAX_MOVE_DISTANCE = 100;
 
     static std::set<BlockType> CollidingAbleBlockTypes;

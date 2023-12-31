@@ -66,10 +66,10 @@ public:
     bool updateBlockPosition(MovableBlock* block);
     bool hasBlockAtPosition(const Vec2& pos, int floor=0) const;
 
-    bool createBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
-    bool createBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
-    bool createBlock(const Vec2& pos, BlockType t, Gamer* gamer=nullptr);
-    int createBlocks(const std::vector<Vec2>& posList, BlockType t, Gamer* gamer=nullptr);
+    bool createBlock(int i, int j, BlockType t, Actor* actor=nullptr);
+    bool createBlock(float x, float y, BlockType t, Actor* actor=nullptr);
+    bool createBlock(const Vec2& pos, BlockType t, Actor* actor=nullptr);
+    int createBlocks(const std::vector<Vec2>& posList, BlockType t, Actor* actor=nullptr);
 
     void resetMap();                                // 清理工作
     void clearBlocks();
@@ -80,8 +80,8 @@ private:
     using Node::addChild;           // make it private, to use addNode/addAndManageBlock instead of it
     using Node::removeChild;        // make it private, to use removeNode/removeAndUnmanageBlock instead of it
 
-    bool _addBlock(float x, float y, BlockType t, Gamer* gamer=nullptr);
-    bool _addBlock(int i, int j, BlockType t, Gamer* gamer=nullptr);
+    bool _addBlock(float x, float y, BlockType t, Actor* actor=nullptr);
+    bool _addBlock(int i, int j, BlockType t, Actor* actor=nullptr);
 
     bool _manageBlock(Block* block, FloorXYAxisBlockMap& floorPosBlocks);
     bool _updateBlockPosition(const Vec3& updatePos, BlockType type, Block* block);

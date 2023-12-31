@@ -21,7 +21,7 @@ enum class BlockType {
     CAMPUS,         // 玩家营地，floor为0，玩家出生地，不可被摧毁，可进入玩家自创剧本(故事线)
     IMMOVABLE_BLOCK,
     MOVABLE_BLOCK,
-    GAMER,
+    ACTOR,
     PLAYER,
     SPECTATOR,
     NPC,
@@ -46,7 +46,7 @@ using BlockTypeSet = std::set<BlockType>;
 const int NoneFloor = -999;
 const bool IsActiveCollision = true;
 
-class Gamer;
+class Actor;
 
 class Block : public cocos2d::Sprite {
 public:
@@ -59,7 +59,7 @@ public:
 
     static int generateID();
     static int getDefaultFloor(BlockType bt);
-    static Block* createBlock(BlockType type, Gamer* creator=nullptr);
+    static Block* createBlock(BlockType type, Actor* creator=nullptr);
     static bool isThisBlock(BlockType type, const Block* block);
 
 public:
@@ -70,9 +70,9 @@ public:
     void setFloor(int floor) { setLocalZOrder(floor); }
     void increaseFloor() { setLocalZOrder(getLocalZOrder() + 1); }
     void decreaseFloor() { setLocalZOrder(getLocalZOrder() - 1); }
-    void setCreator(Gamer* creator) { _creator = creator; }
+    void setCreator(Actor* creator) { _creator = creator; }
     void unsetCreator() { _creator = nullptr; }
-    Gamer* getCreator() const { return _creator; }
+    Actor* getCreator() const { return _creator; }
 
     virtual BlockType getType() const = 0;
     virtual bool movable() const = 0;
@@ -93,5 +93,5 @@ public:
     virtual std::string getSpriteFrameName() const = 0;
 
 protected:
-    Gamer* _creator = nullptr;
+    Actor* _creator = nullptr;
 };

@@ -11,7 +11,7 @@ enum class PositionType {
     POSITION,
 };
 
-bool isGamer(BlockType bType);
+bool isActor(BlockType bType);
 
 class MovableBlock : public Block {
 public:

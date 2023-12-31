@@ -151,7 +151,7 @@ const char* Player::getAvatar() const {
 }
 
 bool Player::init() {
-    if (!Gamer::init()) {
+    if (!Actor::init()) {
         return false;
     }
     _canMove = false;

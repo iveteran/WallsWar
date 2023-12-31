@@ -39,7 +39,7 @@ int Block::getDefaultFloor(BlockType bt) {
     return floor;
 }
 
-Block* Block::createBlock(BlockType type, Gamer* creator) {
+Block* Block::createBlock(BlockType type, Actor* creator) {
     Block* block = nullptr;
     switch (type)
     {
@@ -113,8 +113,8 @@ bool Block::isThisBlock(BlockType type, const Block* block_) {
         case BlockType::ICE:
             yes = dynamic_cast<BlockIce*>(block) != nullptr;
             break;
-        case BlockType::GAMER:
-            yes = dynamic_cast<Gamer*>(block) != nullptr;
+        case BlockType::ACTOR:
+            yes = dynamic_cast<Actor*>(block) != nullptr;
             break;
         case BlockType::PLAYER:
             yes = dynamic_cast<Player*>(block) != nullptr;

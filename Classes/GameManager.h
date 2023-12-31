@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Gamer.h"
+#include "Actor.h"
 
-class GameManager : public Gamer {
+class GameManager : public Actor {
 public:
-    bool init() override { return Gamer::init(); }
-    int getSize() const override { return Gamer::SIZE; }
+    bool init() override { return Actor::init(); }
+    int getSize() const override { return Actor::SIZE; }
     BlockType getType() const override { return BlockType::MANAGER; }
     void setName(const std::string& name) { _name = name; };
 

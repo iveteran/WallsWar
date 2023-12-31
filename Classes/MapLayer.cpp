@@ -480,7 +480,7 @@ bool MapLayer::loadMapData() {
     return true;
 }
 
-bool MapLayer::_addBlock(float x, float y, BlockType t, Gamer* gamer) {
+bool MapLayer::_addBlock(float x, float y, BlockType t, Actor* actor) {
     Vec2 blockPos(x, y);
     int floor = Block::getDefaultFloor(t);
     if (hasBlockAtPosition(blockPos, floor)) {
@@ -492,7 +492,7 @@ bool MapLayer::_addBlock(float x, float y, BlockType t, Gamer* gamer) {
     // 创建不同类型的方块
     Block* block = Block::createBlock(t);
     if (block) {
-        block->setCreator(gamer);
+        block->setCreator(actor);
         block->setPosition(blockPos);
         addAndManageBlock(block);
 
@@ -501,26 +501,26 @@ bool MapLayer::_addBlock(float x, float y, BlockType t, Gamer* gamer) {
     return false;
 }
 
-bool MapLayer::_addBlock(int i, int j, BlockType t, Gamer* gamer) {
-    return _addBlock((float)i * Block::SIZE, (float)j * Block::SIZE, t, gamer);
+bool MapLayer::_addBlock(int i, int j, BlockType t, Actor* actor) {
+    return _addBlock((float)i * Block::SIZE, (float)j * Block::SIZE, t, actor);
 }
 
-bool MapLayer::createBlock(int i, int j, BlockType t, Gamer* gamer) {
-    return _addBlock(i, j, t, gamer);
+bool MapLayer::createBlock(int i, int j, BlockType t, Actor* actor) {
+    return _addBlock(i, j, t, actor);
 }
 
-bool MapLayer::createBlock(float x, float y, BlockType t, Gamer* gamer) {
-    return _addBlock(x, y, t, gamer);
+bool MapLayer::createBlock(float x, float y, BlockType t, Actor* actor) {
+    return _addBlock(x, y, t, actor);
 }
 
-bool MapLayer::createBlock(const Vec2& pos, BlockType t, Gamer* gamer) {
-    return createBlock(pos.x, pos.y, t, gamer);
+bool MapLayer::createBlock(const Vec2& pos, BlockType t, Actor* actor) {
+    return createBlock(pos.x, pos.y, t, actor);
 }
 
-int MapLayer::createBlocks(const std::vector<Vec2>& posList, BlockType t, Gamer* gamer) {
+int MapLayer::createBlocks(const std::vector<Vec2>& posList, BlockType t, Actor* actor) {
     int count = 0;
     for (auto pos : posList) {
-        bool success = createBlock(pos.x, pos.y, t, gamer);
+        bool success = createBlock(pos.x, pos.y, t, actor);
         if (success) {
             count++;
         }
