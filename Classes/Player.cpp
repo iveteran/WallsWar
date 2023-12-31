@@ -29,7 +29,7 @@ Player::CollidingAbleBlockTypes{
     BlockType::CAMP
 };
 
-static const float minBordGrap = Player::SIZE * 2;
+static const float movingMinBoundaryGap = Player::SIZE * 5;
 
 Vec2 convertToMapPosition(const Vec2& pos);
 
@@ -364,20 +364,20 @@ void Player::moveCamaraToCamp() {
     float xOffset = 0, yOffset = 0;
     if (cameraPos.x > campPos.x) {
         xOffset = cameraPos.x - campPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
-        xOffset += std::min(campPos.x - Camp::SIZE / 2, minBordGrap);
+        xOffset += std::min(campPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
         xOffset = xOffset > 0 ? xOffset * -1 : 0;
     } else {
         xOffset = campPos.x - cameraPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
-        xOffset += std::min(CENTER_WIDTH - campPos.x - Camp::SIZE / 2, minBordGrap);
+        xOffset += std::min(CENTER_WIDTH - campPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
         xOffset = xOffset > 0 ? xOffset : 0;
     }
     if (cameraPos.y > campPos.y) {
         yOffset = cameraPos.y - campPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
-        yOffset += std::min(campPos.y - Camp::SIZE / 2, minBordGrap);
+        yOffset += std::min(campPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
         yOffset = yOffset > 0 ? yOffset * -1 : 0;
     } else {
         yOffset = campPos.y - cameraPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
-        yOffset += std::min(CENTER_HEIGHT - campPos.y - Camp::SIZE / 2, minBordGrap);
+        yOffset += std::min(CENTER_HEIGHT - campPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
         yOffset = yOffset > 0 ? yOffset : 0;
     }
 

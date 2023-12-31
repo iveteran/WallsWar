@@ -13,7 +13,7 @@ MovableBlock::CollidingAbleBlockTypes{
     BlockType::MAP_BORDER
 };
 
-static const int minBordGrap = PLAYER_SIZE * 2;
+static const float movingMinBoundaryGap = PLAYER_SIZE * 5;
 
 bool isActor(BlockType bType) {
     return bType == BlockType::ACTOR ||
@@ -302,21 +302,21 @@ void MovableBlock::makeCameraFollows() {
         case Direction::LEFT:
             cameraGap = cameraPos.x - visible_size.width / 2 + (CENTER_WIDTH / 2 - visible_size.width / 2);
             gap = pos.x - cameraGap;
-            if (gap < minBordGrap && cameraGap > 0)
+            if (gap < movingMinBoundaryGap && cameraGap > 0)
             {
                 xOffset = -1;
             }
             break;
         case Direction::RIGHT:
             gap = visible_size.width - pos.x;
-            if (cameraPos.x < CENTER_WIDTH / 2 && gap < minBordGrap)
+            if (cameraPos.x < CENTER_WIDTH / 2 && gap < movingMinBoundaryGap)
             {
                 xOffset = 1;
             }
             break;
         case Direction::UP:
             gap = visible_size.height - pos.y;
-            if (cameraPos.y < CENTER_HEIGHT / 2 && gap < minBordGrap)
+            if (cameraPos.y < CENTER_HEIGHT / 2 && gap < movingMinBoundaryGap)
             {
                 yOffset = 1;
             }
@@ -324,7 +324,7 @@ void MovableBlock::makeCameraFollows() {
         case Direction::DOWN:
             cameraGap = cameraPos.y - visible_size.height / 2 + (CENTER_HEIGHT / 2 - visible_size.height / 2);
             gap = pos.y - cameraGap;
-            if (gap < minBordGrap && cameraGap > 0)
+            if (gap < movingMinBoundaryGap && cameraGap > 0)
             {
                 yOffset = -1;
             }
