@@ -2,6 +2,14 @@
 
 static const double PI = 3.141592654;
 
+float degreeToRadians(float degrees) {
+    return (degrees * PI) / 180;
+}
+
+float radiansToDegree(float radians) {
+    return (radians * 180) / PI;
+}
+
 bool isPointInCircle(const Vec2& center, float radius, const Vec2& point) {
 	float x = point.x - center.x;
 	float y = point.y - center.y;
