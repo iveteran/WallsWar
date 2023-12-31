@@ -31,12 +31,11 @@ public:
 
     virtual int getMaxMovingDistance() const override { return MAX_MOVING_DISTANCE; }
     virtual void onStopped() override;
+    virtual bool isNeedRotateForDirection() const override { return true; }
     virtual int getMovingStep() const override;
     std::set<BlockType> getCollidingAbleBTs() const;
     virtual void onBeCollided(Block* activeBlock) override;
     virtual void onCollidedWith(cocos2d::Vector<Block*>& withBlocks) override;
-
-    virtual void changeSpriteDirection() override {}
 
 private:
     void stopAndRecycle();

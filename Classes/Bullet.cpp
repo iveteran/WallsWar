@@ -25,20 +25,9 @@ void Bullet::initSpriteFrameCache() {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
     // 子弹
-    auto bullet_l = Sprite::create("images/bullet/bullet-0.png")->getSpriteFrame();
-    auto bullet_u = Sprite::create("images/bullet/bullet-1.png")->getSpriteFrame();
-    auto bullet_r = Sprite::create("images/bullet/bullet-2.png")->getSpriteFrame();
-    auto bullet_d = Sprite::create("images/bullet/bullet-3.png")->getSpriteFrame();
-
-    bullet_l->getTexture()->setAliasTexParameters();
-    bullet_u->getTexture()->setAliasTexParameters();
-    bullet_r->getTexture()->setAliasTexParameters();
-    bullet_d->getTexture()->setAliasTexParameters();
-
-    spriteFrameCache->addSpriteFrame(bullet_l, "bullet_l");
-    spriteFrameCache->addSpriteFrame(bullet_u, "bullet_u");
-    spriteFrameCache->addSpriteFrame(bullet_r, "bullet_r");
-    spriteFrameCache->addSpriteFrame(bullet_d, "bullet_d");
+    auto bullet_up = Sprite::create("images/bullet/bullet-up.png")->getSpriteFrame();
+    bullet_up->getTexture()->setAliasTexParameters();
+    spriteFrameCache->addSpriteFrame(bullet_up, "bullet_up");
 
     // 子弹爆炸
     auto bumb_0 = Sprite::create("images/bullet/bumb0.png")->getSpriteFrame();
@@ -58,6 +47,8 @@ bool Bullet::init() {
     if (!Weapon::init()) {
         return false;
     }
+
+    setSpriteFrame("bullet_up");
 
     setFiring(false);
     //setPosition(1.0f, 1.0f); // NOTE: 将初始地址设为(1, 1)，避免在MapLayer更新位置时被忽略(值为Vec2(0, 0))
@@ -103,22 +94,7 @@ bool Bullet::getBeIntersection() const {
 }
 
 void Bullet::shoot(const Vec2& startPos, Direction dir, int floor) {
-    switch (dir) {
-    case Direction::LEFT:
-        setSpriteFrame("bullet_l");
-        break;
-    case Direction::UP:
-        setSpriteFrame("bullet_u");
-        break;
-    case Direction::RIGHT:
-        setSpriteFrame("bullet_r");
-        break;
-    case Direction::DOWN:
-        setSpriteFrame("bullet_d");
-        break;
-    default:
-        break;
-    }
+    setDirection(dir);
 
     //printf(">> Player at (%d, %d) shoot bullet at (%d, %d)\n",
     //        (int)_creator->getPosition().x, (int)_creator->getPosition().y,

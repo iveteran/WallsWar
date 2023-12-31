@@ -12,6 +12,7 @@ enum class PositionType {
 };
 
 bool isActor(BlockType bType);
+float calculateRotateDegree(Direction from, Direction to);
 
 class MovableBlock : public Block {
 public:
@@ -24,8 +25,8 @@ public:
     bool movable() const override { return true; }
     int getDistances() const { return _distances; }
 
-    Direction getDirection() const { return _dir; }
-    void setDirection(Direction dir);
+    virtual Direction getDirection() const { return _dir; }
+    virtual bool setDirection(Direction dir);
 
     void goBack();
     void moveTo(const Vec2& to);
@@ -47,11 +48,10 @@ public:
     virtual void allowCameraFollows() { _allowedCameraFollows = true; }
     void makeCameraFollows();
 
-    virtual std::string getSpriteFrameName() const = 0;
-
-    virtual void changeSpriteDirection();
     virtual int getMaxMovingDistance() const { return -1; }
     virtual void onStopped() { }
+    virtual bool isNeedRotateForDirection() const { return false; }
+    virtual void changeDirection(float degree);
     virtual void playAnimate();                         // 播放移动动画
     virtual void playFallingAnimate();
     virtual void stopAnimate();                         // 停止播放动画

@@ -23,6 +23,13 @@ bool isActor(BlockType bType) {
         bType == BlockType::MANAGER;
 }
 
+float calculateRotateDegree(Direction from, Direction to) {
+    float degree = ((int)to - (int)from) * 90;
+    return degree > 180 ? degree - 360 :    // eg: 270 -> -90
+        degree < -180 ? degree + 360 :      // eg: -270 -> 90
+        degree;
+}
+
 bool MovableBlock::init() {
     if (!Block::init()) return false;
 
@@ -35,20 +42,23 @@ MovableBlock::getCollidingAbleBTs() const {
     return MovableBlock::CollidingAbleBlockTypes;
 }
 
-void MovableBlock::changeSpriteDirection() {
-    auto name = getSpriteFrameName();
-    // 更换图片
-    this->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(name));
+void MovableBlock::changeDirection(float degree) {
+    float durationTime = 0.2f;
+    this->runAction(RotateBy::create(durationTime, degree));
 }
 
-void MovableBlock::setDirection(Direction dir) {
+bool MovableBlock::setDirection(Direction dir) {
     if (dir == _dir) {
-        return;
+        return false;
     }
     _fromDir = _dir;
     _dir = dir;
 
-    changeSpriteDirection();
+    if (isNeedRotateForDirection()) {
+        float degree = calculateRotateDegree(_fromDir, _dir);
+        changeDirection(degree);
+    }
+    return true;
 }
 
 void MovableBlock::goBack() {
