@@ -31,9 +31,10 @@
 #    -fill 'rgba(0, 255, 0, 0.5)'  -draw "path 'M 100,50     A 50,50 0 0,1 50,100 L 50,75 A 25,25 0 0,0 75,50 Z'" \
 #    -fill 'rgba(0, 0, 255, 0.5)'  -draw "path 'M 50,100     A 50,50 0 0,1 0,50   L 25,50 A 25,25 0 0,0 50,75 Z'" \
 #    -fill 'rgba(0, 255, 0, 0.5)'  -draw "path 'M 0,50       A 50,50 0 0,1 50,0   L 50,25 A 25,25 0 0,0 25,50 Z'" \
-#    piechart_3.png
+#    ring.png
 
 # 绘制一个圆环，分成8段，背景透明，无边缘线条
+# M: move to, A: arc, L: line to, Z: close path
 convert -size 200x200 xc:none -stroke none \
     -fill 'rgba(100, 100, 100, 0.5)'  -draw "path 'M 100,0        A 100,100 0 0,1 170.71,29.29   L 135.36,64.64  A 50,50 0 0,0 100,50 Z'" \
     -fill 'rgba(50, 50, 50, 0.5)'  -draw "path 'M 170.71,29.29 A 100,100 0 0,1 200,100        L 150,100       A 50,50 0 0,0 135.36,64.64 Z'" \
@@ -45,3 +46,5 @@ convert -size 200x200 xc:none -stroke none \
     -fill 'rgba(50, 50, 50, 0.5)'  -draw "path 'M 29.29,29.29  A 100,100 0 0,1 100,0          L 100,50        A 50,50 0 0,0 64.64,64.64 Z'" \
     -fill 'rgba(100, 100, 100, 0.5)'  -draw "circle 100,100 70,70" \
     weapon_wheel_2.png
+
+display weapon_wheel_2.png
