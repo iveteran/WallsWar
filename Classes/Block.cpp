@@ -141,7 +141,18 @@ bool Block::init() {
     }
     setTag(generateID());
 
+    //addShadow();
+
     return true;
+}
+
+void Block::addShadow() {
+    auto shadowSprite = Sprite::create();
+    shadowSprite->initWithSpriteFrameName("block-shadow-40x20");
+    shadowSprite->setScale(0.5);
+    auto blockCenter = Point(getContentSize() / 2);
+    shadowSprite->setPosition(blockCenter.x + 4, blockCenter.y - 4);
+    addChild(shadowSprite, getFloor() - 1);
 }
 
 bool Block::containsPoint(const Vec2& point) const {
@@ -235,6 +246,7 @@ void Block::onDestroyed() {
 }
 
 void Block::initSpriteFrameCache() {
+    Block::initBlockShadowFrameCache();
     Campus::initSpriteFrameCache();
     Camp::initSpriteFrameCache();
     BlockWall::initSpriteFrameCache();
@@ -245,4 +257,12 @@ void Block::initSpriteFrameCache() {
     BlockIce::initSpriteFrameCache();
     BlockTrench::initSpriteFrameCache();
     BlockRiver::initSpriteFrameCache();
+}
+
+void Block::initBlockShadowFrameCache() {
+    auto spriteFrameCache = SpriteFrameCache::getInstance();
+    // 阴影
+    auto shadow = Sprite::create("images/block/shadow-40x20.png")->getSpriteFrame();
+    shadow->getTexture()->setAliasTexParameters();
+    spriteFrameCache->addSpriteFrame(shadow, "block-shadow-40x20");
 }

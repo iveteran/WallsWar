@@ -56,6 +56,7 @@ public:
     static const int DefaultFloor = 0;
 
     static void initSpriteFrameCache();
+    static void initBlockShadowFrameCache();
 
     static int generateID();
     static int getDefaultFloor(BlockType bt);
@@ -64,6 +65,7 @@ public:
 
 public:
     bool init() override;             // 调用父类的init
+    void addShadow();
 
     int id() const { return getTag(); }
     int getFloor() const { return getLocalZOrder(); }
