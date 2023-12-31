@@ -71,9 +71,17 @@ void Bullet::destroy() {
     MapLayer::getInstance()->removeNode(this);
 }
 
+void Bullet::onStopped() {
+    _recycle();
+}
+
+void Bullet::stopAndRecycle() {
+    stopMove();
+    _recycle();
+}
+
 void Bullet::_recycle() {
     setFiring(false);
-    stopMove();
     MapLayer::getInstance()->unmanageBlock(this);
 
     // 如果子弹的创建者(如玩家)不存在了就真实销毁它
@@ -175,7 +183,7 @@ void Bullet::onBeCollided(Block* activeBlock) {
             dynamic_cast<Player*>(activeBlock)->id() == _creator->id()) {
         return;
     }
-    _recycle();
+    stopAndRecycle();
 }
 
 void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
@@ -209,7 +217,7 @@ void Bullet::onCollidedWith(Vector<Block*>& withBlocks) {
         _playEffectVoice();
     }
 
-    _recycle();
+    stopAndRecycle();
 }
 
 const char* Bullet::getVoicePath() const {

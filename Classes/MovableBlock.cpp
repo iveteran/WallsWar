@@ -194,6 +194,11 @@ void MovableBlock::update(float dt) {
     if (!_isMoving) {
         return;
     }
+    if (getMaxMovingDistance() > 0 && _moveDistance >= getMaxMovingDistance()) {
+        stopMove();
+        onStopped();
+        return;
+    }
     int step = getMovingStep();
 
     // 假设可以移动

@@ -50,6 +50,8 @@ public:
     virtual std::string getSpriteFrameName() const = 0;
 
     virtual void changeSpriteDirection();
+    virtual int getMaxMovingDistance() const { return -1; }
+    virtual void onStopped() { }
     virtual void playAnimate();                         // 播放移动动画
     virtual void playFallingAnimate();
     virtual void stopAnimate();                         // 停止播放动画

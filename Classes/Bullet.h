@@ -5,6 +5,7 @@
 class Bullet : public Weapon {
 public:
     static constexpr float SIZE = 4;
+    static constexpr float MAX_MOVING_DISTANCE = 200;
     static std::set<BlockType> CollidingAbleBlockTypes;
 
 public:
@@ -28,6 +29,8 @@ public:
     void setBeIntersection(bool value = true);
     bool getBeIntersection() const;
 
+    virtual int getMaxMovingDistance() const override { return MAX_MOVING_DISTANCE; }
+    virtual void onStopped() override;
     virtual int getMovingStep() const override;
     std::set<BlockType> getCollidingAbleBTs() const;
     virtual void onBeCollided(Block* activeBlock) override;
@@ -36,6 +39,7 @@ public:
     virtual void changeSpriteDirection() override {}
 
 private:
+    void stopAndRecycle();
     void _recycle();
     void _showEffect();                            // 展示碰撞特效
     void _playEffectVoice();
