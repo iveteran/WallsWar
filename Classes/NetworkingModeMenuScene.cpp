@@ -13,7 +13,11 @@ static const char* defaultButtonBgImage = "images/icon-button-bg-48.png";
 static const char* defaultFont = "fonts/simhei.ttf";
 static int defaultFontSize = 12;
 static float defaultFontScale = 0.5f;
-static const Color3B defaultBgColor = Color3B(41, 74, 122);  // 深蓝色
+static const Color3B defaultBgColor = Color3B(41, 74, 122);    // 深蓝色
+static const Color3B colorLightSeaGreen = Color3B(32,178,170); // light sea green
+static const Color3B colorDodgerBlue = Color3B(30,144,255);    // dodger blue
+static const Color3B colorSteelBlue = Color3B(70,130,180);     // steel blue
+static const Color3B colorRoyalBlue = Color3B(65,105,225);     // royal blue
 static int defaultOpacity = 128;
 
 NetworkingModeCard* NetworkingModeCard::create(const char* title, const char* bgImage, const char* summary) {
@@ -36,8 +40,7 @@ bool NetworkingModeCard::init(const char* title, const char* bgImage, const char
     auto winSize = Director::getInstance()->getVisibleSize();
     setContentSize(Size(winSize.width / 3, winSize.height * 0.5));
 
-    setBackGroundColor(Color3B::GREEN);
-    setBackGroundColorOpacity(defaultOpacity);
+    setBackGroundColor(colorSteelBlue);
 
     setLayoutType(Layout::Type::VERTICAL);
 
@@ -177,8 +180,7 @@ Layout* NetworkingModeMenuScene::buildSummaryPanel(float width, float height) {
     auto layout = Layout::create();
     layout->setLayoutType(Layout::Type::RELATIVE);
     layout->setContentSize(Size(width, height));
-    layout->setBackGroundColor(Color3B::GREEN);
-    layout->setBackGroundColorOpacity(defaultOpacity);
+    layout->setBackGroundColor(colorSteelBlue);
 
     _summaryLabel = Text::create("", defaultFont, defaultFontSize);
     layout->addChild(_summaryLabel);
