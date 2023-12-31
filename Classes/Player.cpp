@@ -30,6 +30,7 @@ Player::CollidingAbleBlockTypes{
 };
 
 static const float movingMinBoundaryGap = Player::SIZE * 5;
+static const float defaultSpriteScale = 0.25f;
 
 Vec2 convertToMapPosition(const Vec2& pos);
 
@@ -88,58 +89,22 @@ void Player::initSpriteFrameCache() {
 }
 
 void Player::loadFrameAnimation() {
-    const char* playerImgPath = "images/player1_tank";
-    const char* playerNamePrefix = "player1";
-    _loadFrameAnimation(playerImgPath, playerNamePrefix);
 
-    const char* enemyImgPath = "images/enemy_tank/normal_tank";
-    const char* enemyNamePrefix = "enemy";
-    _loadFrameAnimation(enemyImgPath, enemyNamePrefix);
-}
+    auto sf1 = Sprite::create("images/player-avatar-anonymous.png")->getSpriteFrame();
+    sf1->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf1, "enemy_avatar");
 
-void Player::_loadFrameAnimation(const char* imgPath, const char* namePrefix) {
-    auto spriteFrameCache = SpriteFrameCache::getInstance();
+    auto sf2 = Sprite::create("images/player-avatar-yuu.png")->getSpriteFrame();
+    sf2->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf2, "player_avatar");
 
-    Rect playerRect(0, 0, Player::SIZE, Player::SIZE);
-    bool isHost = strcmp(namePrefix, "player1") == 0;
+    auto sf3 = Sprite::create("images/player-blood-ring-3.png")->getSpriteFrame();
+    sf3->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf3, "player-blood-ring");
 
-    // 总共4个等级，从0到3
-    for (int level = 0; level < 4; level++) {
-        // 总共4个方向：left(0), up(1), right(2), down(3)
-        for (int dir = (int)Direction::NONE+1; dir < (int)Direction::COUNT; dir++) {
-            char buf[128] = {0};
-            // FIXME: 修改图片名称使其统一
-            if (isHost) {
-                snprintf(buf, sizeof(buf), "%s/m%d-%d-1.png", imgPath, level, dir);
-            } else { // for enemy
-                snprintf(buf, sizeof(buf), "%s/%d-%d-1.png", imgPath, level+1, dir+1);
-            }
-            auto player_1 = SpriteFrame::create(buf, playerRect);
-            // FIXME: 修改图片名称使其统一
-            if (isHost) {
-                snprintf(buf, sizeof(buf), "%s/m%d-%d-2.png", imgPath, level, dir);
-            } else { // for enemy
-                snprintf(buf, sizeof(buf), "%s/%d-%d-2.png", imgPath, level+1, dir+1);
-            }
-            auto player_2 = SpriteFrame::create(buf, playerRect);
-            auto player = Animation::createWithSpriteFrames({ player_1, player_2 }, 0.05f);
-
-            player_1->getTexture()->setAliasTexParameters();
-            player_2->getTexture()->setAliasTexParameters();
-
-            // 添加到缓存
-            char name[128] = {0};
-            snprintf(name, sizeof(name), "%s_%d_%d", namePrefix, dir, level);
-            spriteFrameCache->addSpriteFrame(player_1, name);
-
-            // 保存
-            if (isHost) {
-                _animations[dir].pushBack(Animate::create(player));
-            } else {
-                _enemy_animations[dir].pushBack(Animate::create(player));
-            }
-        }
-    }
+    auto sf4 = Sprite::create("images/player-direction-indicator.png")->getSpriteFrame();
+    sf4->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf4, "player-direction-indicator");
 }
 
 const char* Player::getAvatar() const {
@@ -154,28 +119,51 @@ bool Player::init() {
     if (!Actor::init()) {
         return false;
     }
+    bool success = false;
+
+    setScale(defaultSpriteScale);
     _canMove = false;
 
     _initBullets();
 
     _isHost = Player::IsHost;
     if (_isHost) {
-        return _initPlayer();
+        success = _initPlayer();
     } else {
-        return _initEnemy();
+        success = _initEnemy();
     }
 
-    return true;
+    addBloodRing();
+    addDirectionIndicator();
+    //addShadow();
+
+    return success;
+}
+
+void Player::addBloodRing() {
+    _bloodRing = Sprite::create();
+    addChild(_bloodRing);
+}
+
+void Player::addDirectionIndicator() {
+    _dirIndicator = Sprite::create();
+    addChild(_dirIndicator);
+}
+
+void Player::loadSpriteFrames() {
+    _bloodRing->initWithSpriteFrameName("player-blood-ring");
+    _bloodRing->setPosition(getContentSize() / 2);
+
+    _dirIndicator->initWithSpriteFrameName("player-direction-indicator");
+    _dirIndicator->setPosition(getContentSize() / 2);
 }
 
 bool Player::_initPlayer() {
     // 玩家出生时血量为3
     _blood = 3;
+    _level = 2;
 
-    // 展示出生动画
-    char name[128] = {0};
-    snprintf(name, sizeof(name), "player1_%d_%d", (int)_dir, _level);
-    birth(name);
+    birth("player_avatar");
 
     return true;
 }
@@ -184,22 +172,9 @@ bool Player::_initEnemy() {
     // 随机选择一个类型
     _level = RandomUtil::random(0, 3);
 
-    // 展示出生动画
-    char name[128] = {0};
-    snprintf(name, sizeof(name), "enemy_%d_%d", (int)_dir, _level);
-    birth(name);
+    birth("enemy_avatar");
 
     return true;
-}
-
-std::string Player::getSpriteFrameName() const {
-    char name[128] = {0};
-    if (_isHost) {
-        snprintf(name, sizeof(name), "player1_%d_%d", (int)_dir, _level);
-    } else {
-        snprintf(name, sizeof(name), "enemy_%d_%d", (int)_dir, _level);
-    }
-    return std::string(name);
 }
 
 Direction Player::getInitialDirection() const {
@@ -216,7 +191,7 @@ Direction Player::getInitialDirection() const {
             }
         }
     } else {
-        dir = Direction::RIGHT;
+        dir = Direction::UP;
         int xDistance = abs(campPos.x - enemyCampPos.x);
         if (campPos.y < enemyCampPos.y) {
             int yDistance = abs(campPos.y - enemyCampPos.y);
@@ -229,8 +204,7 @@ Direction Player::getInitialDirection() const {
 }
 
 void Player::setInitialDirection() {
-    Direction dir = getInitialDirection();
-    setDirection(dir);
+    setDirection(getInitialDirection());
 }
 
 void Player::setInitialPosition() {
@@ -287,28 +261,17 @@ void Player::_detachBullets() {
 }
 
 void Player::playAnimate() {
-    if (!_canMove) {
-        return;
-    }
-
-    if (_isHost) {
-        this->runAction(RepeatForever::create(_animations[int(_dir)].at(_level)));
-    } else {
-        this->runAction(RepeatForever::create(_enemy_animations[int(_dir)].at(_level)));
-    }
-}
-
-void Player::playFallingAnimate() {
-    // rising, falling
-    //this->runAction(RepeatForever::create(_animations[int(_dir)].at(_level)));
 }
 
 void Player::stopAnimate() {
     if (!_canMove) {
         return;
     }
+    stopAllActions();
+}
 
-    this->stopAllActions();
+void Player::playFallingAnimate() {
+    // rising, falling
 }
 
 int Player::getMovingStep() const {
@@ -317,10 +280,6 @@ int Player::getMovingStep() const {
 }
 
 void Player::birth(const std::string& frameName) {
-    if (_isHost)
-    {
-        _level = 0;
-    }
     _canMove = false;
     stopAllActions();
 
@@ -339,7 +298,8 @@ void Player::birth(const std::string& frameName) {
     auto action = this->runAction(Sequence::create(
         animate,
         CallFunc::create([=]() {
-            this->initWithSpriteFrameName(frameName);
+            initWithSpriteFrameName(frameName);
+            loadSpriteFrames();
             _canMove = true;
             if (_isHost) {
                 this->beInvincible(3);
@@ -424,14 +384,25 @@ void Player::beInvincible(int time) {
         ));
 }
 
-void Player::changeDirection() {
-    if (_moveDistance < Player::MAX_MOVE_DISTANCE) {
+bool Player::setDirection(Direction dir) {
+    bool changed = MovableBlock::setDirection(dir);
+    if (changed && _dirIndicator) {
+        float degree = calculateRotateDegree(_fromDir, _dir);
+        float durationTime = 0.2f;
+        _dirIndicator->runAction(RotateBy::create(durationTime, degree));
+    }
+    return changed;
+}
+
+void Player::changeEnemyDirection() {
+    if (_moveDistance < Player::MAX_MOVING_DISTANCE) {
         return;
     }
     _moveDistance = 0;
 
+    stopAnimate();
+
     auto select = RandomUtil::random(1, 10);
-    this->stopAnimate();
     if (select <= 4) {
         setDirection(Direction::DOWN);
     } else if (select <= 6) {
@@ -441,14 +412,11 @@ void Player::changeDirection() {
     } else {
         setDirection(Direction::RIGHT);
     }
-    this->playAnimate();
+
+    playAnimate();
 }
 
 void Player::shoot() {
-    if (!_canMove) {
-        return;
-    }
-
     auto bullet1 = _bullets.at(0);
     auto bullet2 = _bullets.at(1);
 
@@ -537,7 +505,7 @@ void Player::disBlood() {
             // 回到出生点, TODO: 等待N秒钟再重生
             setInitialDirection();
             setInitialPosition();
-            birth("player1_" + std::to_string((int)_dir) + "_" + std::to_string(_level));
+            birth("player_avatar");
         }
     }
 }
@@ -607,8 +575,8 @@ void Player::onCollidedWith(Vector<Block*>& withBlocks) {
     }
     if (!_isHost) {
         // 敌方坦克碰撞后可以改变方向
-        _moveDistance = Player::MAX_MOVE_DISTANCE;
-        changeDirection();
+        _moveDistance = Player::MAX_MOVING_DISTANCE;
+        changeEnemyDirection();
     }
 }
 

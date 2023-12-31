@@ -19,20 +19,14 @@ class Block;
 class Player : public Actor {
 public:
     static constexpr float SIZE = Actor::SIZE;
-    static constexpr int MAX_MOVE_DISTANCE = 100;
+    static constexpr int MAX_MOVING_DISTANCE = 100;
 
     static std::set<BlockType> CollidingAbleBlockTypes;
     static bool IsHost;
 
-private:
-    // 存储坦克移动帧动画（方向和等级）
-    static Vector<Animate*> _animations[4];
-    static Vector<Animate*> _enemy_animations[4];
-
 public:
     static void initSpriteFrameCache();
     static void loadFrameAnimation();            // 加载坦克移动帧动画
-    static void _loadFrameAnimation(const char* imgPath, const char* namePrefix);
     CREATE_FUNC(Player);
 
 public:
@@ -41,10 +35,10 @@ public:
 
     const char* getAvatar() const;
 
-    virtual void playAnimate() override;                         // 播放移动动画
+    virtual void playAnimate() override;                   // 播放动画
+    virtual void stopAnimate() override;                   // 停止播放动画
     virtual void playFallingAnimate() override;
-    virtual void stopAnimate() override;                         // 停止播放动画
-    virtual std::string getSpriteFrameName() const;
+    virtual std::string getSpriteFrameName() const { return ""; }
     virtual int getMovingStep() const override;
 
     void birth(const std::string& frameName);           // 坦克出生动画
@@ -76,7 +70,8 @@ public:
     void setInitialPosition();
     Direction getInitialDirection() const;
     void setInitialDirection();
-    void changeDirection();
+    virtual bool setDirection(Direction dir) override;
+    void changeEnemyDirection();
 
     bool isBeControl() const { return _isBeControl; }
     void shoot();
@@ -105,6 +100,10 @@ public:
 private:
     bool _initPlayer();
     bool _initEnemy();
+    void addBloodRing();
+    void addDirectionIndicator();
+    void loadSpriteFrames();
+    Vec2 calculateDirectionIndicatorPosition();
 
     void _initBullets();
     void _detachBullets();
@@ -112,6 +111,8 @@ private:
     void _shoot(Bullet* bullet);
 
 private:
+    Sprite* _bloodRing = nullptr;
+    Sprite* _dirIndicator = nullptr;
     time_t _birthTime;
     int _blood = 1;
     bool _isInvincible = false;
@@ -130,4 +131,8 @@ private:
     int _fireBombs = 2;         // 燃烧弹
 
     int _creatingBlock = (int)BlockType::WALL;     // default is BlockType::WALL
+
+    // 存储坦克移动帧动画（方向和等级）
+    static Vector<Animate*> _animations[4];
+    static Vector<Animate*> _enemy_animations[4];
 };

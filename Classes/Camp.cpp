@@ -133,7 +133,7 @@ void Camp::autoAddPlayers(float) {
 void Camp::autoControlPlayersDirection(float) {
     for (auto iter : _players) {
         auto player = iter.second;
-        player->changeDirection();
+        player->changeEnemyDirection();
     }
 }
 
