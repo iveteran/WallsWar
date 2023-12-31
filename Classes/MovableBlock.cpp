@@ -23,6 +23,13 @@ bool isActor(BlockType bType) {
         bType == BlockType::MANAGER;
 }
 
+bool MovableBlock::init() {
+    if (!Block::init()) return false;
+
+    scheduleUpdate();
+    return true;
+}
+
 std::set<BlockType>
 MovableBlock::getCollidingAbleBTs() const {
     return MovableBlock::CollidingAbleBlockTypes;
@@ -168,24 +175,23 @@ void MovableBlock::startMove(Direction dir) {
     if (movingMusicEnabled()) {
         _musicId = AudioEngine::play2d("music/player_move.mp3");
     }
-    schedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove), 0);  // 每帧调用
     _isMoving = true;
     playAnimate();
 }
 
 void MovableBlock::stopMove() {
-    unschedule(CC_SCHEDULE_SELECTOR(MovableBlock::_autoMove));
     if (_musicId != -1) {
         AudioEngine::stop(_musicId);
     }
     // 到达目的地后，将坐标调整为最接近于BLOCK_SIZE的倍数
     //_adjustPosition();
     _isMoving = false;
+    _moveDistance = 0;
     stopAnimate();
 }
 
-void MovableBlock::_autoMove(float dt) {
-    if (!_canMove) {
+void MovableBlock::update(float dt) {
+    if (!_isMoving) {
         return;
     }
     int step = getMovingStep();

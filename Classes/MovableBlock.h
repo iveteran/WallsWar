@@ -18,7 +18,7 @@ public:
     static std::set<BlockType> CollidingAbleBlockTypes;
 
 public:
-    bool init() override { return Block::init(); }
+    bool init() override;
     BlockType getType() const override { return BlockType::MOVABLE_BLOCK; }
 
     bool movable() const override { return true; }
@@ -70,7 +70,7 @@ public:
     void onMoved();
 
 protected:
-    void _autoMove(float t);                           // 自动移动
+    virtual void update(float dt) override;
     void _adjustPosition();
     float _adjustNumber(int number);
 
