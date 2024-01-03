@@ -51,7 +51,7 @@ bool Teammate::init(Player* player) {
     addChild(clip);
     */
 
-    auto avatarBtn = Button::create(player->getAvatar());
+    auto avatarBtn = Button::create(player->getAvatarImage());
     avatarBtn->setScale(0.3);
     avatarBtn->setPosition(getContentSize() / 2);
     avatarBtn->setTag(_player->id());

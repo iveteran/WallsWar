@@ -2,6 +2,12 @@
 
 #include "Campus.h"
 
+//constexpr unsigned char ENEMIES_COUNT = 20;
+constexpr unsigned char ENEMIES_COUNT = 6;
+
+class ActorController;
+class CampAI;
+
 class Camp : public Campus {
 public:
     static constexpr float SIZE = Campus::SIZE;
@@ -16,30 +22,19 @@ public:
 
     virtual std::string getSpriteFrameName() const override { return "camp_0"; }
 
-    Player* addPlayer1();
-    Player* getPlayer1();
-    Camp* getEnemyCamp() const { return _enemyCamp; }
-    void setEnemyCamp(Camp* camp) {
-        if (camp == nullptr || _enemyCamp == camp) {
-            return;
-        }
-        _enemyCamp = camp;
-        camp->setEnemyCamp(this);
-    }
+    Player* addHost();
+
+    const Map<int, Camp*>& getEnemyCamps() const;
+    void addEnemyCamp(Camp* camp);
+
     int getRemainPlayers() const { return _remainPlayers; }
 
-    void addPlayers(bool enableAI);
-    Player* addPlayer(bool enableAI=false);
+    Player* addPlayer(ActorController* controller=nullptr);
+    void addPlayer(Player* player);
     void removePlayer(Player* player);
+    void removePlayer(int playerId);
 
     void enableAI();
-
-    void enableAutoAddPlayers(bool enable=true);
-    void enableAutoControlPlayers(bool enable=true);
-
-    void autoAddPlayers(float);
-    void autoControlPlayersDirection(float);
-    void autoControlPlayersShoot(float);
 
     virtual void onBeCollided(Block* activeBlock) override;
 
@@ -47,11 +42,11 @@ public:
     bool isWin() const;
     void showLostAnimate();
 
-    void GameOver();
-    bool isCampOk = true;                           // 大本营是否完好
-
 private:
-    //int _remainPlayers = ENEMIES_COUNT;       // 剩余未出生的敌方坦克
-    int _remainPlayers = 6;
-    Camp* _enemyCamp = nullptr;
+    int _remainPlayers = ENEMIES_COUNT;       // 剩余未出生的敌方坦克
+    Map<int, Camp*> _enemyCamps;
+    bool _joinedBattle = false;
+
+    CampAI* _ai = nullptr;
+    bool isCampOk = true;                           // 大本营是否完好
 };

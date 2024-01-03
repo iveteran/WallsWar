@@ -5,16 +5,18 @@
 #include "Direction.h"
 
 using cocos2d::Vector;
+using cocos2d::Map;
 using cocos2d::Animate;
 
-class Bullet;
-//class Controller;
-class AI;
+class ActorController;
 class User;
+class AI;
 class UserAgent;
 class Camp;
 class Campus;
 class Block;
+class Bullet;
+class Weapon;
 
 class Player : public Actor {
 public:
@@ -22,31 +24,30 @@ public:
     static constexpr int MAX_MOVING_DISTANCE = 100;
 
     static std::set<BlockType> CollidingAbleBlockTypes;
-    static bool IsHost;
 
 public:
     static void initSpriteFrameCache();
-    static void loadFrameAnimation();            // 加载坦克移动帧动画
-    CREATE_FUNC(Player);
+    static void loadFrameAnimation();            // 加载移动帧动画
+    static Player* create(ActorController* controller=nullptr);
 
 public:
-    bool init() override;
+    bool init(ActorController* controller=nullptr);
     BlockType getType() const override { return BlockType::PLAYER; }
 
-    const char* getAvatar() const;
+    const char* getAvatarImage() const;
 
-    virtual void playAnimate() override;                   // 播放动画
-    virtual void stopAnimate() override;                   // 停止播放动画
+    virtual void playAnimate() override;    // 播放动画
+    virtual void stopAnimate() override;    // 停止播放动画
     virtual void playFallingAnimate() override;
     virtual std::string getSpriteFrameName() const { return ""; }
     virtual int getMovingStep() const override;
 
-    void birth(const std::string& frameName);           // 坦克出生动画
-    void beInvincible(int);                             // 使坦克无敌
-    virtual void disBlood();                            // 坦克掉血
+    void birth(const std::string& frameName);
+    void beInvincible(int);
+    virtual void disBlood();
 
     bool isHost() const { return _isHost; }
-    void setHost() { _isHost = true; }
+    //void setHost() { _isHost = true; }
     void moveCamaraToCamp();
 
     bool beControlledByAI(const AI* ai);
@@ -57,15 +58,23 @@ public:
     //void exit();
     virtual Camp* getCamp() const override { return _joinedCamp; }
 
+    Campus* createCampus();
+
+    void handleBeAttacked(const Weapon* weapon);
+
+    void addEnemy(const Player* enemy);
+    void removeEnemy(int playerId);
+    bool isEnemy(int playerId);
+
     void joinCamp(Camp* camp);
     void exitCamp();
     bool hasTeammates() const;
 
-    void setEnemyCamp(Camp* camp) { _enemyCamp = camp; setInitialDirection(); }
-    Camp* getEnemyCamp() const { return _enemyCamp; }
-    //Campus* createCampus();
+    void addEnemyCamp(Camp* camp);
+    const Map<int, Camp*>& getEnemyCamps() const;
+    bool isFreeMan() const;
 
-    //Controller* getController() const;
+    ActorController* getController() const { return _controller; }
 
     void setInitialPosition();
     Direction getInitialDirection() const;
@@ -98,8 +107,6 @@ public:
     //virtual void onBirth();
 
 private:
-    bool _initPlayer();
-    bool _initEnemy();
     void addBloodRing();
     void addDirectionIndicator();
     void loadSpriteFrames();
@@ -118,10 +125,11 @@ private:
     bool _isInvincible = false;
     bool _isHost = false;
     bool _isBeControl = false;
-    //Campus* _campus = nullptr;
+    Campus* _selfCampus = nullptr;
     Camp* _joinedCamp = nullptr;
-    Camp* _enemyCamp = nullptr;
-    //Client* _client;
+    Map<int, Player*> _enemies;
+
+    ActorController* _controller = nullptr;
 
     Vector<Bullet*> _bullets;   // 存储坦克所有的子弹
 
@@ -131,8 +139,4 @@ private:
     int _fireBombs = 2;         // 燃烧弹
 
     int _creatingBlock = (int)BlockType::WALL;     // default is BlockType::WALL
-
-    // 存储坦克移动帧动画（方向和等级）
-    static Vector<Animate*> _animations[4];
-    static Vector<Animate*> _enemy_animations[4];
 };

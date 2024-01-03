@@ -26,10 +26,11 @@ public:
     virtual std::string getSpriteFrameName() const override { return "camp_1"; }
 
     Map<int64_t, Player*> getPlayers() const { return _players; }
-    Player* getManager() const { return _manager; }
-    int count() const { return _players.size(); }
+    Player* getHost() const { return _host; }
+    void setHost(Player* player) { _host = player; }
+    int numPlayers() const { return _players.size(); }
 
 protected:
     Map<int64_t, Player*> _players;
-    Player* _manager = nullptr;
+    Player* _host = nullptr;
 };

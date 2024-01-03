@@ -4,11 +4,10 @@
 #include "Camp.h"
 #include "Player.h"
 #include "MapLayer.h"
+#include "User.h"
+#include "AI.h"
 
 USING_NS_CC;
-
-// 敌方坦克总数
-constexpr unsigned char ENEMIES_COUNT = 20;
 
 void Camp::initSpriteFrameCache() {
     auto camp_0 = Sprite::create("images/block/camp0.png")->getSpriteFrame();
@@ -31,123 +30,39 @@ bool Camp::init() {
 }
 
 void Camp::enableAI() {
-    Player::IsHost = false;
-    bool enableAI = true;
-    addPlayers(enableAI);
-    if (enableAI) {
-        enableAutoAddPlayers();
-        enableAutoControlPlayers();
-    }
+    _ai = CampAI::create(this);
+    addChild(_ai);
+    _ai->run();
 }
 
-void Camp::enableAutoAddPlayers(bool enable) {
-    if (enable) {
-        // 每隔4.5秒添加一名敌人
-        schedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers), 5.0f);
-    } else {
-        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoAddPlayers));
-    }
+Player* Camp::addHost() {
+    auto user = User::create();
+    _host = addPlayer(user);
+    _host->allowCameraFollows();
+    return _host;
 }
 
-void Camp::enableAutoControlPlayers(bool enable) {
-    if (enable) {
-        schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection), 0.1f);
-        schedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot), 0.5f);
-    } else {
-        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersDirection));
-        unschedule(CC_SCHEDULE_SELECTOR(Camp::autoControlPlayersShoot));
-    }
-}
+Player* Camp::addPlayer(ActorController* controller) {
+    auto player = Player::create(controller);
+    addPlayer(player);
 
-void Camp::addPlayers(bool enableAI) {
-    // 初始时添加3辆坦克
-    if (_remainPlayers == ENEMIES_COUNT) {
-        addPlayer(enableAI);
-        addPlayer(enableAI);
-        addPlayer(enableAI);
-    } else {
-        if (_remainPlayers == 0) return;
-
-        // 当坦克数量小于6辆时
-        if (_players.size() < 6) {
-            // 随机添加一辆
-            switch (RandomUtil::random(0, 2)) {
-            case 0:
-                addPlayer(enableAI);
-                break;
-            case 1:
-                addPlayer(enableAI);
-                break;
-            case 2:
-                addPlayer(enableAI);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-}
-
-Player* Camp::addPlayer1() {
-    Player::IsHost = true;
-    auto player1 = addPlayer();
-    player1->allowCameraFollows();
-    _remainPlayers = 0;
-    return player1;
-}
-
-Player* Camp::getPlayer1() {
-    return _manager;
-}
-
-Player* Camp::addPlayer(bool enableAI) {
-    auto mapLayer = MapLayer::getInstance();
-    auto player = Player::create();
-    player->joinCamp(this);
-    player->setInitialPosition();
-    if (enableAI) {
-        player->startMove();
-    }
-    mapLayer->addAndManageBlock(player);
-
-    if (!_manager) {
-        _manager = player;  // set the first player as the camp manager
-    }
-
-    _players.insert(player->id(), player);
-    _remainPlayers--;
-
-    //auto gameScene = dynamic_cast<GameScene*>(Director::getInstance()->getRunningScene());
-    //if (gameScene) {
-    //    gameScene->updateInformationArea();
-    //}
+    MapLayer::getInstance()->addAndManageBlock(player);
 
     return player;
 }
 
-void Camp::autoAddPlayers(float) {
-    bool enableAI = true;
-    addPlayers(enableAI);
-}
-
-void Camp::autoControlPlayersDirection(float) {
-    for (auto iter : _players) {
-        auto player = iter.second;
-        player->changeEnemyDirection();
-    }
-}
-
-void Camp::autoControlPlayersShoot(float) {
-    for (auto iter : _players) {
-        auto player = iter.second;
-        // 三分之一的概率发射子弹
-        if (RandomUtil::random(1, 3) == 1)
-            player->shoot();
-    }
+void Camp::addPlayer(Player* player) {
+    player->joinCamp(this);
+    _players.insert(player->id(), player);
+    _remainPlayers--;
 }
 
 void Camp::removePlayer(Player* player) {
-    _players.erase(player->id());
+    player->exitCamp();
+}
+
+void Camp::removePlayer(int playerId) {
+    _players.erase(playerId);
 }
 
 void Camp::onBeCollided(Block* activeBlock) {
@@ -161,12 +76,33 @@ void Camp::onBeCollided(Block* activeBlock) {
     isCampOk = false;
 }
 
+const Map<int, Camp*>& Camp::getEnemyCamps() const {
+    return _enemyCamps;
+}
+
+void Camp::addEnemyCamp(Camp* camp) {
+    if (camp == nullptr) {
+        return;
+    }
+    _joinedBattle = true;
+    _enemyCamps.insert(camp->id(), camp);
+    //camp->setEnemyCamp(this);
+}
+
 bool Camp::isLost() const {
     return !isCampOk || (_players.empty() && _remainPlayers == 0);
 }
 
 bool Camp::isWin() const {
-    return _enemyCamp && _enemyCamp->isLost();
+    if (!_joinedBattle) return false;
+
+    for (auto iter : _enemyCamps) {
+        auto enemyCamp = iter.second;
+        if (!enemyCamp->isLost()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 void Camp::showLostAnimate() {

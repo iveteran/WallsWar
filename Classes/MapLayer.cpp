@@ -375,14 +375,14 @@ void MapLayer::resetMap() {
 void MapLayer::createCamps() {
     auto campPos = Vec2(CAMP_X, CAMP_Y); // 左下角
     _camp = createCamp(campPos);
-    _player1 = _camp->addPlayer1();
+    _player1 = _camp->addHost();
 
     auto enemyCampPos = Vec2(ENEMY_CAMP_X, ENEMY_CAMP_Y); // 右上角
     _enemyCamp = createCamp(enemyCampPos);
     _enemyCamp->enableAI();
 
-    _camp->setEnemyCamp(_enemyCamp);
-    _player1->setEnemyCamp(_enemyCamp);
+    _camp->addEnemyCamp(_enemyCamp);
+    _player1->addEnemyCamp(_enemyCamp);
 }
 
 Camp* MapLayer::createCamp(const Vec2& pos) {
@@ -408,7 +408,7 @@ Player* MapLayer::getPlayer1() const {
 void MapLayer::createCampusParapetWall(const Camp* camp) {
     // 顺时针所有块，注：坐标原点在左下角, 如果在游戏地图外就不创建
     auto campPos = camp->getPosition();
-    auto campManager = camp->getManager();
+    auto campManager = camp->getHost();
     // 上侧护墙，从左到右
     int x, y;
     y = campPos.y + Camp::SIZE / 2;

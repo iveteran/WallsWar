@@ -5,15 +5,13 @@
 #include "Bullet.h"
 #include "Camp.h"
 #include "constants/CampConstants.h"
+#include "AI.h"
+#include "User.h"
 
 #include "RandomUtil.h"
 #include "AudioEngine.h"
 
 USING_NS_CC;
-
-bool Player::IsHost = false;
-Vector<Animate*> Player::_animations[4]{};
-Vector<Animate*> Player::_enemy_animations[4]{};
 
 std::set<BlockType>
 Player::CollidingAbleBlockTypes{
@@ -92,7 +90,7 @@ void Player::loadFrameAnimation() {
 
     auto sf1 = Sprite::create("images/player-avatar-anonymous.png")->getSpriteFrame();
     sf1->getTexture()->setAliasTexParameters();
-    SpriteFrameCache::getInstance()->addSpriteFrame(sf1, "enemy_avatar");
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf1, "anonymous_avatar");
 
     auto sf2 = Sprite::create("images/player-avatar-yuu.png")->getSpriteFrame();
     sf2->getTexture()->setAliasTexParameters();
@@ -107,37 +105,56 @@ void Player::loadFrameAnimation() {
     SpriteFrameCache::getInstance()->addSpriteFrame(sf4, "player-direction-indicator");
 }
 
-const char* Player::getAvatar() const {
-    if (_isHost) {
-        return "images/yuu-avatar.jpg";
+Player* Player::create(ActorController* controller) {
+    auto pRet = new(std::nothrow) Player();
+    if (pRet && pRet->init(controller)) {
+        pRet->autorelease();
+        return pRet;
     } else {
-        return "images/game-manager.png";
+        delete pRet;
+        return nullptr;
     }
 }
 
-bool Player::init() {
+bool Player::init(ActorController* controller) {
     if (!Actor::init()) {
         return false;
     }
-    bool success = false;
+    _controller = controller;
+    if (!_controller) {
+        auto ai = PlayerAI::create(this);
+        ai->run();
+        _controller = ai;
+        addChild(_controller);
+    }
+    const char* avatarFrameName = "anonymous_avatar";
+    _isHost = _controller->getType() == ActorController::User;
+    if (_isHost) {
+        auto user = dynamic_cast<User*>(_controller);
+        avatarFrameName = user->getAvatarFrameName();
+    }
 
     setScale(defaultSpriteScale);
     _canMove = false;
 
-    _initBullets();
-
-    _isHost = Player::IsHost;
-    if (_isHost) {
-        success = _initPlayer();
-    } else {
-        success = _initEnemy();
-    }
+    birth(avatarFrameName);
 
     addBloodRing();
     addDirectionIndicator();
     //addShadow();
 
-    return success;
+    _initBullets();
+
+    return true;
+}
+
+const char* Player::getAvatarImage() const {
+    if (_isHost) {
+        auto user = dynamic_cast<User*>(_controller);
+        return user->getAvatarImage();
+    } else {
+        return "images/game-manager.png";
+    }
 }
 
 void Player::addBloodRing() {
@@ -158,29 +175,11 @@ void Player::loadSpriteFrames() {
     _dirIndicator->setPosition(getContentSize() / 2);
 }
 
-bool Player::_initPlayer() {
-    // 玩家出生时血量为3
-    _blood = 3;
-    _level = 2;
-
-    birth("player_avatar");
-
-    return true;
-}
-
-bool Player::_initEnemy() {
-    // 随机选择一个类型
-    _level = RandomUtil::random(0, 3);
-
-    birth("enemy_avatar");
-
-    return true;
-}
-
 Direction Player::getInitialDirection() const {
+    /*
     Direction dir = Direction::NONE;
     auto campPos = _joinedCamp->getPosition();
-    auto enemyCampPos = _enemyCamp->getPosition();
+    //auto enemyCampPos = _enemyCamp->getPosition();
     if (campPos.x > enemyCampPos.x) {
         dir = Direction::LEFT;
         int xDistance = campPos.x - enemyCampPos.x;
@@ -201,6 +200,8 @@ Direction Player::getInitialDirection() const {
         }
     }
     return dir;
+    */
+    return Direction::UP;
 }
 
 void Player::setInitialDirection() {
@@ -300,9 +301,9 @@ void Player::birth(const std::string& frameName) {
         CallFunc::create([=]() {
             initWithSpriteFrameName(frameName);
             loadSpriteFrames();
+            beInvincible(3);
             _canMove = true;
             if (_isHost) {
-                this->beInvincible(3);
                 moveCamaraToCamp();
             }
         }),
@@ -510,18 +511,59 @@ void Player::disBlood() {
     }
 }
 
+void Player::handleBeAttacked(const Weapon* weapon) {
+    disBlood();
+    auto enemy = dynamic_cast<const Player*>(weapon->getCreator());
+    if (!enemy) {
+        return;
+    }
+    addEnemy(enemy);
+    auto enemyCamp = enemy->getCamp();
+    if (enemyCamp && _joinedCamp) {
+        _joinedCamp->addEnemyCamp(enemyCamp);
+    }
+}
+
+void Player::addEnemy(const Player* enemy) {
+    _enemies.insert(enemy->id(), (Player*)enemy);
+}
+
+void Player::removeEnemy(int playerId) {
+    _enemies.erase(playerId);
+}
+
+bool Player::isEnemy(int playerId) {
+    return _enemies.find(playerId) != _enemies.end();
+}
+
 void Player::joinCamp(Camp* camp) {
     if (_joinedCamp) {
         exitCamp();
     }
     _joinedCamp = camp;
+
+    setInitialPosition();
 }
 
 void Player::exitCamp() {
     if (_joinedCamp) {
-        _joinedCamp->removePlayer(this);
+        _joinedCamp->removePlayer(id());
         _joinedCamp = nullptr;
     }
+}
+
+void Player::addEnemyCamp(Camp* camp) {
+    _joinedCamp->addEnemyCamp(camp);
+    setInitialDirection();
+}
+
+const Map<int, Camp*>& Player::getEnemyCamps() const {
+    static const Map<int, Camp*> _emptyCamps;
+    return _joinedCamp ? _joinedCamp->getEnemyCamps() : _emptyCamps;
+}
+
+bool Player::isFreeMan() const {
+    return !_joinedCamp;
 }
 
 bool Player::hasTeammates() const {
@@ -538,7 +580,7 @@ void Player::onBeCollided(Block* activeBlock) {
                 ) {
             return; // 忽略自己和队友的子弹
         } else {
-            disBlood();
+            handleBeAttacked(bullet);
         }
     } else if (activeBlock->getType() == BlockType::PLAYER) {
         auto otherPlayer = dynamic_cast<Player*>(activeBlock);
