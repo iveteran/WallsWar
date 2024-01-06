@@ -28,6 +28,7 @@ public:
     void addEnemyCamp(Camp* camp);
 
     int getRemainPlayers() const { return _remainPlayers; }
+    bool requestLifeOk();
 
     Player* addPlayer(ActorController* controller=nullptr);
     void addPlayer(Player* player);

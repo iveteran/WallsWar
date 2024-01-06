@@ -233,7 +233,7 @@ void TMXMapInfo::startElement(void* /*ctx*/, const char *name, const char **atts
     if (elementName == "map")
     {
         std::string version = attributeDict["version"].asString();
-        if ( version != "1.0")
+        if ( version != "1.8")
         {
             CCLOG("cocos2d: TMXFormat: Unsupported TMX version: %s", version.c_str());
         }

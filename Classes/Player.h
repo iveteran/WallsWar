@@ -7,8 +7,10 @@
 using cocos2d::Vector;
 using cocos2d::Map;
 using cocos2d::Animate;
+using cocos2d::SpriteFrame;
 
 class ActorController;
+class PlayerAI;
 class User;
 class AI;
 class UserAgent;
@@ -28,10 +30,10 @@ public:
 public:
     static void initSpriteFrameCache();
     static void loadFrameAnimation();            // 加载移动帧动画
-    static Player* create(ActorController* controller=nullptr);
+    static Player* create(Camp* camp=nullptr, ActorController* controller=nullptr);
 
 public:
-    bool init(ActorController* controller=nullptr);
+    bool init(Camp* camp=nullptr, ActorController* controller=nullptr);
     BlockType getType() const override { return BlockType::PLAYER; }
 
     const char* getAvatarImage() const;
@@ -42,7 +44,7 @@ public:
     virtual std::string getSpriteFrameName() const { return ""; }
     virtual int getMovingStep() const override;
 
-    void birth(const std::string& frameName);
+    Animate* createBirthEffectAnimate(Vector<SpriteFrame*>& spriteFrames);
     void beInvincible(int);
     virtual void disBlood();
 
@@ -109,19 +111,27 @@ public:
 private:
     void addBloodRing();
     void addDirectionIndicator();
-    void loadSpriteFrames();
     Vec2 calculateDirectionIndicatorPosition();
 
     void _initBullets();
     void _detachBullets();
+    void returnToCamp();
+    void addToBattlefield();
+    void removeFromBattlefield();
 
+    void birth();
+    void birthScheduler(float dt);
+    void showAttackedEffect();
+    void changeBloodRing();
+    void showDeadEffect();
+    void showKickoutEffect();
     void _shoot(Bullet* bullet);
 
 private:
     Sprite* _bloodRing = nullptr;
     Sprite* _dirIndicator = nullptr;
     time_t _birthTime;
-    int _blood = 1;
+    int _blood = 3;
     bool _isInvincible = false;
     bool _isHost = false;
     bool _isBeControl = false;
@@ -130,6 +140,7 @@ private:
     Map<int, Player*> _enemies;
 
     ActorController* _controller = nullptr;
+    PlayerAI* _ai = nullptr;
 
     Vector<Bullet*> _bullets;   // 存储坦克所有的子弹
 

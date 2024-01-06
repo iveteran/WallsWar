@@ -98,18 +98,26 @@ void Player::loadFrameAnimation() {
     sf2->getTexture()->setAliasTexParameters();
     SpriteFrameCache::getInstance()->addSpriteFrame(sf2, "player_avatar");
 
-    auto sf3 = Sprite::create("images/player-blood-ring-3.png")->getSpriteFrame();
+    auto sf3 = Sprite::create("images/player-blood-ring-3-3.png")->getSpriteFrame();
     sf3->getTexture()->setAliasTexParameters();
-    SpriteFrameCache::getInstance()->addSpriteFrame(sf3, "player-blood-ring");
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf3, "player-blood-ring-3-3");
+
+    auto sf3_1 = Sprite::create("images/player-blood-ring-3-1.png")->getSpriteFrame();
+    sf3_1->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf3_1, "player-blood-ring-3-1");
+
+    auto sf3_2 = Sprite::create("images/player-blood-ring-3-2.png")->getSpriteFrame();
+    sf3_2->getTexture()->setAliasTexParameters();
+    SpriteFrameCache::getInstance()->addSpriteFrame(sf3_2, "player-blood-ring-3-2");
 
     auto sf4 = Sprite::create("images/player-direction-indicator.png")->getSpriteFrame();
     sf4->getTexture()->setAliasTexParameters();
     SpriteFrameCache::getInstance()->addSpriteFrame(sf4, "player-direction-indicator");
 }
 
-Player* Player::create(ActorController* controller) {
+Player* Player::create(Camp* camp, ActorController* controller) {
     auto pRet = new(std::nothrow) Player();
-    if (pRet && pRet->init(controller)) {
+    if (pRet && pRet->init(camp, controller)) {
         pRet->autorelease();
         return pRet;
     } else {
@@ -118,34 +126,41 @@ Player* Player::create(ActorController* controller) {
     }
 }
 
-bool Player::init(ActorController* controller) {
+bool Player::init(Camp* camp, ActorController* controller) {
     if (!Actor::init()) {
         return false;
     }
-    _controller = controller;
-    if (!_controller) {
-        auto ai = PlayerAI::create(this);
-        ai->run();
-        _controller = ai;
-        addChild(_controller);
-    }
-    const char* avatarFrameName = "anonymous_avatar";
-    _isHost = _controller->getType() == ActorController::User;
-    if (_isHost) {
-        auto user = dynamic_cast<User*>(_controller);
-        avatarFrameName = user->getAvatarFrameName();
-    }
 
     setScale(defaultSpriteScale);
-    _canMove = false;
+    //_canMove = false;
 
-    birth(avatarFrameName);
+    if (!camp) {
+        camp = MapLayer::getInstance()->getPublicCamp();
+    }
+    joinCamp(camp);
+
+    const char* avatarFrameName = "anonymous_avatar";
+    if (controller) {
+        _controller = controller;
+        _isHost = _controller->getType() == ActorController::User;
+        auto user = dynamic_cast<User*>(_controller);
+        avatarFrameName = user->getAvatarFrameName();
+        _level = 2;
+    } else {
+        _ai = PlayerAI::create(this);
+        _ai->run();
+        addChild(_ai);
+    }
+
+    initWithSpriteFrameName(avatarFrameName);
 
     addBloodRing();
     addDirectionIndicator();
     //addShadow();
 
     _initBullets();
+
+    birth();
 
     return true;
 }
@@ -161,20 +176,18 @@ const char* Player::getAvatarImage() const {
 
 void Player::addBloodRing() {
     _bloodRing = Sprite::create();
+    auto spriteFrameName = StringUtils::format("player-blood-ring-3-%d", _blood);
+    _bloodRing->initWithSpriteFrameName(spriteFrameName);
+    _bloodRing->setPosition(getContentSize() / 2);
     addChild(_bloodRing);
+
 }
 
 void Player::addDirectionIndicator() {
     _dirIndicator = Sprite::create();
-    addChild(_dirIndicator);
-}
-
-void Player::loadSpriteFrames() {
-    _bloodRing->initWithSpriteFrameName("player-blood-ring");
-    _bloodRing->setPosition(getContentSize() / 2);
-
     _dirIndicator->initWithSpriteFrameName("player-direction-indicator");
     _dirIndicator->setPosition(getContentSize() / 2);
+    addChild(_dirIndicator);
 }
 
 Direction Player::getInitialDirection() const {
@@ -258,7 +271,7 @@ void Player::_detachBullets() {
         if (bullet->isFiring()) {
             bullet->unsetCreator();
         } else {
-            bullet->destroy();
+            //bullet->destroy();
         }
     }
 }
@@ -282,12 +295,40 @@ int Player::getMovingStep() const {
     return step;
 }
 
-void Player::birth(const std::string& frameName) {
-    _canMove = false;
+void Player::birth() {
+    //_canMove = false;
+    _blood = 3;
+
     stopAllActions();
 
+    auto spriteFrameName = StringUtils::format("player-blood-ring-3-%d", _blood);
+    _bloodRing->initWithSpriteFrameName(spriteFrameName);
+    addToBattlefield();
+    setInitialDirection();
+    setInitialPosition();
+
+    //Vector<SpriteFrame*> spriteFrames;
+    //auto animate = createBirthEffectAnimate(spriteFrames);
+
+    runAction(Sequence::create(
+        //animate,
+        CallFunc::create([=]() {
+            beInvincible(3);
+            //_canMove = true;
+            if (_isHost) {
+                moveCameraToPlayer();
+            }
+        }),
+        nullptr
+    ));
+}
+
+void Player::birthScheduler(float dt) {
+    birth();
+}
+
+Animate* Player::createBirthEffectAnimate(Vector<SpriteFrame*>& spriteFrames) {
     auto spriteFrameCache = SpriteFrameCache::getInstance();
-    Vector<SpriteFrame*> spriteFrames;
     for (int i = 0; i < 4 * 2; i++) {
         std::string n = std::to_string(i % 4);
         auto spriteFrame = spriteFrameCache->getSpriteFrameByName("star_" + n);
@@ -298,19 +339,7 @@ void Player::birth(const std::string& frameName) {
     auto animation = Animation::createWithSpriteFrames(spriteFrames, 0.2f);
     auto animate = Animate::create(animation);
 
-    auto action = this->runAction(Sequence::create(
-        animate,
-        CallFunc::create([=]() {
-            initWithSpriteFrameName(frameName);
-            loadSpriteFrames();
-            beInvincible(3);
-            _canMove = true;
-            if (_isHost) {
-                moveCameraToPlayer();
-            }
-        }),
-        nullptr
-    ));
+    return animate;
 }
 
 void Player::moveCameraToPlayer() {
@@ -392,31 +421,11 @@ bool Player::setDirection(Direction dir) {
     if (changed && _dirIndicator) {
         float degree = calculateRotateDegree(_fromDir, _dir);
         float durationTime = 0.2f;
+        stopAnimate();
         _dirIndicator->runAction(RotateBy::create(durationTime, degree));
+        playAnimate();
     }
     return changed;
-}
-
-void Player::changeEnemyDirection() {
-    if (_moveDistance < Player::MAX_MOVING_DISTANCE) {
-        return;
-    }
-    _moveDistance = 0;
-
-    stopAnimate();
-
-    auto select = RandomUtil::random(1, 10);
-    if (select <= 4) {
-        setDirection(Direction::DOWN);
-    } else if (select <= 6) {
-        setDirection(Direction::UP);
-    } else if (select <= 8) {
-        setDirection(Direction::LEFT);
-    } else {
-        setDirection(Direction::RIGHT);
-    }
-
-    playAnimate();
 }
 
 void Player::shoot() {
@@ -464,8 +473,66 @@ void Player::_shoot(Bullet* bullet) {
 }
 
 void Player::disBlood() {
-    if (_isInvincible)
-        return;
+    _blood--;
+
+    if (_blood > 0) {
+        showAttackedEffect();
+        changeBloodRing();
+    } else {
+        _detachBullets(); // 让已发射的子弹可以继续有效
+
+        if (_joinedCamp->requestLifeOk()) {
+            showDeadEffect();
+            returnToCamp();
+            // 回到出生点, TODO: show waiting message at window top
+            scheduleOnce(CC_SCHEDULE_SELECTOR(Player::birthScheduler), 2.0f);
+            printf(">>> player/enemy dead, wait 2 seconds to rebirth\n");
+        } else {
+            if (_ai) {
+                _ai->stop();
+            }
+            exitCamp(); // 移除该坦克
+            //MapLayer::getInstance()->removeAndUnmanageBlock(this);
+            removeFromBattlefield();
+            showKickoutEffect();
+            printf(">>> player/enemy dead, have no more life, kickout\n");
+        }
+    }
+}
+
+void Player::returnToCamp() {
+    setVisible(false);
+    setPosition(_joinedCamp->getPosition());
+}
+
+void Player::removeFromBattlefield() {
+    setVisible(false);
+    MapLayer::getInstance()->unmanageBlock(this);
+}
+
+void Player::addToBattlefield() {
+    setVisible(true);
+    MapLayer::getInstance()->manageBlock(this);
+}
+
+void Player::showAttackedEffect() {
+    // TODO: freeze the player one second
+    showDeadEffect();
+}
+
+void Player::changeBloodRing() {
+    printf(">>> player/enemy disblood, replace blood ring\n");
+    auto spriteFrameName = StringUtils::format("player-blood-ring-3-%d", _blood);
+    _bloodRing->initWithSpriteFrameName(spriteFrameName);
+}
+
+void Player::showDeadEffect() {
+    // 播放音效
+    if (_isHost) {
+        AudioEngine::play2d("music/player_bomb.mp3");
+    } else {
+        AudioEngine::play2d("music/enemy-bomb.mp3");
+    }
 
     auto spriteFrameCache = SpriteFrameCache::getInstance();
     Vector<SpriteFrame*> spriteFrames;
@@ -478,42 +545,25 @@ void Player::disBlood() {
 
     // TODO 每次死亡都重新构造动画
     auto blastAnimation = Animation::createWithSpriteFrames(spriteFrames, 0.1f);
-    auto blastanimate = Animate::create(blastAnimation);
+    auto blastAnimate = Animate::create(blastAnimation);
 
     // 播放动画
     auto mapLayer = MapLayer::getInstance();
     auto node = Sprite::create();
     mapLayer->addNode(node);
     node->setPosition(getPosition());
-    node->runAction(Sequence::create(blastanimate,
+    node->runAction(Sequence::create(blastAnimate,
                 CallFunc::create([node] {node->removeFromParentAndCleanup(true); }),
                 nullptr));
+}
 
-    if (--_blood == 0) {
-        // 播放音效
-        if (_isHost) {
-            AudioEngine::play2d("music/player_bomb.mp3");
-        } else {
-            AudioEngine::play2d("music/enemy-bomb.mp3");
-        }
-        // 移除该坦克
-        exitCamp();
-        _detachBullets(); // 让已发射的子弹可以继续有效
-        MapLayer::getInstance()->removeAndUnmanageBlock(this);
-        printf(">>> player/enemy removed\n");
-    } else {
-        if (_isHost) {
-            // 播放动画
-            _isInvincible = true; // 防止掉血
-            // 回到出生点, TODO: 等待N秒钟再重生
-            setInitialDirection();
-            setInitialPosition();
-            birth("player_avatar");
-        }
-    }
+void Player::showKickoutEffect() {
 }
 
 void Player::handleBeAttacked(const Weapon* weapon) {
+    if (_isInvincible)
+        return;
+
     disBlood();
     auto enemy = dynamic_cast<const Player*>(weapon->getCreator());
     if (!enemy) {
@@ -544,19 +594,19 @@ void Player::joinCamp(Camp* camp) {
     }
     _joinedCamp = camp;
 
-    setInitialPosition();
+    //setInitialPosition();
 }
 
 void Player::exitCamp() {
     if (_joinedCamp) {
         _joinedCamp->removePlayer(id());
-        _joinedCamp = nullptr;
+        _joinedCamp = MapLayer::getInstance()->getPublicCamp();
     }
 }
 
 void Player::addEnemyCamp(Camp* camp) {
     _joinedCamp->addEnemyCamp(camp);
-    setInitialDirection();
+    //setInitialDirection();
 }
 
 const Map<int, Camp*>& Player::getEnemyCamps() const {
@@ -570,7 +620,7 @@ bool Player::isFreeMan() const {
 
 bool Player::hasTeammates() const {
     //return _joinedCamp && _joinedCamp->count() > 1;
-    return true; // just for test
+    return true; // FIXME: just for test
 }
 
 void Player::onBeCollided(Block* activeBlock) {
@@ -617,10 +667,8 @@ void Player::onCollidedWith(Vector<Block*>& withBlocks) {
             break;  // 如果碰到一个障碍物就不能前进
         }
     }
-    if (!_isHost) {
-        // 敌方坦克碰撞后可以改变方向
-        _moveDistance = Player::MAX_MOVING_DISTANCE;
-        changeEnemyDirection();
+    if (_ai) {
+        _ai->handleCollidedWith(withBlocks);
     }
 }
 

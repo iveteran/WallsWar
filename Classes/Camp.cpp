@@ -39,11 +39,14 @@ Player* Camp::addHost() {
     auto user = User::create();
     _host = addPlayer(user);
     _host->allowCameraFollows();
+    _remainPlayers = 3;
     return _host;
 }
 
 Player* Camp::addPlayer(ActorController* controller) {
-    auto player = Player::create(controller);
+    if (_remainPlayers <= 0) return nullptr;
+
+    auto player = Player::create(this, controller);
     addPlayer(player);
 
     MapLayer::getInstance()->addAndManageBlock(player);
@@ -52,13 +55,12 @@ Player* Camp::addPlayer(ActorController* controller) {
 }
 
 void Camp::addPlayer(Player* player) {
-    player->joinCamp(this);
     _players.insert(player->id(), player);
     _remainPlayers--;
 }
 
 void Camp::removePlayer(Player* player) {
-    player->exitCamp();
+    removePlayer(player->id());
 }
 
 void Camp::removePlayer(int playerId) {
@@ -89,8 +91,13 @@ void Camp::addEnemyCamp(Camp* camp) {
     //camp->setEnemyCamp(this);
 }
 
+bool Camp::requestLifeOk() {
+    printf("_remainPlayers: %d\n", _remainPlayers);
+    return _remainPlayers > 0 ? (_remainPlayers--, true) : false;
+}
+
 bool Camp::isLost() const {
-    return !isCampOk || (_players.empty() && _remainPlayers == 0);
+    return !isCampOk || (_players.empty() && _remainPlayers <= 0);
 }
 
 bool Camp::isWin() const {
@@ -111,10 +118,10 @@ void Camp::showLostAnimate() {
     campLost->getTexture()->setAliasTexParameters();
     MapLayer::getInstance()->addNode(campLost);
     campLost->setPosition(-campLost->getContentSize().width / 2, getPosition().y);
-    printf(">> camp lost position: (%f, %f)\n", campLost->getPosition().x, campLost->getPosition().y);
+    printf(">> camp lost, position: (%f, %f)\n", campLost->getPosition().x, campLost->getPosition().y);
 
     auto moveTo = MoveTo::create(1.0f, getPosition());
-    printf(">> camp lost move to: (%f, %f)\n", getPosition().x, getPosition().y);
+    printf(">> camp lost, move to: (%f, %f)\n", getPosition().x, getPosition().y);
     campLost->runAction(Sequence::create(moveTo, 
                 DelayTime::create(1.0f),
                 CallFunc::create([campLost](){campLost->removeFromParent();}), 
