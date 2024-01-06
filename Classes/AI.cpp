@@ -24,6 +24,7 @@ bool PlayerAI::init(Player* player) {
 }
 
 void PlayerAI::run() {
+    _player->startMove();
     enableAutoControl();
 }
 
@@ -36,7 +37,7 @@ void PlayerAI::update(float dt) {
 
 void PlayerAI::enableAutoControl(bool enable) {
     if (enable) {
-        schedule(CC_SCHEDULE_SELECTOR(PlayerAI::autoControlDirection), 0.1f);
+        schedule(CC_SCHEDULE_SELECTOR(PlayerAI::autoControlDirection), 5.0f);
         schedule(CC_SCHEDULE_SELECTOR(PlayerAI::autoControlShoot), 0.5f);
     } else {
         unschedule(CC_SCHEDULE_SELECTOR(PlayerAI::autoControlDirection));
@@ -45,8 +46,24 @@ void PlayerAI::enableAutoControl(bool enable) {
 }
 
 void PlayerAI::autoControlDirection(float dt) {
-    _player->changeEnemyDirection();
-    _player->startMove();
+    changeDirectionRandomly();
+}
+
+void PlayerAI::changeDirectionRandomly() {
+    auto select = RandomUtil::random(1, 10);
+    if (select <= 4) {
+        _player->setDirection(Direction::DOWN);
+    } else if (select <= 6) {
+        _player->setDirection(Direction::UP);
+    } else if (select <= 8) {
+        _player->setDirection(Direction::LEFT);
+    } else {
+        _player->setDirection(Direction::RIGHT);
+    }
+}
+
+void PlayerAI::handleCollidedWith(Vector<Block*>& withBlocks) {
+    changeDirectionRandomly();
 }
 
 void PlayerAI::autoControlShoot(float) {

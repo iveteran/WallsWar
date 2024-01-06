@@ -2,6 +2,9 @@
 
 #include "ActorController.h"
 
+using cocos2d::Vector;
+
+class Block;
 class Player;
 class Npc;
 class Camp;
@@ -25,10 +28,13 @@ public:
     virtual void run() override;
     virtual void stop() override;
 
+    void handleCollidedWith(Vector<Block*>& withBlocks);
+
 protected:
     void update(float dt);
     void enableAutoControl(bool enable=true);
     void autoControlDirection(float);
+    void changeDirectionRandomly();
     void autoControlShoot(float);
 
 private:
