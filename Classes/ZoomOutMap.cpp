@@ -126,7 +126,7 @@ void ZoomOutMap::addMaster() {
 }
 
 void ZoomOutMap::addCampus() {
-    if (!_player) {
+    if (!_player || !_player->getCamp()) {
         return;
     }
     ZoomOutEntity* zoEntity = nullptr;

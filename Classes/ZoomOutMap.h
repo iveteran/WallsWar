@@ -45,6 +45,7 @@ public:
     virtual bool init() override;
 
     void attachPlayer(Player* player) { _player = player; }
+    void detachPlayer() { _player = nullptr; }
     void addEntity(ZoomOutEntity* entity);
     void addMaster();
     void addCampus();
