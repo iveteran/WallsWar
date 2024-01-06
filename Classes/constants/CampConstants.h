@@ -5,6 +5,10 @@
 
 constexpr float CAMP_SIZE = BLOCK_SIZE * 2;
 
+// 地图中间
+constexpr float PUBLIC_CAMP_X = CENTER_WIDTH / 2;
+constexpr float PUBLIC_CAMP_Y = CENTER_HEIGHT / 2;
+
 // 左下角
 constexpr float CAMP_X = CAMP_SIZE / 2;
 constexpr float CAMP_Y = CAMP_SIZE / 2;

@@ -366,6 +366,9 @@ void MapLayer::resetMap() {
 }
 
 void MapLayer::createCamps() {
+    auto publicCampPos = Vec2(PUBLIC_CAMP_X, PUBLIC_CAMP_Y); // 地图中间
+    _publicCamp = createCamp(publicCampPos);
+
     auto campPos = Vec2(CAMP_X, CAMP_Y); // 左下角
     _camp = createCamp(campPos);
     _player1 = _camp->addHost();
@@ -384,6 +387,10 @@ Camp* MapLayer::createCamp(const Vec2& pos) {
     addAndManageBlock(camp);
     createCampusParapetWall(camp);
     return camp;
+}
+
+Camp* MapLayer::getPublicCamp() const {
+    return _publicCamp;
 }
 
 Camp* MapLayer::getCamp() const {

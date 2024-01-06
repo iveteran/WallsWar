@@ -44,6 +44,7 @@ public:
 
     void createCamps();
     Camp* createCamp(const Vec2& pos);
+    Camp* getPublicCamp() const;
     Camp* getCamp() const;
     Camp* getEnemyCamp() const;
     void createCampusParapetWall(const Camp* camp);
@@ -109,6 +110,7 @@ private:
 
     std::string _mapData;                               // 地图数据
 
+    Camp* _publicCamp = nullptr;
     Camp* _camp = nullptr;
     Camp* _enemyCamp = nullptr;
     Player* _player1 = nullptr;
