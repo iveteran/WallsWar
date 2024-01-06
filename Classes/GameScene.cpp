@@ -38,6 +38,8 @@ bool GameScene::init() {
     if (!Scene::init())
         return false;
 
+    initSpriteFrameCache();
+
     // 播放开始音乐
     /*AudioEngine::setFinishCallback(AudioEngine::play2d("music/start.mp3"),
         [](int, const std::string &) {
@@ -221,6 +223,7 @@ void GameScene::_gameover(float) {
         ));
 }
 
+/*
 void GameScene::updateInformationArea(bool first) {
     static std::vector<Sprite*> sprites;
     if (first) {
@@ -248,8 +251,10 @@ void GameScene::updateInformationArea(bool first) {
     }
 
 }
+*/
 
 void GameScene::initSpriteFrameCache() {
+    /*
     auto spriteFrameCache = SpriteFrameCache::getInstance();
 
     spriteFrameCache->addSpriteFrame(Sprite::create("images/enemytank-ico.png")->getSpriteFrame(), "enemy_icon");
@@ -257,5 +262,6 @@ void GameScene::initSpriteFrameCache() {
     spriteFrameCache->addSpriteFrame(Sprite::create("images/2P.png")->getSpriteFrame(), "2p");
     spriteFrameCache->addSpriteFrame(Sprite::create("images/playertank-ico.png")->getSpriteFrame(), "player_icon");
     spriteFrameCache->addSpriteFrame(Sprite::create("images/flag.png")->getSpriteFrame(), "flag");
-
+    */
+    MapLayer::initSpriteFrameCache();
 }

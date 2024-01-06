@@ -34,6 +34,8 @@ class MapLayer : public LayerColor {
 public:
     bool init() override;
 
+    static void initSpriteFrameCache();             // 加载精灵帧缓存
+
     static MapLayer* getInstance();                 // 得到地图图层实例
 
     //void loadCamp();
@@ -98,8 +100,6 @@ private:
         const Vec2& origin, float sideLength, const BlockTypeSet& btSet,
         const BlockPositionFilter& positionFilter,
         const XYAxisBlock& xyAxisBlock);
-
-    void initSpriteFrameCache();                   // 加载精灵帧缓存
 
 private:
     FloorXYAxisBlockMap _floorPosBlocks;

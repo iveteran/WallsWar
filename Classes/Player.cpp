@@ -86,6 +86,8 @@ void Player::initSpriteFrameCache() {
 
     spriteFrameCache->addSpriteFrame(ring_0, "ring_0");
     spriteFrameCache->addSpriteFrame(ring_1, "ring_1");
+
+    loadFrameAnimation();
 }
 
 void Player::loadFrameAnimation() {
