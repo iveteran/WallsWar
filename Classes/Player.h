@@ -48,7 +48,7 @@ public:
 
     bool isHost() const { return _isHost; }
     //void setHost() { _isHost = true; }
-    void moveCamaraToCamp();
+    void moveCameraToPlayer();
 
     bool beControlledByAI(const AI* ai);
     bool beControlledByUser(const User* user);

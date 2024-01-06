@@ -306,50 +306,50 @@ void Player::birth(const std::string& frameName) {
             beInvincible(3);
             _canMove = true;
             if (_isHost) {
-                moveCamaraToCamp();
+                moveCameraToPlayer();
             }
         }),
         nullptr
     ));
 }
 
-void Player::moveCamaraToCamp() {
+void Player::moveCameraToPlayer() {
     auto camera = Camera::getDefaultCamera();
     auto originCameraPos = camera->getPosition();
-    printf(">> camera pos: (%f, %f)\n", originCameraPos.x, originCameraPos.y);
+    printf(">> [moveCameraToPlayer] camera pos: (%f, %f)\n", originCameraPos.x, originCameraPos.y);
     auto cameraPos = convertToMapPosition(originCameraPos);
-    printf(">> camera pos for map: (%f, %f)\n", cameraPos.x, cameraPos.y);
+    printf(">> [moveCameraToPlayer] camera pos for map: (%f, %f)\n", cameraPos.x, cameraPos.y);
 
-    auto campPos = _joinedCamp->getPosition();
-    printf(">> camp pos: (%f, %f)\n", campPos.x, campPos.y);
+    auto playerPos = getPosition();
+    printf(">> [moveCameraToPlayer] player pos: (%f, %f)\n", playerPos.x, playerPos.y);
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     float xOffset = 0, yOffset = 0;
-    if (cameraPos.x > campPos.x) {
-        xOffset = cameraPos.x - campPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
-        xOffset += std::min(campPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
+    if (cameraPos.x > playerPos.x) {
+        xOffset = cameraPos.x - playerPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
+        xOffset += std::min(playerPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
         xOffset = xOffset > 0 ? xOffset * -1 : 0;
     } else {
-        xOffset = campPos.x - cameraPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
-        xOffset += std::min(CENTER_WIDTH - campPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
+        xOffset = playerPos.x - cameraPos.x - visibleSize.width / 2 + Camp::SIZE  / 2;
+        xOffset += std::min(CENTER_WIDTH - playerPos.x - Camp::SIZE / 2, movingMinBoundaryGap);
         xOffset = xOffset > 0 ? xOffset : 0;
     }
-    if (cameraPos.y > campPos.y) {
-        yOffset = cameraPos.y - campPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
-        yOffset += std::min(campPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
+    if (cameraPos.y > playerPos.y) {
+        yOffset = cameraPos.y - playerPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
+        yOffset += std::min(playerPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
         yOffset = yOffset > 0 ? yOffset * -1 : 0;
     } else {
-        yOffset = campPos.y - cameraPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
-        yOffset += std::min(CENTER_HEIGHT - campPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
+        yOffset = playerPos.y - cameraPos.y - visibleSize.height / 2 + Camp::SIZE / 2;
+        yOffset += std::min(CENTER_HEIGHT - playerPos.y - Camp::SIZE / 2, movingMinBoundaryGap);
         yOffset = yOffset > 0 ? yOffset : 0;
     }
 
-    printf(">> offset: (%f, %f)\n", xOffset, yOffset);
+    printf(">> [moveCameraToPlayer] offset: (%f, %f)\n", xOffset, yOffset);
     if (xOffset != 0 || yOffset != 0 ) {
         // make moving effect
         float movingTime = std::max(abs(xOffset), abs(yOffset)) * 0.01f;
         movingTime = std::min(movingTime, 3.0f);
-        printf(">> movingTime: %f\n", movingTime);
+        printf(">> [moveCameraToPlayer] movingTime: %f\n", movingTime);
 
         camera->runAction(MoveBy::create(movingTime, Vec2(xOffset, yOffset)));
 
@@ -358,7 +358,7 @@ void Player::moveCamaraToCamp() {
             ctrlLayer->runAction(MoveBy::create(movingTime, Vec2(xOffset, yOffset)));
         }
 
-        CCLOG(">> [moveCamaraToCamp] camera move to position: (%f, %f)",
+        CCLOG(">> [moveCameraToPlayer] camera move to position: (%f, %f)",
                 camera->getPosition().x, camera->getPosition().y);
     }
 }
