@@ -12,6 +12,17 @@ USING_NS_CC;
 
 static MapLayer* _mapLayer = nullptr;
 
+void MapLayer::initSpriteFrameCache() {
+    // 方块
+    Block::initSpriteFrameCache();
+
+    // 子弹
+    Bullet::initSpriteFrameCache();
+
+    // 玩家
+    Player::initSpriteFrameCache();
+}
+
 bool MapLayer::init() {
     if (!LayerColor::init()) {
         return false;
@@ -25,9 +36,6 @@ bool MapLayer::init() {
     // 设置背景颜色为黑色
     //this->initWithColor(Color4B(0, 0, 0, 255));
 
-    // 加载精灵帧缓存
-    initSpriteFrameCache();
-
     return true;
 }
 
@@ -38,21 +46,6 @@ MapLayer* MapLayer::getInstance() {
     }
 
     return _mapLayer;
-}
-
-void MapLayer::initSpriteFrameCache() {
-    // 右侧信息区域
-    GameScene::initSpriteFrameCache();
-
-    // 方块
-    Block::initSpriteFrameCache();
-
-    // 子弹
-    Bullet::initSpriteFrameCache();
-
-    // 坦克
-    Player::initSpriteFrameCache();
-    Player::loadFrameAnimation();
 }
 
 bool MapLayer::addAndManageBlock(Block* block) {
