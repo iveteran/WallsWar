@@ -24,7 +24,7 @@ class ToggleButton;
 
 class Player;
 class Camp;
-
+class GameRuntime;
 
 struct GameInfo {
     int frames = 0;
@@ -124,6 +124,8 @@ protected:
 
     void pauseServerPlaying(const ToggleButton* sender);
     void startServerPlaying(const ToggleButton* sender);
+    void suspendGame();
+    void resumeGame();
 
     Text* createCustomizedLabel(const char* tag, const char* value, Layout* container);
     ImageView* createCustomizedIcon(const char* iconImg, Layout* container);
@@ -173,6 +175,7 @@ private:
     PlayerInfo _playerInfo;
     CampsInfo _campsInfo;
 
+    GameRuntime* _gameRuntime = nullptr;
     bool _isGameSuspended = false;
 
     targetClickedCallback _openSettingsCallback = nullptr;

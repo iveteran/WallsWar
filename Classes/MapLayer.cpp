@@ -3,6 +3,7 @@
 #include "Block.h"
 #include "Bullet.h"
 #include "GameScene.h"
+#include "GameCard.h"
 #include "Camp.h"
 #include "constants/CampConstants.h"
 
@@ -366,15 +367,19 @@ void MapLayer::resetMap() {
 }
 
 void MapLayer::createCamps() {
+    _camps.clear();
+
     auto publicCampPos = Vec2(PUBLIC_CAMP_X, PUBLIC_CAMP_Y); // 地图中间
     _publicCamp = createCamp(publicCampPos);
 
     auto campPos = Vec2(CAMP_X, CAMP_Y); // 左下角
     _camp = createCamp(campPos);
+    _camps.pushBack(_camp);
     _player1 = _camp->addHost();
 
     auto enemyCampPos = Vec2(ENEMY_CAMP_X, ENEMY_CAMP_Y); // 右上角
     _enemyCamp = createCamp(enemyCampPos);
+    _camps.pushBack(_enemyCamp);
     _enemyCamp->enableAI();
 
     _camp->addEnemyCamp(_enemyCamp);
@@ -387,6 +392,11 @@ Camp* MapLayer::createCamp(const Vec2& pos) {
     addAndManageBlock(camp);
     createCampusParapetWall(camp);
     return camp;
+}
+
+const Vector<Camp*>
+MapLayer::getCamps() const {
+    return _camps;
 }
 
 Camp* MapLayer::getPublicCamp() const {
@@ -532,11 +542,15 @@ void MapLayer::loadLevelData(short stage) {
     // 清理工作
     resetMap();
 
-    // 添加大本营
-    createCamps();
-
     // 加载地图
     loadMapData();
+
+    // 添加大本营
+    createCamps();
+}
+
+void MapLayer::loadGame(GameRuntime* gameRuntime) {
+    loadLevelData(gameRuntime->getStage());
 }
 
 const std::string&

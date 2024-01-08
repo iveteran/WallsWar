@@ -70,7 +70,7 @@ bool GameCard::init(NetworkingMode nm, GameEndpoint ep,
             case Widget::TouchEventType::ENDED:
                 printf("GameCard running button clicked\n");
                 if (_story->isSubscribed()) {
-                    Director::getInstance()->pushScene(GameScene::createScene());
+                    Director::getInstance()->pushScene(GameScene::create(GameRuntime::create(this)));
                 }
                 break;
             default:
@@ -95,7 +95,7 @@ bool GameCard::init(NetworkingMode nm, GameEndpoint ep,
                 break;
             case Widget::TouchEventType::ENDED:
                 printf("GameCard joining button clicked\n");
-                //Director::getInstance()->pushScene(GameScene::createScene());
+                //Director::getInstance()->pushScene(GameScene::create(GameRuntime::create(this)));
                 break;
             default:
                 break;
@@ -114,7 +114,7 @@ bool GameCard::init(NetworkingMode nm, GameEndpoint ep,
                 break;
             case Widget::TouchEventType::ENDED:
                 printf("GameCard watching button clicked\n");
-                //Director::getInstance()->pushScene(GameScene::createScene());
+                //Director::getInstance()->pushScene(GameScene::create(GameRuntime::create(this)));
                 break;
             default:
                 break;
@@ -127,4 +127,22 @@ bool GameCard::init(NetworkingMode nm, GameEndpoint ep,
     addChild(descriptionText);
 
     return true;
+}
+
+GameRuntime* GameRuntime::create(GameCard* gameCard) {
+    auto *pRet = new(std::nothrow) GameRuntime();
+    if (pRet && pRet->init()) {
+        pRet->_gameCard = gameCard;
+        pRet->autorelease();
+        return pRet;
+    } else {
+        delete pRet;
+        return nullptr;
+    }
+}
+
+void GameRuntime::saveCheckPoint() {
+}
+
+void GameRuntime::loadCheckPoint() {
 }

@@ -2,6 +2,10 @@
 
 static const double PI = 3.141592654;
 
+Vec2 convertToNodeLocation(const Vec2& point, const Vec2& originPoint) {
+    return Vec2(point.x - originPoint.x, point.y - originPoint.y);
+}
+
 float degreeToRadians(float degrees) {
     return (degrees * PI) / 180;
 }

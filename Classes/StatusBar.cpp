@@ -2,6 +2,7 @@
 #include "Camp.h"
 #include "Player.h"
 #include "GameScene.h"
+#include "GameCard.h"
 #include "ControlLayer.h"
 #include "constants/MapConstants.h"
 
@@ -335,9 +336,7 @@ void StatusBar::createServerPlayingButton(Layout* parentLayout) {
     parentLayout->addChild(toggleButton);
 
     if (_isGameSuspended) {
-        // TODO: reload game
-        Director::getInstance()->pushScene(GameScene::createScene());
-        _isGameSuspended = false;
+        resumeGame();
     }
 }
 
@@ -346,10 +345,22 @@ void StatusBar::pauseServerPlaying(const ToggleButton* sender) {
     GET_CONTROL_LAYER()->addNotice("Game server paused", NoticeLevel::WARNING);
 
     if (!_isGameSuspended) {
-        // TODO: save/suspend game
-        Director::getInstance()->popScene();
-        _isGameSuspended = true;
+        suspendGame();
     }
+}
+
+void StatusBar::suspendGame() {
+    _isGameSuspended = true;
+    auto gameScene = dynamic_cast<GameScene*>(Director::getInstance()->getRunningScene());
+    _gameRuntime = gameScene->getGameRuntime();
+    _gameRuntime->saveCheckPoint();
+    Director::getInstance()->popScene();
+}
+
+void StatusBar::resumeGame() {
+    _isGameSuspended = false;
+    _gameRuntime->loadCheckPoint();
+    Director::getInstance()->pushScene(GameScene::create(_gameRuntime));
 }
 
 void StatusBar::startServerPlaying(const ToggleButton* sender) {

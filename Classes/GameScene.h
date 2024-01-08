@@ -5,11 +5,12 @@
 class Player;
 class ControlLayer;
 class MapLayer;
+class GameRuntime;
 class Camp;
 
 class GameScene : public cocos2d::Scene {
 public:
-    static cocos2d::Scene* createScene();
+    static GameScene* create(GameRuntime* gameRuntime);
 
     ~GameScene();
     bool init() override;
@@ -24,29 +25,15 @@ public:
     Player* getPlayer1() const { return _player1; }
     ControlLayer* getControlLayer() const { return _ctrlLayer; }
     MapLayer* getMapLayer() const { return _map; }
+    GameRuntime* getGameRuntime() { return _gameRuntime; }
 
-    static GameScene* create(int stage = 1) {
-        auto* pRet = new(std::nothrow) GameScene();
-        if (pRet) {
-            pRet->stage = stage;
-            if (pRet->init()) {
-                pRet->autorelease();
-                return pRet;
-            }
-        }
-
-        delete pRet;
-        pRet = nullptr;
-
-        return nullptr;
-    }
-
-    short stage = 1;                                          // 当前关卡
+    //short stage = 1;                                          // 当前关卡
 
 private:
     ControlLayer* _ctrlLayer = nullptr;                      // 游戏控制、信息和状态显示
     MapLayer* _map = nullptr;                                // 管理地图
     Player* _player1 = nullptr;
+    GameRuntime* _gameRuntime = nullptr;
 
     void _printGameInfo();
     //void _showLoadAnimate();                                 // 展示载入关卡动画
@@ -54,6 +41,7 @@ private:
     void _initControlLayer();
     void _checkGameStatus(float);                            // 检查游戏状态
     void _gameover(float);                                   // 游戏结束动画
+    void _gamewin(float);
 };
 
 inline Player* GET_PLAYER1() {

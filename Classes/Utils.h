@@ -4,6 +4,7 @@
 
 USING_NS_CC;
 
+Vec2 convertToNodeLocation(const Vec2& point, const Vec2& originPoint);
 float degreeToRadians(float degrees);
 float radiansToDegree(float radians);
 bool isPointInCircle(const Vec2& center, float radius, const Vec2& point);

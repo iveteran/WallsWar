@@ -1,12 +1,13 @@
 #pragma once
 
 #include "cocos2d.h"
-#include "Block.h"
 #include "Vec2Hash.h"
 
+#include "Block.h"
 #include "constants/MapConstants.h"
 #include "Direction.h"
 #include "Utils.h"
+#include "Camp.h"
 
 #include <map>
 #include <string>
@@ -29,6 +30,7 @@ using BlockPositionFilter = std::function<bool(const Vec2&)>;
 class MovableBlock;
 class Camp;
 class Player;
+class GameRuntime;
 
 class MapLayer : public LayerColor {
 public:
@@ -41,8 +43,10 @@ public:
     //void loadCamp();
     bool loadMapData();
     void loadLevelData(short stage);                // 加载指定关卡的数据
+    void loadGame(GameRuntime* gameRuntime);
 
     void createCamps();
+    const Vector<Camp*> getCamps() const;
     Camp* createCamp(const Vec2& pos);
     Camp* getPublicCamp() const;
     Camp* getCamp() const;
@@ -113,5 +117,6 @@ private:
     Camp* _publicCamp = nullptr;
     Camp* _camp = nullptr;
     Camp* _enemyCamp = nullptr;
+    Vector<Camp*> _camps;
     Player* _player1 = nullptr;
 };

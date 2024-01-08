@@ -2,20 +2,33 @@
 
 #include "AudioEngine.h"
 #include "MenuScene.h"
-#include "GameOverScene.h"
+#include "GameFinishScene.h"
 #include "NumberUtil.h"
 
 #include "GameScene.h"
 #include "MapLayer.h"
 #include "Camp.h"
 #include "ControlLayer.h"
+#include "GameCard.h"
 #include "constants/SceneConstants.h"
 
 USING_NS_CC;
 
-Scene* GameScene::createScene() {
-    CCLOG("-------- GameScene::createScene -----------");
-    return GameScene::create();
+GameScene* GameScene::create(GameRuntime* gameRuntime) {
+    CCLOG("-------- GameScene::create -----------");
+
+    auto* pRet = new(std::nothrow) GameScene();
+    if (pRet) {
+        //pRet->stage = stage;
+        pRet->_gameRuntime = gameRuntime;
+        if (pRet->init()) {
+            pRet->autorelease();
+            return pRet;
+        }
+    }
+    delete pRet;
+
+    return nullptr;
 }
 
 GameScene::~GameScene() {
@@ -155,7 +168,8 @@ void GameScene::_initMapLayer() {
     addChild(_map);
 
     // 加载地图数据
-    _map->loadLevelData(stage);
+    //_map->loadLevelData(stage);
+    _map->loadGame(_gameRuntime);
     _player1 = _map->getPlayer1();
     if (_ctrlLayer) {
         _ctrlLayer->attachPlayer(_player1);
@@ -181,7 +195,7 @@ void GameScene::update(float dt) {
 void GameScene::_checkGameStatus(float dt) {
     //CCLOG("GameScene::_checkGameStatus dt: %f", dt);
     // 停止所有音乐
-    //AudioEngine::stopAll();
+    AudioEngine::stopAll();
     if (!_map || !_map->getCamp()) {
         return;
     }
@@ -192,14 +206,12 @@ void GameScene::_checkGameStatus(float dt) {
         unscheduleAllCallbacks();
         _eventDispatcher->removeAllEventListeners();
 
+        _gameRuntime->setStatus(GameStatus::FAILURE);
         scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::_gameover), 2.0f);
     } else if (_map->getCamp()->isWin()) {
         // 进入结算场景
-        cleanup();
-        removeAllChildrenWithCleanup(true);
-
-        auto scene = GameScene::create((this->stage + 1) % (STAGE_COUNT + 1));
-        Director::getInstance()->replaceScene(scene);
+        _gameRuntime->setStatus(GameStatus::WIN);
+        scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::_gamewin), 2.0f);
     }
 }
 
@@ -217,10 +229,17 @@ void GameScene::_gameover(float) {
             cleanup();
             removeAllChildrenWithCleanup(true);
 
-            Director::getInstance()->replaceScene(GameOverScene::createScene());
+            Director::getInstance()->replaceScene(GameFinishScene::create(_gameRuntime));
         }),
         nullptr
         ));
+}
+
+void GameScene::_gamewin(float) {
+    cleanup();
+    removeAllChildrenWithCleanup(true);
+
+    Director::getInstance()->replaceScene(GameFinishScene::create(_gameRuntime));
 }
 
 /*

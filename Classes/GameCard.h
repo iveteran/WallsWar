@@ -28,13 +28,17 @@ enum class GameEndpoint {
     REMOTE,
 };
 
+enum class GameStatus {
+    FAILURE,
+    WIN,
+    RUNNING,
+};
+
 class GameCard : public Layout {
 public:
     static GameCard* createDemo(NetworkingMode nm, GameEndpoint ep);
 
     static GameCard* create(NetworkingMode nm, GameEndpoint ep,
-            Story* story, float width, float height);
-    bool init(NetworkingMode nm, GameEndpoint ep,
             Story* story, float width, float height);
 
     NetworkingMode getNetworkingMode() const { return _networkingMode; }
@@ -42,6 +46,8 @@ public:
     const Story* getStory() const { return _story; }
 
 protected:
+    bool init(NetworkingMode nm, GameEndpoint ep,
+            Story* story, float width, float height);
     void obtainGameServerInfo();
     void downloadStoryLine();
 
@@ -50,4 +56,27 @@ private:
     GameEndpoint _endpoint;
     Story* _story = nullptr;
     GameServer* _gameServer = nullptr;
+};
+
+class GameRuntime : public Ref {
+public:
+    static GameRuntime* create(GameCard* gameCard);
+    virtual bool init() { return true; }
+
+    const GameCard* getGameCard() const { return _gameCard; }
+    const Story* getStory() const { return _gameCard->getStory(); }
+
+    int getStage() const { return _stage; }
+    void setStage(int stage) { _stage = stage; }
+
+    GameStatus getStatus() const { return _status; }
+    void setStatus(GameStatus status) { _status = status; }
+
+    void saveCheckPoint();
+    void loadCheckPoint();
+
+private:
+    GameCard* _gameCard = nullptr;
+    int _stage = 1;
+    GameStatus _status;
 };
