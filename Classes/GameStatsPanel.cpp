@@ -135,21 +135,27 @@ Layout* GameStatsPanel::buildCampStatsCard(const Camp* camp, const Size& cardSiz
 
     auto players = camp->getPlayers();
     printf(">>> num players: %d\n", players.size());
+
+    auto caption = StringUtils::format("camp: %s, players: %d", camp->getName().c_str(), players.size());
+    auto captionLabel = Text::create(caption, defaultFont, defaultFontSize);
+    captionLabel->setLayoutParameter(lp->clone());
+    campStatsCard->addChild(captionLabel);
+
     if (players.size() > 0) {
         for (auto iter : players) {
             auto player = iter.second;
-            auto rowString = StringUtils::format("score: %d", player->getScore());
+            auto rowString = StringUtils::format("player: %d, score: %d", player->id(), player->getScore());
             auto itemLabel = Text::create(rowString, defaultFont, defaultFontSize);
             itemLabel->setLayoutParameter(lp->clone());
             campStatsCard->addChild(itemLabel);
         }
     } else {
-        auto rowString = StringUtils::format("score: %d", 1024);
+        auto rowString = StringUtils::format("player: 1, score: %d", 1024);
         auto itemLabel = Text::create(rowString, defaultFont, defaultFontSize);
         itemLabel->setLayoutParameter(lp->clone());
         campStatsCard->addChild(itemLabel);
 
-        auto rowString2 = StringUtils::format("score: %d", 2048);
+        auto rowString2 = StringUtils::format("player: 2, score: %d", 2048);
         auto itemLabel2 = Text::create(rowString2, defaultFont, defaultFontSize);
         itemLabel2->setLayoutParameter(lp->clone());
         campStatsCard->addChild(itemLabel2);

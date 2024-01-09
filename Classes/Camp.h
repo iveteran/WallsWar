@@ -5,6 +5,8 @@
 //constexpr unsigned char ENEMIES_COUNT = 20;
 constexpr unsigned char ENEMIES_COUNT = 6;
 
+using std::string;
+
 class ActorController;
 class CampAI;
 
@@ -14,11 +16,11 @@ public:
     static const constexpr char* UIIcon = "images/block-icon-camp.png";
 
     static void initSpriteFrameCache();
-    CREATE_FUNC(Camp);
+    static Camp* create(const char* name, const Vec2& pos);
 
 public:
-    bool init() override;
     BlockType getType() const override { return BlockType::CAMP; }
+    const string& getName() const { return _name; }
 
     virtual std::string getSpriteFrameName() const override { return "camp_0"; }
 
@@ -43,7 +45,11 @@ public:
     bool isWin() const;
     void showLostAnimate();
 
+protected:
+    bool init(const char* name, const Vec2& pos);
+
 private:
+    string _name;
     int _remainPlayers = ENEMIES_COUNT;       // 剩余未出生的敌方坦克
     Map<int, Camp*> _enemyCamps;
     bool _joinedBattle = false;

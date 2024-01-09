@@ -370,15 +370,15 @@ void MapLayer::createCamps() {
     _camps.clear();
 
     auto publicCampPos = Vec2(PUBLIC_CAMP_X, PUBLIC_CAMP_Y); // 地图中间
-    _publicCamp = createCamp(publicCampPos);
+    _publicCamp = createCamp("Public", publicCampPos);
 
     auto campPos = Vec2(CAMP_X, CAMP_Y); // 左下角
-    _camp = createCamp(campPos);
+    _camp = createCamp("Host", campPos);
     _camps.pushBack(_camp);
     _player1 = _camp->addHost();
 
     auto enemyCampPos = Vec2(ENEMY_CAMP_X, ENEMY_CAMP_Y); // 右上角
-    _enemyCamp = createCamp(enemyCampPos);
+    _enemyCamp = createCamp("Enemy", enemyCampPos);
     _camps.pushBack(_enemyCamp);
     _enemyCamp->enableAI();
 
@@ -386,9 +386,8 @@ void MapLayer::createCamps() {
     _player1->addEnemyCamp(_enemyCamp);
 }
 
-Camp* MapLayer::createCamp(const Vec2& pos) {
-    auto camp = Camp::create();
-    camp->setPosition(pos);
+Camp* MapLayer::createCamp(const char* name, const Vec2& pos) {
+    auto camp = Camp::create(name, pos);
     addAndManageBlock(camp);
     createCampusParapetWall(camp);
     return camp;
@@ -403,7 +402,7 @@ Camp* MapLayer::getPublicCamp() const {
     return _publicCamp;
 }
 
-Camp* MapLayer::getCamp() const {
+Camp* MapLayer::getHostCamp() const {
     return _camp;
 }
 

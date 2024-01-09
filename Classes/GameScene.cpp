@@ -196,19 +196,19 @@ void GameScene::_checkGameStatus(float dt) {
     //CCLOG("GameScene::_checkGameStatus dt: %f", dt);
     // 停止所有音乐
     AudioEngine::stopAll();
-    if (!_map || !_map->getCamp()) {
+    if (!_map || !_map->getHostCamp()) {
         return;
     }
-    if (_map->getCamp()->isLost()) {
+    if (_map->getHostCamp()->isLost()) {
         // 进入失败场景
-        _map->getCamp()->showLostAnimate();
+        _map->getHostCamp()->showLostAnimate();
 
         unscheduleAllCallbacks();
         _eventDispatcher->removeAllEventListeners();
 
         _gameRuntime->setStatus(GameStatus::FAILURE);
         scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::_gameover), 2.0f);
-    } else if (_map->getCamp()->isWin()) {
+    } else if (_map->getHostCamp()->isWin()) {
         // 进入结算场景
         _gameRuntime->setStatus(GameStatus::WIN);
         scheduleOnce(CC_SCHEDULE_SELECTOR(GameScene::_gamewin), 2.0f);

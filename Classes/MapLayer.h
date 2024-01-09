@@ -47,9 +47,9 @@ public:
 
     void createCamps();
     const Vector<Camp*> getCamps() const;
-    Camp* createCamp(const Vec2& pos);
+    Camp* createCamp(const char* name, const Vec2& pos);
     Camp* getPublicCamp() const;
-    Camp* getCamp() const;
+    Camp* getHostCamp() const;
     Camp* getEnemyCamp() const;
     void createCampusParapetWall(const Camp* camp);
 

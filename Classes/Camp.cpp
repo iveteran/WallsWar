@@ -18,11 +18,24 @@ void Camp::initSpriteFrameCache() {
     SpriteFrameCache::getInstance()->addSpriteFrame(camp_1, "camp_1");
 }
 
-bool Camp::init() {
+Camp* Camp::create(const char* name, const Vec2& pos) {
+    auto *pRet = new(std::nothrow) Camp();
+    if (pRet && pRet->init(name, pos)) {
+        pRet->autorelease();
+        return pRet;
+    } else {
+        delete pRet;
+        return nullptr;
+    }
+}
+
+bool Camp::init(const char* name, const Vec2& pos) {
     if (!Campus::init()) {
         return false;
     }
 
+    _name = name;
+    setPosition(pos);
     setFloor(Camp::DefaultFloor);
     initWithSpriteFrameName("camp_0");
 

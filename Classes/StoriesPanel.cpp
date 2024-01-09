@@ -72,6 +72,7 @@ Vector<Story*> StoriesPanel::loadStoriesFromPath(const char* path) {
 
 void StoriesPanel::addBattleCityStoryCard() {
     auto story = Story::create();
+    story->setId(Story::TANK_BATTLE_STORY_ID);
     story->setName("经典坦克大战");
     story->setCover("images/game-cover-battle-city.png");
     story->setDescription("80后的经典坦克大战");

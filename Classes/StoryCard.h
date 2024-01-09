@@ -54,10 +54,14 @@ private:
 
 class Story : public Ref {
 public:
+    static const int TANK_BATTLE_STORY_ID = 1024;
+
+public:
     CREATE_FUNC(Story);
     virtual bool init() { return true; }
 
     int getId() const { return _id; }
+    void setId(int id) { _id = id; }
 
     const string& getName() const { return _name; }
     void setName(const string& name) { _name = name; }
